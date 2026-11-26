@@ -21,6 +21,12 @@ and enjoy the meal.
    that prints the target, to the office's POKEY muzak. A job a day (left
    and right on the menu pick it): HELLO, a count, and a whole card of
    PONG. GO HOME (below the card) goes back to the menu.
+4. *The evening*: the 7800 homebrew forum, 40 columns with avatars. Read
+   the regulars' threads (clues, and a rumor about card readers), download
+   pixelkid_07's latest release, break it, and post a review built from
+   canned phrases: a complaint for each bug Arthur saw, and on day 3 a kind
+   option in every slot. A regular answers him. (Days 2 and 3's slop ROMs
+   aren't built yet: SUPER PADDLE BALL DELUXE stands in.)
 
 The menu shows how many POKEYs it found: the music plays on two, or falls
 back to lead, bass and drums on one. See [Concept.md](Concept.md)
@@ -36,6 +42,7 @@ tools/build.sh        # -> build/myac.a78
 tools/test_break.sh   # a bot breaks the slop ROM, headless (a7800 fork)
 tools/test_porch.sh   # a bot plays the porch (ONEPOKEY=1: one POKEY)
 tools/test_cards.sh   # GO HOME, a card punched by hand, days 2-3 Cloud Assisted
+tools/test_forum.sh   # read, download, break, review and post (days 1 and 3)
 ```
 
 The porch's controls: just the buttons. Arthur's aim swings across the
@@ -54,12 +61,17 @@ then `.venv/bin/python tools/gfx.py`.
 | `src/slop.bas` | SUPER PADDLE BALL DELUXE (bank 2) |
 | `src/porch.bas` | The porch and the rain (bank 3) |
 | `src/cards.bas`, `src/asm/cards.asm` | The day job: 320A, 40 columns, the card and its reader (bank 4) |
-| `tools/gfx.py` | The art, drawn as text, and the font |
+| `src/forum.bas`, `src/asm/forum.asm` | The evening: the forum and the review builder (bank 5) |
+| `storyboard/forum.txt` | The forum's script: the regulars (swap in a forum name here), threads, posts, review phrases |
+| `tools/forum.py` | The forum's script to `src/gen/forumtxt.asm` |
+| `src/asm/text40.asm` | The 40-column (320A) text screens the day job and the forum share |
+| `tools/gfx.py` | The art, drawn as text, and the fonts (the forum's avatars too) |
 | `tools/test_break.sh`, `tools/emu/breaktest.lua` | Headless test: break the slop ROM |
 | `src/asm/sound.asm` | The POKEY music player and TIA effects (from Cosmic Arc II), with the one-POKEY fallback |
 | `tools/music.py` | The songs and effects, to `src/gen/` |
 | `tools/test_porch.sh`, `tools/emu/porchtest.lua` | Headless test: the porch |
 | `tools/test_cards.sh`, `tools/emu/cardtest.lua` | Headless test: the day job |
+| `tools/test_forum.sh`, `tools/emu/forumtest.lua` | Headless test: the evening |
 | `tools/dmalog.py` | MARIA's DMA load per line (`A7800_DMA_LOG`, from the a7800 fork) |
 | `tools/snap.sh` | Headless screenshots, with scripted inputs |
 

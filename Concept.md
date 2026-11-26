@@ -133,9 +133,9 @@ Running past column 20 halts. A step limit stops infinite loops, and the reader 
 - **Music:** `MUS_OFFICE`, F major muzak (F, Dm, Gm, C) with a soft thump and tick, under the TIA clacks.
 - The Soul Meter comes later.
 
-### 4.2 The Evening: AtariAge Forum and Slop Pong (160A)
+### 4.2 The Evening: AtariAge Forum and Slop Pong (320A forum, 160A slop)
 
-**Forum look:** chunky, colorful **160A** with an early-2000s forum layout: avatars, post counts, hype threads, and 40-column text. The joystick scrolls and selects threads.
+**Forum look:** an early-2000s forum layout: avatars, post counts, hype threads, and **40-column text in 320A** (the day job's text screen: 20 columns of 160A was too few for posts), each poster in their own colour. The joystick scrolls and selects threads.
 
 **Replies are clues.** Regulars post hints without knowing it ("anyone else get weird symbols when the score gets high?"). Their posts also introduce them before the mirror chapter.
 
@@ -167,6 +167,17 @@ The other two slop ROMs get their own mix, for example palette writes landing at
 > **[ NO SOUL. ]** **[ HITBOXES OF A POTATO. ]** **[ ★☆☆☆☆ ]**
 
 The phrase lists grow each day. On **Day 3** a new kind of option appears in every slot ("HERE'S HOW TO FIX THE BALL SPEED.", "DM ME IF YOU WANT HELP."). Arthur can still pick the grumpy ones, but the constructive ones are what pixelkid_07 remembers in the finale.
+
+**As built (prototype 4):**
+- **The script** is one text file, `storyboard/forum.txt`: the regulars (handle, tag, colour, avatar), each evening's threads and posts, the review phrases and the replies. `tools/forum.py` checks it (line lengths, the font's characters) and builds the tables. Swapping in an AtariAge member's name is one line.
+- **The thread list:** up to four threads an evening, with who started each and how many replies. The first is always pixelkid_07's release.
+- **A thread:** posts with a 4 × 2 character avatar (16 × 16 art, doubled), the name in the poster's colour, a tag ("NEW MEMBER - 3 POSTS", "6502 OR DIE"), and up to four lines. Up and down scroll a post at a time; MORE... says there's more. The release thread says "PIXELKID_07 IS VIEWING THIS THREAD." pixelkid reads every review.
+- **Clues and the rumor:** Hal asks about weird symbols when the score gets high (day 1), the ball going through the wall (day 2), and says to try the left difficulty switch (day 3). On day 1, in "NIMBUSWORKS HIRING CARD PUNCHERS??", Hal's uncle knows the card readers have a secret ("UP, UP, DOWN, DOWN... HE NEVER TOLD ME THE REST") and DocMaria says that's a Contra thing.
+- **Story beats in the threads:** Sue's "@PIXELKID_07 - YOU THERE?" and DocMaria pointing at the pinned 7800basic thread (day 2), pixelkid's "...IT'S PONG AGAIN. SORRY. I DON'T KNOW HOW TO MAKE ANYTHING ELSE." and Sue tracing the slop to a generator at NimbusWorks, where Arthur works (day 3), and "HOW DID YOU ALL START?".
+- **Download:** button 1 in the release thread runs the slop ROM. Its crash goes to the review builder.
+- **The review builder:** three lines (the opener, the bugs, the verdict). Up and down pick the line, left and right the words. Each slot offers its day's phrases and earlier ones. The bugs slot offers a complaint only for a bug Arthur actually saw. On day 3 every slot gets a constructive option, and for the bugs it's the *fix* for a bug he saw ("SED, THEN ADC: A BCD SCORE.", "CAP THE COMBO. A BYTE STOPS AT 255."). Button 1 posts it.
+- **After posting:** the thread shows Arthur's review and a regular's reply (Hal's "OOF. TOUGH CROWD, ARTHUR.", Sue's "YOU COULD JUST TELL THE KID HOW TO FIX IT, YOU KNOW."). On day 3 a kind review gets DocMaria's "...ARTHUR? ARE YOU FEELING OK?". The game keeps each day's phrases and how many were kind (`rev_ph`, `rev_kind`) for pixelkid's dialogue in the finale.
+- Days 2 and 3's slop ROMs (*CYBER NEON BLAST*, *QUANTUM PIXEL QUEST*) aren't built yet: *SUPER PADDLE BALL DELUXE* stands in. There's no forum music yet (the concept's "dial-up nostalgia" loop).
 
 ### 4.3 The Night: Yelling at the Cloud (160A)
 
@@ -323,7 +334,7 @@ The rain's noise and the porch beat's kick get their own channels, so the beat t
 - **Cart:** SuperGame-style bank switching: **144K**, with bank 1 fixed at $4000 (code and the sound driver) and bank 9 fixed at $C000 (graphics), as in Gamma Force and Cosmic Arc II. It can grow to 272K. Dual POKEY at `$0450` + `$0440`. Add cart RAM only if a scene needs it. The forum text and puzzle state should fit in the 7800's 4K.
 - **Hardware rules:** nothing that only the AstroCart has. **No Math Unit:** the game's arithmetic (Pong physics, aiming arcs) uses tables and 8-bit math. Real-hardware testing is on the AstroCart V4. The emulator tests use the a7800 fork with only the features a stock cart has.
 - **Saves:** both the **High Score Cart and SaveKey / AtariVox**, through 7800basic's built-in support. They hold the Free Play unlock and Hal's best rally, and both are optional. The HSC game slot and the SaveKey address range will be assigned when save code is written (a free range is still to be found).
-- **Graphics modes, one per scene:** **320A** for the punch cards; **160A** for the forum, slop ROMs, porch and mirror. Modes switch only between scenes, never mid-screen. No display-list interrupt tricks needed.
+- **Graphics modes, one per scene:** **320A** for the punch cards and the forum (one 40-column text engine, `text40.asm`); **160A** for the slop ROMs, porch and mirror. Modes switch only between scenes, never mid-screen. No display-list interrupt tricks needed.
 - **Rain and text effects:** the rain is **animated character tiles** (cheap for MARIA), with a few sprite drops near Arthur. Speech bubbles are sprites, with a small cap on how many exist at once. Measure the DMA load per line with `tools/dmalog.py`.
 - **Text:** 40-column teletype text in the Gamma Force cutscene style. The script lives in one file (`storyboard/script.txt`) and is generated into banks.
 - **Bank layout (rough):** core and title; punch-card engine and puzzles; forum and review builder; the slop ROMs (one engine with each game's bug as a flag); porch; mirror; cutscenes and text; music.

@@ -272,35 +272,12 @@ crashloop
   if u = 0 then goto crashloop
 
   rem ======================================================================
-  rem  Arthur's review (a placeholder: the review builder is prototype 4)
+  rem  Arthur's review: the forum's review builder (forum.bas, bank 5),
+  rem  which offers a complaint for each bug he saw (seenbugs)
   rem ======================================================================
 review
-  AUDV1 = 0
-  BACKGRND = $00
-  P0C1 = $0F : P2C1 = $1C : P3C1 = $46
-  clearscreen
-  plotchars 'SUPER PADDLE BALL' 0 12 1
-  plotchars 'DELUXE' 0 56 2
-  plotchars 'ARTHUR~S REVIEW:' 2 16 3
-  plotchars '*----  NO SOUL.' 3 20 4
-  rem the canned complaints the review builder will offer: one line for
-  rem each bug Arthur saw
-  y = 5
-  t = seenbugs & 1 : if t then plotchars 'BALL IN EVERY ZONE.' 0 4 y : y = y + 1
-  t = seenbugs & 2 : if t then plotchars 'BALL CLIPS AT ZONES.' 0 0 y : y = y + 1
-  t = seenbugs & 4 : if t then plotchars 'NO HOLEY DMA? LOL.' 0 8 y : y = y + 1
-  t = seenbugs & 8 : if t then plotchars 'PADDLE FLICKERS.' 0 16 y : y = y + 1
-  t = seenbugs & 16 : if t then plotchars 'SCORE ISN~T BCD.' 0 16 y : y = y + 1
-  t = seenbugs & 32 : if t then plotchars 'SCORE OVERFLOWS.' 0 16 y : y = y + 1
-  savescreen
-  fireheld = 1
-reviewloop
-  restorescreen
-  drawscreen
-  if switchreset then reboot
-  gosub newfire
-  if u = 0 then goto reviewloop
-  goto menu
+  AUDV0 = 0 : AUDV1 = 0
+  goto forumrev bank5
 
   rem digit d is glyph 16 + d: code 32 + 2d
   rem BUG 16, not BCD: the score's byte goes straight to the digit font, a

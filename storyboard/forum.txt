@@ -1,0 +1,177 @@
+# The evening forum's script: tools/forum.py turns it into src/gen/forumtxt.asm.
+#
+# Swapping in an AtariAge member's name is one line in @user (handle and
+# tag). Limits (checked by the tool): a handle 12 characters, a tag 22, a
+# thread title 38, a post line 35, a post 4 lines, a review phrase 35.
+# Text is ASCII 32-95: upper case, digits and punctuation.
+#
+# @user  key  HANDLE  palette  avatar  | tag
+#   palettes: 3 blue, 4 magenta, 5 orange, 6 green, 7 violet
+# @day N  | the evening's name ; @game | the slop ROM's title
+# @thread key [release] | title          (release: the slop ROM's thread)
+# @post key                              (then its lines)
+# @phrase slot day [kind] [bug N] | text
+#   slot: opener, bugs, verdict. day: the first day it's offered. kind: a
+#   constructive one (counted for the finale). bug N: only if Arthur saw
+#   that bug (seenbugs bit N: 1 zone ghosts, 2 zone clipping, 4 no holey
+#   DMA, 8 DMA overrun, 16 not BCD, 32 the overflow).
+# @after day [kind] key                  (a reply to Arthur's review)
+
+@user arthur   ARTHUR_6502   3 arthur   | 6502 OR DIE
+@user pixelkid PIXELKID_07   4 pixelkid | NEW MEMBER - 3 POSTS
+@user sue      SOLDERSUE     5 sue      | CART BUILDER
+@user hal      HI_SCORE_HAL  6 hal      | TOP 10 IN 40 GAMES
+@user maria    DOCMARIA      7 maria    | CHIP HISTORIAN
+
+# ---------------------------------------------------------------------------
+@day 1 | MON EVE
+@game | SUPER PADDLE BALL DELUXE
+
+@thread pixelkid release | *** SUPER PADDLE BALL DELUXE *** OUT!!
+@post pixelkid
+THE BEST PADDLE GAME EVER MADE FOR
+THE 7800!!! 60 FPS! 4K GRAPHICS!
+INFINITE REPLAY! DOWNLOAD NOW!!!
+@post hal
+60 FPS ON A 7800? I'LL BITE.
+DOWNLOADING.
+@post maria
+"4K GRAPHICS." THE ROM IS 8K.
+I HAVE QUESTIONS.
+@post hal
+ANYONE ELSE GET WEIRD SYMBOLS WHEN
+THE SCORE GETS HIGH? : ; < = ?
+@post sue
+NO SOURCE. NO SCREENSHOTS. HMM.
+
+@thread sue | NIMBUSWORKS HIRING CARD PUNCHERS??
+@post sue
+SAW THE AD. PUNCH CARDS. IN THIS
+DECADE. WHO EVEN APPLIES?
+@post hal
+MY UNCLE SAYS THOSE CARD READERS
+HAVE A SECRET: UP, UP, DOWN, DOWN
+HE NEVER TOLD ME THE REST.
+@post maria
+THAT'S NOT A CARD READER THING.
+THAT'S A CONTRA THING.
+
+@thread maria | MARIA DMA: A HISTORY (PART 12)
+@post maria
+PART 12: WHY YOUR SPRITES FLICKER.
+SHORT ANSWER: DMA.
+LONG ANSWER: ALSO DMA.
+@post hal
+I'M STILL ON PART 3.
+
+@thread hal | WHO STILL HAS A WORKING PROLINE?
+@post hal
+MINE'S ON ITS THIRD SET OF BUTTONS.
+POST YOUR SCARS.
+@post sue
+I SELL REPLACEMENT SWITCHES.
+YOU'RE WELCOME.
+
+# ---------------------------------------------------------------------------
+@day 2 | WED EVE
+@game | CYBER NEON BLAST
+
+@thread pixelkid release | !!! CYBER NEON BLAST !!! FASTEST PONG
+@post pixelkid
+FROM THE MAKER OF SUPER PADDLE BALL
+DELUXE!!! NOW WITH NEON! AND SPEED!
+10/10 - IGN (PROBABLY)
+@post sue
+SAME KID. STILL NO SOURCE.
+@post hal
+THE BALL WENT THROUGH THE WALL.
+IS THAT A FEATURE?
+
+@thread sue | @PIXELKID_07 - YOU THERE?
+@post sue
+YOU POST, YOU VANISH. KID, WE DON'T
+BITE. (WELL. ARTHUR BITES.)
+@post maria
+IF YOU WANT TO LEARN, THE 7800BASIC
+THREAD IS PINNED. EVERYONE STARTS
+SOMEWHERE.
+
+@thread hal | HIGH SCORES: PONG CLONES (LOL)
+@post hal
+SUPER PADDLE BALL DELUXE: 255.
+THEN IT CRASHED. DOES THAT COUNT?
+@post maria
+IT DOES NOT.
+
+# ---------------------------------------------------------------------------
+@day 3 | FRI EVE
+@game | QUANTUM PIXEL QUEST
+
+@thread pixelkid release | QUANTUM PIXEL QUEST - AN EPIC (PONG)
+@post pixelkid
+MY BIGGEST GAME YET!!!
+...IT'S PONG AGAIN. SORRY. I DON'T
+KNOW HOW TO MAKE ANYTHING ELSE.
+@post hal
+TRY THE LEFT DIFFICULTY SWITCH.
+TRUST ME.
+@post maria
+AT LEAST THE TITLE SCREEN DOESN'T
+CRASH THIS TIME.
+
+@thread sue | NIMBUSWORKS = THE SLOP FACTORY?
+@post sue
+TRACED THE ROMS. ALL OF THEM CAME
+OUT OF A GENERATOR AT NIMBUSWORKS.
+@post hal
+...ARTHUR? DON'T YOU WORK THERE?
+
+@thread maria | HOW DID YOU ALL START?
+@post maria
+FIRST PROGRAM: 10 PRINT "HI"
+20 GOTO 10. WHAT WAS YOURS?
+@post sue
+A BLINKING LED. TOOK ME A WEEK.
+@post hal
+A PONG CLONE. A BAD ONE. :)
+
+# ---------------------------------------------------------------------------
+# The review builder: three lines, a slot each.
+
+@phrase opener 1 | NO SOUL.
+@phrase opener 1 | WHAT IS THIS?
+@phrase opener 1 | I WANT MY 5 MINUTES BACK.
+@phrase opener 2 | ANOTHER PONG. GREAT.
+@phrase opener 2 | NOT A GAME. A CRY FOR HELP.
+@phrase opener 3 | MY TOASTER CODES BETTER.
+@phrase opener 3 kind | WELCOME TO THE 7800, KID.
+
+@phrase bugs 1 | HITBOXES OF A POTATO.
+@phrase bugs 1 bug 1 | BALL IN EVERY ZONE.
+@phrase bugs 1 bug 2 | BALL CLIPS AT ZONES.
+@phrase bugs 1 bug 4 | NO HOLEY DMA? LOL.
+@phrase bugs 1 bug 8 | PADDLE FLICKERS.
+@phrase bugs 1 bug 16 | SCORE ISN'T BCD.
+@phrase bugs 1 bug 32 | SCORE OVERFLOWS. THEN IT CRASHES.
+@phrase bugs 3 kind bug 1 | CLEAR EVERY ZONE'S LIST EACH FRAME.
+@phrase bugs 3 kind bug 2 | PLOT IT IN BOTH ZONES IT CROSSES.
+@phrase bugs 3 kind bug 4 | HOLEY DMA FIXES THE GARBAGE.
+@phrase bugs 3 kind bug 8 | FEWER OBJECTS IN ONE ZONE.
+@phrase bugs 3 kind bug 16 | SED, THEN ADC: A BCD SCORE.
+@phrase bugs 3 kind bug 32 | CAP THE COMBO. A BYTE STOPS AT 255.
+
+@phrase verdict 1 | 1 STAR.
+@phrase verdict 1 | ZERO STARS, IF I COULD.
+@phrase verdict 2 | -- ARTHUR. 6502 OR DIE.
+@phrase verdict 3 | STAY OFF MY LAWN.
+@phrase verdict 3 kind | DM ME IF YOU WANT HELP.
+
+@after 1 hal
+OOF. TOUGH CROWD, ARTHUR.
+@after 2 sue
+YOU COULD JUST TELL THE KID HOW TO
+FIX IT, YOU KNOW.
+@after 3 hal
+SAME OLD ARTHUR.
+@after 3 kind maria
+...ARTHUR? ARE YOU FEELING OK?
