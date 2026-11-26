@@ -4,7 +4,8 @@
   rem
   rem  For now a menu of prototypes:
   rem    1  SUPER PADDLE BALL DELUXE, the first slop ROM (below)
-  rem    2  THE PORCH: yelling at the Cloud, then the rain (further down)
+  rem    2  THE PORCH: yelling at the Cloud, then the rain (porch.bas)
+  rem    3  THE DAY JOB: punch cards at NimbusWorks (cards.bas)
   rem
   rem  Prototype 1: SUPER PADDLE BALL DELUXE, the first slop ROM.
   rem  An overblown title, then a broken Pong. Every hit scores the COMBO
@@ -71,7 +72,8 @@
   dim sfxon = $2582
   dim sfxid = $2253
   rem TIA effects (tools/music.py SFX): 1 YELL, 2 FIST, 3 GOOD,
-  rem 4 PERFECT, 5 MISS, 6 TOOFAST, 7 DIZZY, 8 THUNDER
+  rem 4 PERFECT, 5 MISS, 6 TOOFAST, 7 DIZZY, 8 THUNDER, 9 PUNCH, 10 CLACK,
+  rem 11 BELL, 12 JAM
 
   rem ---- the menu ----
   dim menusel = $2254
@@ -110,6 +112,7 @@ end
   plotchars 'PROTOTYPES' 3 40 4
   plotchars 'SUPER PADDLE BALL' 0 16 6
   plotchars 'THE PORCH: NIGHT' 0 16 7
+  plotchars 'THE DAY JOB' 0 16 8
   plotchars 'POKEYS FOUND:' 3 16 10
   savescreen
   fireheld = 1 : stickheld = 1
@@ -134,14 +137,15 @@ menuloop
   if t = 0 then stickheld = 0
   if stickheld then goto menufire
   if t then stickheld = 1
-  if t = 1 then menusel = 0
-  if t = 2 then menusel = 1
+  if t = 2 && menusel < 2 then menusel = menusel + 1
+  if t = 1 && menusel > 0 then menusel = menusel - 1
   if t = 3 && night > 1 then night = night - 1
   if t = 4 && night < 3 then night = night + 1
 menufire
   gosub newfire
   if u = 0 then goto menuloop
   if menusel = 1 then goto porch bank3
+  if menusel = 2 then goto cards bank4
   goto title bank2
 
 
@@ -197,6 +201,8 @@ end
   incbasic porch.bas
 
   bank 4
+  incbasic cards.bas
+
   bank 5
   bank 6
   bank 7

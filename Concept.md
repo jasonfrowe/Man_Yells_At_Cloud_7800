@@ -113,6 +113,15 @@ Running past column 20 halts. A step limit stops infinite loops, and the reader 
 
 **Cloud Assist (the Konami code):** on the puzzle screen, enter **↑ ↑ ↓ ↓ ← → ← → B A**, where B is button 2 and A is button 1. Stray cursor moves or punches during the code don't matter, because the solution overwrites the card. The reader solves the card instantly, and the Soul Meter dips (see 4.5). **We want people to try it, so it's hinted in two places:** the manual has a coffee-stained margin note (*"heard you can make the reader do it for you… ask a Contra fan"*), and on Day 1 a forum regular posts it as a rumor. Neither spells out the whole code.
 
+**As built (prototype 3):**
+- **The screen:** 320A, 40 columns of text in RAM that MARIA reads live. The font sits at $A000 in the day job's own bank.
+- **The card:** the 12 card rows fit in 6 text rows, two to a character. The cell, label and ruler glyphs use the font's odd codes. The card is cream "on" pixels, and a hole is "off" pixels, so the dark screen shows through.
+- **The panel:** beside the card, it decodes the cursor's column (OP, VAL and its character) and shows A and the step count while the card runs.
+- **Running:** the reader steps through the card every 6 frames with a clack. The output prints in green under the target, and a match rings a bell. Two opcodes in one column, a JMP to nowhere, or 200 steps jams the reader with a KA-CHUNK.
+- **The jobs, day 1 only for now:** HI (the first two columns come punched, as a tutorial), HELLO, and PONG.
+- **Cloud Assist:** the Konami code, ending with B (button 2) and A (button 1). The B is held back so it doesn't run the card, and the card punches itself and runs.
+- Days 2 and 3 (SHIFT, loops with JMP, and NimbusWorks' darker targets) and the Soul Meter come later.
+
 ### 4.2 The Evening: AtariAge Forum and Slop Pong (160A)
 
 **Forum look:** chunky, colorful **160A** with an early-2000s forum layout: avatars, post counts, hype threads, and 40-column text. The joystick scrolls and selects threads.

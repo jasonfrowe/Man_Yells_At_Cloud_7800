@@ -9,13 +9,16 @@ people he's been arguing with every night.
 Everyone is welcome in retrogaming. Don't just leave slop and run: stay
 and enjoy the meal.
 
-**Status:** two prototypes, picked from a menu:
+**Status:** three prototypes, picked from a menu:
 
 1. *SUPER PADDLE BALL DELUXE*: the first slop ROM, from its overblown title
    screen to its crash, showing off the MARIA mistakes a first 7800 program
    makes.
 2. *The porch*: Arthur yells at the Cloud on the beat of the POKEY music
    until it breaks into rain and says one thing to him (nights 1 to 3).
+3. *The day job*: punch cards at NimbusWorks, in 320A, 40 columns. Punch
+   a 20-column program (LOAD, ADD, SHIFT, JMP, OUT, and a 7-bit operand)
+   that prints the target. Three jobs: HI, HELLO, and... PONG.
 
 The menu shows how many POKEYs it found: the music plays on two, or falls
 back to lead, bass and drums on one. See [Concept.md](Concept.md)
@@ -30,6 +33,7 @@ Needs [wasmtime](https://wasmtime.dev) (7800basic is vendored in
 tools/build.sh        # -> build/myac.a78
 tools/test_break.sh   # a bot breaks the slop ROM, headless (a7800 fork)
 tools/test_porch.sh   # a bot plays the porch (ONEPOKEY=1: one POKEY)
+tools/test_cards.sh   # a bot punches a card, and Cloud Assists the rest
 ```
 
 The porch's controls: just the buttons. Arthur's aim swings across the
@@ -44,12 +48,16 @@ then `.venv/bin/python tools/gfx.py`.
 
 | Path | |
 |---|---|
-| `src/myac.bas` | The game (7800basic) |
+| `src/myac.bas` | The game (7800basic): settings, the menu, shared helpers, the sound driver (bank 1) |
+| `src/slop.bas` | SUPER PADDLE BALL DELUXE (bank 2) |
+| `src/porch.bas` | The porch and the rain (bank 3) |
+| `src/cards.bas`, `src/asm/cards.asm` | The day job: 320A, 40 columns, the card and its reader (bank 4) |
 | `tools/gfx.py` | The art, drawn as text, and the font |
 | `tools/test_break.sh`, `tools/emu/breaktest.lua` | Headless test: break the slop ROM |
 | `src/asm/sound.asm` | The POKEY music player and TIA effects (from Cosmic Arc II), with the one-POKEY fallback |
 | `tools/music.py` | The songs and effects, to `src/gen/` |
 | `tools/test_porch.sh`, `tools/emu/porchtest.lua` | Headless test: the porch |
+| `tools/test_cards.sh`, `tools/emu/cardtest.lua` | Headless test: the day job |
 | `tools/dmalog.py` | MARIA's DMA load per line (`A7800_DMA_LOG`, from the a7800 fork) |
 | `tools/snap.sh` | Headless screenshots, with scripted inputs |
 

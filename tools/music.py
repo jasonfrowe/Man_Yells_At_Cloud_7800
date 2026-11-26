@@ -284,6 +284,11 @@ SFX = [
     ("TOOFAST", 1, 4, notes_fx(12, [20, 24], 4, 7)),      # mashing
     ("DIZZY", 1, 5, [(4, f, 7) for f in (12, 16, 12, 16, 14, 18, 14, 18, 16, 20, 16, 20)]),
     ("THUNDER", 1, 6, sweep(8, 28, 31, 12, 0, 60)),       # the Cloud breaks
+    # the day job
+    ("PUNCH", 0, 2, [(8, 2, 12), (8, 4, 10), (15, 28, 9), (15, 30, 6), (15, 31, 3)]),  # ka-chunk
+    ("CLACK", 1, 1, [(8, 1, 6), (8, 3, 3)]),               # the reader steps
+    ("BELL", 1, 4, notes_fx(4, [11, 8, 6], 5, 10)),       # a match
+    ("JAM", 1, 5, sweep(15, 20, 31, 13, 2, 30)),          # the reader jams
 ]
 
 
