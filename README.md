@@ -9,8 +9,30 @@ people he's been arguing with every night.
 Everyone is welcome in retrogaming. Don't just leave slop and run: stay
 and enjoy the meal.
 
-**Status:** concept. See [Concept.md](Concept.md) for the design
-([Concept_v1.md](Concept_v1.md) is the original pitch).
+**Status:** prototype 1, *SUPER PADDLE BALL DELUXE*: the first slop ROM,
+from its overblown title screen to its crash. See [Concept.md](Concept.md)
+for the design ([Concept_v1.md](Concept_v1.md) is the original pitch).
+
+## Building
+
+Needs [wasmtime](https://wasmtime.dev) (7800basic is vendored in
+`tools/7800basic` as WebAssembly) and Python 3:
+
+```sh
+tools/build.sh        # -> build/myac.a78
+tools/test_break.sh   # a bot breaks the slop ROM, headless (a7800 fork)
+```
+
+The graphics in `src/gfx/` are committed. After changing the art, remake
+them with Pillow: `python3 -m venv .venv && .venv/bin/pip install pillow`,
+then `.venv/bin/python tools/gfx.py`.
+
+| Path | |
+|---|---|
+| `src/myac.bas` | The game (7800basic) |
+| `tools/gfx.py` | The art, drawn as text, and the font |
+| `tools/test_break.sh`, `tools/emu/breaktest.lua` | Headless test: break the slop ROM |
+| `tools/snap.sh` | Headless screenshots, with scripted inputs |
 
 ## Hardware
 
