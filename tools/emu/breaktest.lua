@@ -12,12 +12,14 @@ for tag, port in pairs(manager:machine():ioport().ports) do
   for name, field in pairs(port.fields) do fields[name] = field end
 end
 local function m() return manager:machine().devices[":maincpu"].spaces["program"] end
-local f, start, gl, lastscore, hits, hit4 = 0, 200, nil, -1, 0, nil
+local f, start, gl, lastscore, hits, hit4 = 0, 300, nil, -1, 0, nil
 local edge = os.getenv("EDGE") or "middle"
 emu.register_frame_done(function()
   f = f + 1
   local mm = m()
   local held = {}
+  -- the menu's first item (SUPER PADDLE BALL), then the slop title
+  if f >= 230 and f < 234 then held["P1 Button 1"] = true end
   if f >= start and f < start + 4 then held["P1 Button 1"] = true end
   if f > start + 10 and not gl then
     local pady, bally = mm:read_u8(0xE6), mm:read_u8(0xE9)

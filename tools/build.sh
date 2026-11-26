@@ -13,9 +13,14 @@ BASDIR="$ROOT/tools/7800basic"
 WORK="$ROOT/build/work"
 PATH="$HOME/.wasmtime/bin:$PATH"
 
+python3 "$ROOT/tools/music.py"
+
 rm -rf "$WORK"
 mkdir -p "$WORK"
 cp -R "$ROOT/src/." "$WORK/"
+# 7800basic turns an inline file's path into a symbol name, so a "/" in
+# it breaks the assembly: assembly files go flat into the work directory.
+cp "$ROOT"/src/asm/*.asm "$ROOT"/src/gen/*.asm "$WORK/"
 cd "$WORK"
 bas7800dir="$BASDIR" PATH="$BASDIR:$PATH" sh "$BASDIR/7800basic.sh" myac.bas > build.log 2>&1 || true
 if [ ! -f myac.bas.a78 ] || grep -q -i -E "error|unresolved|Compilation failed" build.log; then
