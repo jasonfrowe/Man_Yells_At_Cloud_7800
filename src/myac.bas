@@ -191,6 +191,7 @@ end
   inline sound.asm
   inline music.asm
   inline sfx.asm
+  inline text40.asm
 
   rem ======================================================================
   rem  The scenes, a bank each (MARIA reads a scene's text from its bank,

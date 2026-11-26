@@ -106,6 +106,10 @@ end
   gosub homeupd
   clearscreen
   asm
+  lda #<c_segs
+  sta c_ptr
+  lda #>c_segs
+  sta c_ptr+1
   jsr c_draw
 end
   savescreen

@@ -36,7 +36,9 @@ Arthur tears into each game, writes a 1-star review, then walks onto his porch a
 
 The sky listens. A great cumulus cloud absorbs his anger, swells, and rains on him until he calms down. It leaves one quiet line of text in the rain each night.
 
-Then a thread appears with no hype, no box art and zero replies: **`0x7800_MIRROR.BIN`**. It boots into Arthur's own living room, drawn in 8-bit. Through the TV in that room he can walk into other rooms belonging to the forum regulars he argues with every night. And pixelkid_07 is there too.
+On the third night the Cloud, heavy with everything Arthur has yelled into it, drifts across town and stops over the **NimbusWorks data centre**: the machine Arthur's punch cards have been feeding, the one turning out the slop. It lets go. Lightning walks down the server racks, and with every strike the Cloud writes **hex** straight into the machines, byte by byte. Not slop this time: one game, made for one player.
+
+Saturday morning a thread appears with no hype, no box art and zero replies: **`0x7800_MIRROR.BIN`**. It boots into Arthur's own living room, drawn in 8-bit. Through the TV in that room he can walk into other rooms belonging to the forum regulars he argues with every night. And pixelkid_07 is there too.
 
 ### The Cloud
 
@@ -47,7 +49,8 @@ Rules for writing the Cloud:
 1. It never fights back and never lectures.
 2. It speaks only in the rain: **one line per night**, written in 40 columns or fewer.
 3. It never tells Arthur he's wrong to love old things. It reminds him why he loves them.
-4. It made the mirror ROM. Nobody ever asks how.
+4. It made the mirror ROM, with lightning, writing hex into the NimbusWorks data centre: the slop machine, used once to make something with soul. The player sees it happen. Nobody ever asks how a cloud knows 6502.
+5. The charge it lets go is everything Arthur yelled into it. His anger, given back as a gift.
 
 ### Cast
 
@@ -73,8 +76,8 @@ The regulars are the same people Arthur argues with in the forum scenes, so the 
 |---|---|---|---|
 | **Day 1 (Mon)** | 1 punch-card job | Break *SUPER PADDLE BALL DELUXE* | Yell. Cloud's first line. |
 | **Day 2 (Wed)** | 1 job | Break *CYBER NEON BLAST* | Yell. Arthur's lines get softer. |
-| **Day 3 (Fri)** | 1 job (the whole card) | Break *QUANTUM PIXEL QUEST*. Then the MIRROR thread appears. | Yell. The Cloud's key line. |
-| **Finale (Sat)** | **The mirror ROM:** gather the cards, solve the two-person puzzles, run the deck. | | **Potluck on the porch.** Ending. |
+| **Day 3 (Fri)** | 1 job (the whole card) | Break *QUANTUM PIXEL QUEST*. | Yell. The Cloud's key line. Then **the storm** over the data centre. |
+| **Finale (Sat)** | The MIRROR thread, then **the mirror ROM:** gather the cards, solve the two-person puzzles, run the deck. | | **Potluck on the porch.** Ending. |
 
 Totals: 3 punch-card jobs, 3 slop ROMs, 3 porch nights, 1 mirror chapter, the ending. Short cutscenes (picture or portrait over 40-column teletype text, as in Gamma Force) link the scenes.
 
@@ -203,6 +206,16 @@ Arthur's yell phrases change over the nights. By Night 3 a few are quieter: *"WH
   - Night 3 mixes in quieter ones about a quarter of the time: "WE USED TO MAKE / THINGS TOGETHER...", "IS ANYONE OUT THERE?"
   - The same line never comes up twice in a row.
 - The Cloud's line is typed out in the rain, a page at a time (night 3 has two pages), while the TIA hisses the rain. Then the rain stops and Arthur answers in his own colour: "...HUH. / I FEEL BETTER NOW." (night 1), "I FEEL BETTER NOW. / ...THANKS." (night 2), "I FEEL BETTER NOW. / THANK YOU, CLOUD." (night 3).
+
+### 4.3b The Storm (cutscene, end of Night 3)
+
+After the night 3 rain and Arthur's reply, the Cloud drifts off the porch screen. Cut to the **NimbusWorks data centre** at night: a low building, a humming sign, rows of blinking racks through the windows. The Cloud rolls over it and darkens.
+
+- **Lightning:** bolts strike the roof one at a time (TIA thunder, a POKEY crackle, a white flash of the background colour).
+- **The hex:** each strike types a row of hex across a 40-column strip at the bottom of the screen, the Cloud writing the program. They're real 7800 bytes, starting with the boot code every homebrewer knows: `78 D8 A9 07 85 01` (SEI, CLD, LDA #$07, STA INPTCTRL)... Homebrewers will recognise them; nobody else needs to.
+- **The end:** the last strike, the racks all light at once, and one line: `0x7800_MIRROR.BIN  WRITTEN.  FOR: ARTHUR`. The Cloud thins out and drifts away. Saturday morning, the thread is on the forum.
+
+It's the one time the player sees the Cloud *do* something rather than rain. It stays mystical: no explanation, no dialogue. The irony is the point: the slop machine Arthur's cards fed, used once to make something with soul.
 
 ### 4.4 The Finale: `0x7800_MIRROR.BIN` (160A)
 
@@ -333,7 +346,7 @@ The rain's noise and the porch beat's kick get their own channels, so the beat t
 3. **The punch-card engine** in 320A with 3 puzzles.
 4. **The forum and review builder.**
 5. **The mirror ROM:** rooms, follower AI, two-player join.
-6. **The story pass:** script, cutscenes, potluck, credits, manual.
+6. **The story pass:** script, cutscenes (including the storm over the data centre), potluck, credits, manual.
 7. **Free Play:** the menu, the jukebox, saves.
 
 ---
@@ -347,7 +360,9 @@ The rain's noise and the porch beat's kick get their own channels, so the beat t
 - **Hardware:** dual POKEY yes, AstroCart Math Unit no.
 - **POKEY fallback:** kept. The game must play fully on a single-POKEY 7800GD.
 - **Saves:** both the High Score Cart and SaveKey. A free SaveKey range is to be found when needed.
+- **The day job:** one job a day, CNT and LOOP in place of SHIFT and JMP, hints in the manual (a full manual, as computers used to come with), Cloud Assist always there.
+- **Where the mirror ROM comes from:** the Cloud's lightning over the NimbusWorks data centre, writing hex into the slop machine: a game made just for the player (the storm cutscene, 4.3b).
 
 ## 9. Open Questions
 
-- None right now. Next: prototype step 1, *SUPER PADDLE BALL DELUXE*.
+- None right now. Next: prototype step 4, the forum and the review builder.
