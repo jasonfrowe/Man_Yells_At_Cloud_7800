@@ -256,7 +256,7 @@ The unlock is kept in the High Score Cart or SaveKey if one is present. Without 
 
 The rain's noise and the porch beat's kick get their own channels, so the beat the Cloud breathes to always comes through the music.
 
-**Single-POKEY fallback (recommended):** many more players have a one-POKEY cart (or an emulator set that way) than an AstroCart. At boot the game checks for POKEY 2. If it's missing, the music plays lead and bass only, and the porch beat moves to POKEY 1. The game sounds thinner but loses nothing you need to play it.
+**Single-POKEY fallback (required):** many players will run this on a **7800GD** or another one-POKEY setup rather than an AstroCart. At boot the game checks for POKEY 2. If it's missing, the music plays lead and bass only, and the porch beat moves to POKEY 1. The game sounds thinner but loses nothing you need to play it. Test on both the AstroCart V4 (dual) and the 7800GD (single). Every song must sound complete on POKEY 1 alone, so POKEY 2 only adds harmony, pad, drums and hats on top.
 
 ---
 
@@ -264,7 +264,7 @@ The rain's noise and the porch beat's kick get their own channels, so the beat t
 
 - **Cart:** SuperGame-style bank switching. Start at **128K** and grow as needed (Gamma Force is 272K). Dual POKEY at `$0450` + `$0440`. Add cart RAM only if a scene needs it. The forum text and puzzle state should fit in the 7800's 4K.
 - **Hardware rules:** nothing that only the AstroCart has. **No Math Unit:** the game's arithmetic (Pong physics, aiming arcs) uses tables and 8-bit math. Real-hardware testing is on the AstroCart V4. The emulator tests use the a7800 fork with only the features a stock cart has.
-- **Saves:** High Score Cart / SaveKey for the Free Play unlock and Hal's best rally, both optional.
+- **Saves:** both the **High Score Cart and SaveKey / AtariVox**, through 7800basic's built-in support. They hold the Free Play unlock and Hal's best rally, and both are optional. The HSC game slot and the SaveKey address range will be assigned when save code is written (a free range is still to be found).
 - **Graphics modes, one per scene:** **320A** for the punch cards; **160A** for the forum, slop ROMs, porch and mirror. Modes switch only between scenes, never mid-screen. No display-list interrupt tricks needed.
 - **Rain and text effects:** the rain is **animated character tiles** (cheap for MARIA), with a few sprite drops near Arthur. Speech bubbles are sprites, with a small cap on how many exist at once. Measure the DMA load per line with `tools/dmalog.py`.
 - **Text:** 40-column teletype text in the Gamma Force cutscene style. The script lives in one file (`storyboard/script.txt`) and is generated into banks.
@@ -300,8 +300,9 @@ The rain's noise and the porch beat's kick get their own channels, so the beat t
 - **Hal's rally:** Player 2 if a second joystick is present, a CPU partner otherwise. Every two-person moment can be done by one person with two sticks.
 - **Free Play:** yes, after the credits: the slop ROMs, Hal's rally and the jukebox.
 - **Hardware:** dual POKEY yes, AstroCart Math Unit no.
+- **POKEY fallback:** kept. The game must play fully on a single-POKEY 7800GD.
+- **Saves:** both the High Score Cart and SaveKey. A free SaveKey range is to be found when needed.
 
 ## 9. Open Questions
 
-- Keep the single-POKEY fallback, or require dual POKEY?
-- Which save device to target first: High Score Cart, SaveKey, or both?
+- None right now. Next: prototype step 1, *SUPER PADDLE BALL DELUXE*.

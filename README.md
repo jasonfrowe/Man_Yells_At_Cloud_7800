@@ -18,7 +18,9 @@ and enjoy the meal.
   is optional)
 - SuperGame-style cart with dual POKEY ($0450 + $0440)
 - No AstroCart Math Unit needed: the game is meant to run for everyone
-- Tested on real hardware with the AstroCart V4
+- Plays fully on a single POKEY (e.g. the 7800GD); the second POKEY adds layers
+- Saves to the High Score Cart or SaveKey/AtariVox (optional)
+- Tested on real hardware with the AstroCart V4 and the 7800GD
 
 ## Related projects
 
