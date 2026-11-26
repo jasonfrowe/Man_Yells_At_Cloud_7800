@@ -3,9 +3,18 @@
   rem  A story game for the Atari 7800. See Concept.md.
   rem
   rem  Prototype 1: SUPER PADDLE BALL DELUXE, the first slop ROM.
-  rem  An overblown title, then a broken Pong. Edge hits double the COMBO
-  rem  and add it to the score; the score is one byte, so past 255 it
-  rem  overflows, the HUD turns to garbage, and the game crashes (BRK).
+  rem  An overblown title, then a broken Pong. Every hit scores the COMBO
+  rem  (1, 2, 4, 8...) and doubles it; the CPU only ever scores 1. Score
+  rem  and combo are bytes, so on the 8th hit in a row they overflow, the
+  rem  HUD turns to garbage, and the game crashes (BRK).
+  rem  On the way it shows the MARIA mistakes a first 7800 program makes
+  rem  (seenbugs records which, for the review builder):
+  rem    1  zone ghosts: after a hit the ball is drawn 16 and 32 lines away
+  rem    2  zone clipping: the ball's cut off at a zone's bottom edge
+  rem    4  no holey DMA: garbage under the ball in odd zones
+  rem    8  DMA overrun: the CPU's paddle flickers when the ball's in its zone
+  rem   16  not BCD: the score's digits run 0-9 then : ; < = > ?
+  rem   32  the score overflow and the crash
   rem  Slop ROMs use TIA sound only (the POKEYs stay quiet).
   rem ======================================================================
 
@@ -41,10 +50,14 @@
   dim servet = r
   dim glitch = s
   dim sndf = z
+  dim cpuscore = i
+  dim ghostt = v
   rem t, u, w, x, y: scratch (todec writes w x y)
   rem the HUD's digits, character codes (glyph * 2)
   dim dscore = var40
   dim dcombo = var43
+  dim dcpu = var46
+  dim seenbugs = var50
 
   rem Buttons: either fire button starts and continues (joy0fire1 is
   rem button 1 and a one-button stick's, joy0fire0 button 2).
@@ -98,10 +111,12 @@ titleloop
   rem ======================================================================
 startgame
   AUDV0 = 0 : AUDV1 = 0
-  score = 0 : combo = 1 : glitch = 0 : combot = 0
+  score = 0 : combo = 1 : glitch = 0 : combot = 0 : cpuscore = 0
+  ghostt = 0 : seenbugs = 0
   pady = 90 : cpuy = 90
   gosub showscore
   gosub showcombo
+  gosub showcpu
   gosub serveball
   BACKGRND = $51
   P0C1 = $0F
@@ -111,8 +126,9 @@ startgame
   P5C1 = $9A
   P6C2 = $56
   clearscreen
-  plotchars 'SCORE' 0 0 0
-  plotchars 'COMBO X' 0 80 0
+  plotchars 'P1' 0 0 0
+  plotchars 'X' 0 56 0
+  plotchars 'CPU' 0 104 0
   plotchars wallt 5 0 1 20
   plotchars wallb 5 0 11 20
   for t = 2 to 10
@@ -131,10 +147,20 @@ playloop
   gosub moveball
 playdraw
   plotsprite padp 1 8 pady 0 2
+  rem BUG 8, DMA overrun: with the ball in the zone of the CPU paddle's
+  rem top, MARIA "runs out of time" every other frame and drops the paddle
+  t = bally / 16 : u = cpuy / 16 : w = frm & 1
+  if t <> u then goto drawcpu
+  if servet then goto drawcpu
+  seenbugs = seenbugs | 8
+  if w then goto skipcpu
+drawcpu
   plotsprite padc 2 148 cpuy 0 2
-  plotsprite ball 3 ballx bally
-  plotchars dscore 0 48 0 3
-  plotchars dcombo 0 136 0 3
+skipcpu
+  gosub drawball
+  plotchars dscore 0 24 0 2
+  plotchars dcombo 0 64 0 3
+  plotchars dcpu 0 136 0 2
   if combot then combot = combot - 1 : P4C1 = frm : plotchars 'COMBO!!' 4 52 5
   gosub sndtick
   drawscreen
@@ -176,31 +202,31 @@ ballleft
   rem where on the paddle (1-33): the top and bottom 7 lines are edges
   t = t - pady
   ballx = 12 : balldx = 2
-  if t < 8 then balldy = 253 : goto edgehit
-  if t > 27 then balldy = 3 : goto edgehit
-  if t < 14 then balldy = 254 : goto centrehit
-  if t < 18 then balldy = 255 : goto centrehit
-  if t < 22 then balldy = 1 : goto centrehit
+  rem the edges smash it back (faster, steeper)
+  if t < 8 then balldy = 253 : balldx = 3 : goto playerhit
+  if t > 27 then balldy = 3 : balldx = 3 : goto playerhit
+  if t < 14 then balldy = 254 : goto playerhit
+  if t < 18 then balldy = 255 : goto playerhit
+  if t < 22 then balldy = 1 : goto playerhit
   balldy = 2
-centrehit
-  t = 1 : gosub addpoints
-  gosub sndhit
-  return
-  rem THE BUG: an edge hit scores the combo, then doubles it
-edgehit
-  balldx = 3
+  rem THE BUG: every hit scores the combo, then doubles it, in one byte:
+  rem 1 + 2 + ... + 128 = 255, and the 8th hit's doubling wraps to 0
+playerhit
   t = combo : gosub addpoints
   combo = combo + combo
+  if combo = 0 then gosub startglitch
   combot = 40
+  ghostt = 24
   gosub showcombo
   gosub sndedge
   return
 cpumiss
-  t = 1 : gosub addpoints
   gosub sndmiss
   goto serveball
 playermiss
   combo = 1 : gosub showcombo
+  if cpuscore < 99 then cpuscore = cpuscore + 1
+  gosub showcpu
   gosub sndmiss
 serveball
   ballx = 78 : balldx = 254
@@ -208,6 +234,36 @@ serveball
   balldy = 1
   t = rand & 1 : if t then balldy = 255
   servet = 60
+  return
+
+  rem the ball, with its zone bugs
+drawball
+  u = bally : gosub plotball
+  if ghostt = 0 then return
+  rem BUG 1, zone ghosts: the ball's still in other zones' display lists
+  ghostt = ghostt - 1
+  seenbugs = seenbugs | 1
+  if bally >= 36 then u = bally - 16 : gosub plotball
+  if bally <= 166 then u = bally + 16 : gosub plotball
+  if ghostt < 12 then return
+  if bally >= 52 then u = bally - 32 : gosub plotball
+  if bally <= 150 then u = bally + 32 : gosub plotball
+  return
+  rem one ball at line u
+plotball
+  if servet then plotsprite ball 3 ballx u : return
+  w = u & 15
+  if w < 11 then plotsprite ball 3 ballx u : goto plotgarb
+  rem BUG 2, zone clipping: only the top zone's part is drawn
+  seenbugs = seenbugs | 2
+  w = 15 - w
+  plotsprite ballcut0 3 ballx u w
+plotgarb
+  rem BUG 4, no holey DMA in odd zones: MARIA reads garbage under it
+  w = u & 16 : if w = 0 then return
+  seenbugs = seenbugs | 4
+  w = frm & 1 : x = u + 6
+  plotsprite garb0 3 ballx x w
   return
 
   rem the CPU follows the ball at 1 pixel a frame, or drifts home
@@ -225,8 +281,14 @@ cpumove
 addpoints
   u = score
   score = score + t
-  if score < u then glitch = 1 : gtime = 150
+  if score < u then gosub startglitch
   goto showscore
+
+  rem once only: a hit during the glitch mustn't put off the crash
+startglitch
+  if glitch then return
+  glitch = 1 : gtime = 150
+  return
 
   rem the glitch: the HUD fills with noise, colors and the TIA go wrong
 doglitch
@@ -235,6 +297,7 @@ doglitch
   t = rand & 15 : t = t + t : dscore[1] = t + 186
   t = rand & 15 : t = t + t : dscore[2] = t + 186
   t = rand & 15 : t = t + t : dcombo[1] = t + 186
+  t = rand & 15 : t = t + t : dcpu[0] = t + 186
   t = rand & 7 : if t = 0 then P0C1 = rand : P1C2 = rand : BACKGRND = rand & $F3
   AUDC1 = 15 : AUDF1 = rand & 31 : AUDV1 = 8
   return
@@ -243,6 +306,7 @@ doglitch
   rem  The crash
   rem ======================================================================
 crash
+  seenbugs = seenbugs | 32
   AUDV0 = 0 : sndt = 0
   BACKGRND = $82
   P0C1 = $0F
@@ -277,11 +341,17 @@ review
   clearscreen
   plotchars 'SUPER PADDLE BALL' 0 12 1
   plotchars 'DELUXE' 0 56 2
-  plotchars 'ARTHUR~S REVIEW:' 2 16 4
-  plotchars '*----' 3 60 5
-  plotchars '^NO SOUL.^' 0 40 6
-  plotchars '(REVIEW BUILDER' 0 20 8
-  plotchars 'COMING SOON)' 0 32 9
+  plotchars 'ARTHUR~S REVIEW:' 2 16 3
+  plotchars '*----  NO SOUL.' 3 20 4
+  rem the canned complaints the review builder will offer: one line for
+  rem each bug Arthur saw
+  y = 5
+  t = seenbugs & 1 : if t then plotchars 'BALL IN EVERY ZONE.' 0 4 y : y = y + 1
+  t = seenbugs & 2 : if t then plotchars 'BALL CLIPS AT ZONES.' 0 0 y : y = y + 1
+  t = seenbugs & 4 : if t then plotchars 'NO HOLEY DMA? LOL.' 0 8 y : y = y + 1
+  t = seenbugs & 8 : if t then plotchars 'PADDLE FLICKERS.' 0 16 y : y = y + 1
+  t = seenbugs & 16 : if t then plotchars 'SCORE ISN~T BCD.' 0 16 y : y = y + 1
+  t = seenbugs & 32 : if t then plotchars 'SCORE OVERFLOWS.' 0 16 y : y = y + 1
   savescreen
   fireheld = 1
 reviewloop
@@ -317,9 +387,17 @@ todec2
   return
 
   rem digit d is glyph 16 + d: code 32 + 2d
+  rem BUG 16, not BCD: the score's byte goes straight to the digit font, a
+  rem nibble a digit, so past 9 come the glyphs after it: : ; < = > ?
 showscore
-  t = score : gosub todec
-  dscore[0] = w + w + 32 : dscore[1] = x + x + 32 : dscore[2] = y + y + 32
+  w = score / 16 : x = score & 15
+  dscore[0] = w + w + 32 : dscore[1] = x + x + 32
+  if w > 9 then seenbugs = seenbugs | 16
+  if x > 9 then seenbugs = seenbugs | 16
+  return
+showcpu
+  t = cpuscore : gosub todec
+  dcpu[0] = x + x + 32 : dcpu[1] = y + y + 32
   return
 showcombo
   t = combo : gosub todec
@@ -395,6 +473,13 @@ end
   incgraphic gfx/padp.png 160A 0 1 2 3
   incgraphic gfx/padc.png 160A 0 1 2 3
   incgraphic gfx/ball.png 160A 0 1 2 3
+  incgraphic gfx/ballcut0.png 160A 0 1 2 3
+  incgraphic gfx/ballcut1.png 160A 0 1 2 3
+  incgraphic gfx/ballcut2.png 160A 0 1 2 3
+  incgraphic gfx/ballcut3.png 160A 0 1 2 3
+  incgraphic gfx/ballcut4.png 160A 0 1 2 3
+  incgraphic gfx/garb0.png 160A 0 1 2 3
+  incgraphic gfx/garb1.png 160A 0 1 2 3
   incgraphic gfx/spark0.png 160A 0 1 2 3
   incgraphic gfx/spark1.png 160A 0 1 2 3
   incgraphic gfx/spark2.png 160A 0 1 2 3

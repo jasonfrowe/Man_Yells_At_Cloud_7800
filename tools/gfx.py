@@ -87,6 +87,14 @@ PAD_P = ["aaaa", "abba"] + ["bccb"] * 24 + ["abba", "aaaa"]
 PAD_C = ["aaaa"] * 20
 # The ball: 4 pixels by 6 lines, about round on a TV.
 BALL = [".aa.", "abba", "abba", "abba", "abba", ".aa."]
+# The ball cut off at a zone's bottom edge (the "forgot the next zone"
+# bug): frame n shows the top n + 1 lines.
+BALLCUT = [BALL[:n] for n in range(1, 6)]
+# What MARIA reads below the ball where holey DMA isn't on: garbage.
+GARB = [
+    ["abca", "c.b.", ".aca", "b..c", "aacb", ".b.a"],
+    ["c.ab", "bca.", "a..c", ".cba", "b.c.", "ca.b"],
+]
 # Lens-flare sparkles for the title screens, three frames.
 SPARK = [
     ["....", ".a..", "....", "...."],
@@ -101,9 +109,13 @@ def main():
     sprite("padp", PAD_P)
     sprite("padc", PAD_C)
     sprite("ball", BALL)
+    for i, s in enumerate(BALLCUT):
+        sprite(f"ballcut{i}", s)
+    for i, s in enumerate(GARB):
+        sprite(f"garb{i}", s)
     for i, s in enumerate(SPARK):
         sprite(f"spark{i}", s)
-    print(f"wrote {GFX.relative_to(ROOT)}/: font, padp, padc, ball, spark0-2")
+    print(f"wrote {GFX.relative_to(ROOT)}/: font, padp, padc, ball, ballcut0-4, garb0-1, spark0-2")
 
 
 if __name__ == "__main__":
