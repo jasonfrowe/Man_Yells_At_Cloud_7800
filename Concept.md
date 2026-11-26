@@ -180,7 +180,12 @@ Arthur's yell phrases change over the nights. By Night 3 a few are quieter: *"WH
 - On its own, BP falls only slowly, by 2 a beat. **While BP is up, CALM drains:** at BP 64 it loses 2 a beat, and near the top about 4. Eight misses in a row, or about a second of mashing, and Arthur is **exhausted**. He sits in the rocking chair for 2½ seconds and comes out at BP 64, still draining, until some hits bring him down.
 - The soft spot and the fist wind-up were removed.
 - The Cloud is an 80 × 64 sprite in two breathing frames, swelling on each beat. The music builds with CALM: bass, harmony and the beat to start, the lead at 48, everything at 96. The beat is now a clean POKEY thump with a quiet tick between, with no white-noise snare. Perfect play breaks the Cloud in about 9 seconds; mostly-GOOD play takes about 40.
-- The Cloud's line is typed out in the rain, a page at a time (night 3 has two pages). The TIA hisses the rain.
+- What Arthur yells: 20 lines, one or two rows each, grouped by night.
+  - Night 1 is the classic grumbles: "NO SOUL!", "BLOW ON THE CART!", "PROSYSTEM FOREVER!"…
+  - Night 2 adds the hardware rants: "TRAMIEL SHOULD HAVE / RELEASED THE 7800!", "THE 7800 WOULD HAVE / BEAT THE NES!", "MARIA DMA IS SPECIAL", "HOLEY DMA ISN'T A / BUG, IT'S A FEATURE!"…
+  - Night 3 mixes in quieter ones about a quarter of the time: "WE USED TO MAKE / THINGS TOGETHER...", "IS ANYONE OUT THERE?"
+  - The same line never comes up twice in a row.
+- The Cloud's line is typed out in the rain, a page at a time (night 3 has two pages), while the TIA hisses the rain. Then the rain stops and Arthur answers in his own colour: "...HUH. / I FEEL BETTER NOW." (night 1), "I FEEL BETTER NOW. / ...THANKS." (night 2), "I FEEL BETTER NOW. / THANK YOU, CLOUD." (night 3).
 
 ### 4.4 The Finale: `0x7800_MIRROR.BIN` (160A)
 

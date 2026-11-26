@@ -487,6 +487,7 @@ reviewloop
   dim sinceyell = $2264
   dim inwin = $2265
   dim drain = $2266
+  dim reply = $2267
   rem the porch's letters (the slop ROM's are free here)
   dim cloudx = a
   dim bp = d
@@ -756,38 +757,58 @@ buildbar
   return
 
 drawfeedback
-  if fbk = 1 then plotchars 'GOOD!' 5 96 6
-  if fbk = 2 then plotchars 'PERFECT!' 5 88 6
-  if fbk = 3 then plotchars 'MISSED' 4 96 6
-  if fbk = 4 then plotchars 'TOO FAST!' 4 80 6
+  rem (rows 7 and 8, right of Arthur: rows 5 and 6 are what he yells)
+  if fbk = 1 then plotchars 'GOOD!' 5 96 7
+  if fbk = 2 then plotchars 'PERFECT!' 5 88 7
+  if fbk = 3 then plotchars 'MISSED' 4 96 7
+  if fbk = 4 then plotchars 'TOO FAST!' 4 80 7
   if fbk > 2 then return
   if streak < 4 then return
   t = streak : gosub todec
   dnum = x + x : dnum = dnum + 32 : dnum2 = y + y : dnum2 = dnum2 + 32
-  plotchars 'STREAK' 0 88 7
-  if x then plotchars dnum 0 144 7 1
-  plotchars dnum2 0 152 7 1
+  plotchars 'STREAK' 0 88 8
+  if x then plotchars dnum 0 144 8 1
+  plotchars dnum2 0 152 8 1
   return
 
-  rem what he yells: night 1 the classics, night 2 more, night 3 a few
-  rem quieter ones creep in
+  rem what he yells (one or two lines of 20, rows 5 and 6):
+  rem   0-7    night 1: the classic grumbles
+  rem   8-15   night 2 adds the hardware rants
+  rem   16-19  night 3: the quieter ones, a quarter of the time
+  rem never the same one twice running
 pickphrase
-  phrase = rand & 3
-  if night = 2 then phrase = rand & 7 : if phrase > 5 then phrase = phrase - 2
-  if night <> 3 then return
-  t = rand & 3
-  phrase = t
-  if t >= 2 then phrase = t + 4
+  t = phrase
+pickagain
+  phrase = rand & 7
+  if night = 2 then phrase = rand & 15
+  if night < 3 then goto pickcheck
+  phrase = rand & 15
+  u = rand & 3
+  if u = 0 then phrase = rand & 3 : phrase = phrase + 16
+pickcheck
+  if phrase = t then goto pickagain
   return
 drawphrase
   if phrase = 0 then plotchars 'NO SOUL!' 0 0 5
   if phrase = 1 then plotchars 'IT~S JUST PONG!' 0 0 5
   if phrase = 2 then plotchars '6502 OR DIE!' 0 0 5
   if phrase = 3 then plotchars 'GET OFF MY CART!' 0 0 5
-  if phrase = 4 then plotchars 'IN MY DAY...' 0 0 5
+  if phrase = 4 then plotchars 'WHERE~S THE MANUAL?' 0 0 5
   if phrase = 5 then plotchars 'WHO NEEDS 4K HD?' 0 0 5
-  if phrase = 6 then plotchars 'WHY WON~T THEY REPLY' 0 0 5
-  if phrase = 7 then plotchars 'I MISS THE OLD DAYS' 0 0 5
+  if phrase = 6 then plotchars 'BLOW ON THE CART!' 0 0 5
+  if phrase = 7 then plotchars 'PROSYSTEM FOREVER!' 0 0 5
+  if phrase = 8 then plotchars 'TRAMIEL SHOULD HAVE' 0 0 5 : plotchars 'RELEASED THE 7800!' 0 0 6
+  if phrase = 9 then plotchars 'THE 7800 WOULD HAVE' 0 0 5 : plotchars 'BEAT THE NES!' 0 0 6
+  if phrase = 10 then plotchars 'MARIA DMA IS SPECIAL' 0 0 5
+  if phrase = 11 then plotchars 'POKEY HAD SOUL!' 0 0 5
+  if phrase = 12 then plotchars 'HOLEY DMA ISN~T A' 0 0 5 : plotchars 'BUG, IT~S A FEATURE!' 0 0 6
+  if phrase = 13 then plotchars 'IN MY DAY WE COUNTED' 0 0 5 : plotchars 'EVERY CYCLE!' 0 0 6
+  if phrase = 14 then plotchars 'YOUR ZONES ARE' 0 0 5 : plotchars 'A MESS!' 0 0 6
+  if phrase = 15 then plotchars '128 BYTES OF RAM' 0 0 5 : plotchars 'WAS ENOUGH FOR US!' 0 0 6
+  if phrase = 16 then plotchars 'WHY WON~T THEY REPLY' 0 0 5
+  if phrase = 17 then plotchars 'I MISS THE OLD DAYS' 0 0 5
+  if phrase = 18 then plotchars 'WE USED TO MAKE' 0 0 5 : plotchars 'THINGS TOGETHER...' 0 0 6
+  if phrase = 19 then plotchars 'IS ANYONE OUT THERE?' 0 0 5
   return
 
   rem the scenery: stars, the house, the porch, the yard. (No stars in
@@ -822,7 +843,9 @@ rain
   jsr mus_play
 end
   musmask = $3F
-  raint = 0 : tc = 0 : page = 0 : pagedone = 0
+  raint = 0 : tc = 0 : page = 0 : pagedone = 0 : reply = 0
+  rem Arthur's words, in his own colour
+  P3C1 = $1C
   gosub porchscene
   savescreen
   fireheld = 1
@@ -834,6 +857,8 @@ rainloop
   if raint < 70 then goto rainsky
   sfxon = 0
   AUDC1 = 8 : AUDF1 = 1 : t = rand & 1 : AUDV1 = t + 2
+  rem when Arthur answers, the rain has stopped
+  if reply then AUDV1 = 0
 rainsky
   rem the Cloud lightens as it empties
   t = raint / 16
@@ -842,6 +867,7 @@ rainsky
   P1C1 = cloudc1[stage] : P1C2 = cloudc2[stage] : P1C3 = cloudc3[stage]
   plotsprite cloud0 1 cloudx 16 1 4
   if raint < 20 then goto rainarthur
+  if reply then goto rainarthur
   t = frm / 2
   for x = 0 to 19
   y = x + x + x : y = y + t : y = y & 3 : y = y + y
@@ -864,20 +890,42 @@ rainarthur
 raindone
   drawscreen
   if switchreset then reboot
-  if pagedone < 120 then goto rainloop
+  if reply = 0 then goto rainloop
+  if pagedone < 90 then goto rainloop
   gosub newfire
   if u = 0 then goto rainloop
   goto menu
 
   rem one page of the Cloud's words; when it's typed, hold it, then turn
 raintext
+  if reply then goto arthurtext
   if night = 1 then gosub night1text
   if night = 2 then gosub night2text
   if night = 3 then gosub night3text
   if pagedone then pagedone = pagedone + 1
   if pagedone < 150 then return
   if page = 0 && night = 3 then page = 1 : tc = 0 : pagedone = 0 : return
-  pagedone = 149
+  rem the Cloud has said its piece: the rain stops, and Arthur answers
+  reply = 1 : tc = 0 : pagedone = 0
+  return
+arthurtext
+  if night = 2 then goto arthur2
+  if night = 3 then goto arthur3
+  t = 0 : u = 7 : gosub typed : if x then plotchars arhuh 3 0 5 x
+  t = 7 : u = 18 : gosub typed : if x then plotchars arfeel 3 0 6 x
+  v = 25 : goto arthurdone
+arthur2
+  t = 0 : u = 18 : gosub typed : if x then plotchars arfeel 3 0 5 x
+  t = 18 : u = 10 : gosub typed : if x then plotchars arthanks 3 0 6 x
+  v = 28 : goto arthurdone
+arthur3
+  t = 0 : u = 18 : gosub typed : if x then plotchars arfeel 3 0 5 x
+  t = 18 : u = 17 : gosub typed : if x then plotchars arcloud 3 0 6 x
+  v = 35
+arthurdone
+  if tc >= v && pagedone = 0 then pagedone = 1
+  if pagedone && pagedone < 200 then pagedone = pagedone + 1
+  if pagedone < 90 then return
   t = frm & 16 : if t then plotchars 'PRESS FIRE' 0 40 0
   return
   rem typed: x = how many of line (start t, length u) show by now
@@ -1091,6 +1139,19 @@ end
 end
   alphadata n3g font
   'FRIENDS.'
+end
+  rem and what Arthur says back
+  alphadata arhuh font
+  '...HUH.'
+end
+  alphadata arfeel font
+  'I FEEL BETTER NOW.'
+end
+  alphadata arthanks font
+  '...THANKS.'
+end
+  alphadata arcloud font
+  'THANK YOU, CLOUD.'
 end
 
   rem the sound driver: runs every frame from 7800basic's NMI, off screen

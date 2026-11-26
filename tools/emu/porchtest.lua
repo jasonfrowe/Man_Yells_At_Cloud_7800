@@ -6,7 +6,8 @@
 --      exhausted (in the rocking chair)
 --   3. on the beat: a yell as the swing crosses the Cloud's middle; he must
 --      not get dizzy, and the Cloud must break in under 40 s
---   4. the rain: screenshots of the rain and the Cloud's two pages
+--   4. the rain: screenshots of the rain, the Cloud's second page, and
+--      Arthur's answer
 -- Prints "result mash_dizzy offbeat_calm onbeat_dizzy rain_frames".
 -- RAM (build/work/myac.bas.symbol.txt): bp $E9, calm $EA, dizzyt $EB;
 -- mus_frame $2581.
@@ -63,8 +64,8 @@ emu.register_frame_done(function()
     end
     if f - t0 > 2400 then print(string.format("on the beat: no rain after 40 s (calm %d)", calm)); phase = "done" end
   elseif phase == "rain" then
-    if f - t0 == 150 or f - t0 == 330 or f - t0 == 640 then manager:machine().screens[":screen"]:snapshot() end
-    if f - t0 > 650 then phase = "done" end
+    if f - t0 == 150 or f - t0 == 420 or f - t0 == 720 then manager:machine().screens[":screen"]:snapshot() end
+    if f - t0 > 730 then phase = "done" end
   end
   for name, field in pairs(fields) do
     if name:match("^P1 ") then field:set_value(held[name] and 1 or 0) end
