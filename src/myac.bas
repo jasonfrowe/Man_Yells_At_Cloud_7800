@@ -449,10 +449,12 @@ reviewloop
   rem  green while it's over the Cloud). Either button yells (button 2
   rem  shakes a fist). Over the Cloud, it lands: CALM builds, more for a
   rem  streak of them, double for dead centre (PERFECT). Off it, he misses:
-  rem  a little CALM lost, his blood pressure up. Yelling again within half
-  rem  a beat is TOO FAST: more blood pressure, the streak gone. BP falls
-  rem  while he paces himself; at the top he's dizzy, sits in the rocking
-  rem  chair for a while and a little CALM drains away. No failing: CALM
+  rem  a little CALM lost, his blood pressure well up. Yelling again within
+  rem  half a beat is TOO FAST: the same, and the streak gone. Landing one
+  rem  brings BP down a little; on its own it only falls slowly. High BP
+  rem  drains CALM all the time (BP / 4 a frame into an accumulator, a point
+  rem  of CALM each time it overflows). At the top he's exhausted: he sits
+  rem  in the rocking chair for a while. No failing: CALM
   rem  fills, the Cloud breaks, and it rains. The music opens up as the
   rem  Cloud darkens (the voice mask follows CALM).
   rem ======================================================================
@@ -484,6 +486,7 @@ reviewloop
   dim streak = $2263
   dim sinceyell = $2264
   dim inwin = $2265
+  dim drain = $2266
   rem the porch's letters (the slop ROM's are free here)
   dim cloudx = a
   dim bp = d
@@ -504,7 +507,7 @@ end
   sfxon = 1
   for x = 0 to 3 : pt[x] = 0 : next
   cloudx = 36 : clouddir = 1
-  bp = 0 : calm = 0 : dizzyt = 0 : streak = 0 : sinceyell = 255
+  bp = 0 : calm = 0 : dizzyt = 0 : streak = 0 : sinceyell = 255 : drain = 0
   pose = 0 : poset = 0 : phraset = 0 : fbt = 0
   BACKGRND = $70
   P0C1 = $0F : P0C3 = $9C
@@ -531,9 +534,12 @@ porchloop
   if sinceyell < 255 then sinceyell = sinceyell + 1
   gosub porchinput
   gosub moveproj
-  rem blood pressure falls while he paces himself: 16 a beat
-  t = frm & 1
+  rem blood pressure falls slowly on its own: 2 a beat
+  t = frm & 15
   if t = 0 && bp then bp = bp - 1
+  rem and while it's up, CALM drains: BP 64 costs 2 a beat, 120 about 4
+  t = bp / 4 : u = drain : drain = drain + t
+  if drain < u && calm then calm = calm - 1
   if dizzyt then dizzyt = dizzyt - 1
   if bp >= 128 && dizzyt = 0 then gosub getdizzy
   if poset then poset = poset - 1
@@ -653,9 +659,10 @@ freeslot
   x = 255
   return
 
+  rem exhausted: into the rocking chair; he comes out of it calmer (BP
+  rem 64), but the streak's gone
 getdizzy
-  dizzyt = 150 : bp = 48 : streak = 0
-  if calm >= 8 then calm = calm - 8 else calm = 0
+  dizzyt = 150 : bp = 64 : streak = 0
   sfxid = 7
   goto playsfx
 
@@ -703,14 +710,16 @@ cloudhit
   if pperf[x] then w = w + w : fbk = 2
   calm = calm + w
   if calm > 128 then calm = 128
-  bp = bp + 4
+  rem landing one soothes him: BP down 2 (PERFECT 4)
+  t = 2 : if pperf[x] then t = 4
+  if bp >= t then bp = bp - t else bp = 0
   fbt = 30
   sfxid = 3 : if pperf[x] then sfxid = 4
   goto playsfx
 missed
   streak = 0
   if calm >= 2 then calm = calm - 2 else calm = 0
-  bp = bp + 14
+  bp = bp + 16
   fbk = 3 : fbt = 30
   sfxid = 5
   goto playsfx

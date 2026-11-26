@@ -174,10 +174,10 @@ Arthur's yell phrases change over the nights. By Night 3 a few are quieter: *"WH
 
 **As built (prototype 2), after the first play test:** aiming *and* timing was too hard, so the aim now does the timing.
 - Arthur's aim swings back and forth across the Cloud on a sine wave, 56 pixels each way. It crosses the Cloud's middle on every beat of the music, and the aim dots and crosshair turn yellow while they're over the Cloud. Either button yells: button 1 shouts, button 2 shakes a fist.
-- **Hit:** CALM +2, rising to +3, +4 and +5 for a streak of 4, 8 or 12 hits in a row. Dead centre is PERFECT and doubles it. BP +4.
-- **Miss:** CALM −2, BP +14, and the streak resets.
+- **Hit:** CALM +2, rising to +3, +4 and +5 for a streak of 4, 8 or 12 hits in a row. Dead centre is PERFECT and doubles it. A hit soothes Arthur: BP −2 (PERFECT −4).
+- **Miss:** CALM −2, BP +16, and the streak resets.
 - **Too fast** (yelling within half a beat of the last yell): CALM −2, BP +16, and the streak resets.
-- BP falls by 16 a beat. Mashing makes Arthur dizzy in about 1 second. Dizzy lasts 2½ seconds and costs 8 CALM.
+- On its own, BP falls only slowly, by 2 a beat. **While BP is up, CALM drains:** at BP 64 it loses 2 a beat, and near the top about 4. Eight misses in a row, or about a second of mashing, and Arthur is **exhausted**. He sits in the rocking chair for 2½ seconds and comes out at BP 64, still draining, until some hits bring him down.
 - The soft spot and the fist wind-up were removed.
 - The Cloud is an 80 × 64 sprite in two breathing frames, swelling on each beat. The music builds with CALM: bass, harmony and the beat to start, the lead at 48, everything at 96. The beat is now a clean POKEY thump with a quiet tick between, with no white-noise snare. Perfect play breaks the Cloud in about 9 seconds; mostly-GOOD play takes about 40.
 - The Cloud's line is typed out in the rain, a page at a time (night 3 has two pages). The TIA hisses the rain.

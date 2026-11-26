@@ -2,7 +2,8 @@
 -- porch, night 3. Then:
 --   1. mashing: a yell every 8 frames; TOO FAST, and Arthur must get dizzy
 --   2. off the beat: a yell a beat, a quarter beat late (the aim off the
---      Cloud): every one must miss, and CALM must not build
+--      Cloud): every one must miss, CALM must drain, and he must end up
+--      exhausted (in the rocking chair)
 --   3. on the beat: a yell as the swing crosses the Cloud's middle; he must
 --      not get dizzy, and the Cloud must break in under 40 s
 --   4. the rain: screenshots of the rain and the Cloud's two pages
@@ -15,7 +16,7 @@ for tag, port in pairs(manager:machine():ioport().ports) do
 end
 local function m() return manager:machine().devices[":maincpu"].spaces["program"] end
 local f, phase, t0 = 0, "menu", 0
-local mashdizzy, offcalm, ondizzy, rainf, maxbp = -1, -1, 0, -1, 0
+local mashdizzy, offcalm, ondizzy, rainf, maxbp, offdizzy = -1, -1, 0, -1, 0, -1
 emu.register_frame_done(function()
   f = f + 1
   local mm = m()
@@ -39,6 +40,10 @@ emu.register_frame_done(function()
     end
   elseif phase == "off" then
     if beat == 8 then held["P1 Button 1"] = true end
+    if dizzy > 0 and offdizzy < 0 then
+      offdizzy = f - t0
+      print(string.format("off the beat: exhausted after %.1f s", offdizzy / 60))
+    end
     if f - t0 == 480 then
       offcalm = calm
       print(string.format("off the beat: CALM 40 -> %d after 8 s", calm))
@@ -65,6 +70,7 @@ emu.register_frame_done(function()
     if name:match("^P1 ") then field:set_value(held[name] and 1 or 0) end
   end
   if phase == "done" then
+    if offdizzy < 0 then offcalm = 99 end
     print(string.format("result %d %d %d %d", mashdizzy, offcalm, ondizzy, rainf))
     manager:machine():exit()
   end
