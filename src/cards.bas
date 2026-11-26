@@ -1,15 +1,19 @@
   rem ======================================================================
   rem  THE DAY JOB (prototype 3, bank 4): punch cards at NimbusWorks.
   rem  320A, 40 columns (cards.asm). A card is 20 columns of 12 rows: rows
-  rem  0-4 the opcode (one hole: LOAD, ADD, SHIFT, JMP, OUT), rows 5-11 the
-  rem  operand (7 bits, 64 down to 1: ASCII). One register, A (7 bits).
-  rem    LOAD n   A = n            ADD n   A = A + n (mod 128)
-  rem    SHIFT    A = A x 2        JMP n   to column n if A isn't 0
+  rem  0-4 the opcode (one hole: LOAD, ADD, CNT, LOOP, OUT), rows 5-11 the
+  rem  operand (7 bits, 64 down to 1: ASCII). Registers A (7 bits) and the
+  rem  counter C.
+  rem    LOAD n   A = n            ADD n   A = A + n (mod 128; 127 is -1)
+  rem    CNT n    C = n            LOOP n  C = C - 1, to column n if C > 0
   rem    OUT      print A          (no hole: the column's skipped)
+  rem  A job a day (the menu's day): 1 HELLO (HE comes punched), 2 text and
+  rem  a count (a loop), 3 the whole card: two loops and a countdown.
   rem  The stick moves the cursor, button 1 punches (or un-punches) a hole,
   rem  button 2 runs the card: the reader steps through it, printing; the
   rem  output must match the target. Two holes in a column's opcode rows,
-  rem  a jump to nowhere, or 200 steps jam the reader.
+  rem  a loop to nowhere, or 200 steps jam the reader. Below the card's
+  rem  last row is GO HOME (back to the menu: the porch is there).
   rem  The Konami code (up up down down left right left right, button 2,
   rem  button 1) is Cloud Assist: the card punches itself (the forum's
   rem  rumor; Concept.md 4.1).
@@ -46,19 +50,24 @@
   dim cstr = $2276
   dim cfire2 = $227B
   dim cbase = $227C
+  dim ccnt = $227D
+  rem row 10 from column 32 (GO HOME), row 7 from column 31 (C)
+  dim chome = $24A0
 
 cards
   asm
-  jsr mus_stop
+  lda #MUS_OFFICE
+  jsr mus_play
   jsr c_enter
 end
+  musmask = $37
   sfxon = 1 : AUDV0 = 0 : AUDV1 = 0
   BACKGRND = $00
   P0C1 = $0F : P0C2 = $0F : P0C3 = $0F
   P1C1 = $2D : P1C2 = $2D : P1C3 = $2D
   P2C1 = $CA : P2C2 = $CA : P2C3 = $CA
   P3C1 = $1C : P3C2 = $1C : P3C3 = $1C
-  cjob = 0
+  cjob = night - 1
 
   rem ---- a job: the card, the target, the screen ----
 cjobstart
@@ -81,7 +90,7 @@ cjobpre0
 end
   cprow = 0 : cpcol = 0 : cstr = 0 : gosub say
   cprow = 0 : cpcol = 32 : cstr = 1 : gosub say
-  t = cjob + 17 : cpanel[38] = t + t
+  t = cjob + 17 : cpanel[36] = t + t
   cprow = 1 : cpcol = 0 : cstr = 2 : gosub say
   cprow = 1 : cpcol = 8 : cstr = cjobtarget[cjob] : gosub say
   cprow = 2 : cpcol = 0 : cstr = 3 : gosub say
@@ -91,8 +100,10 @@ end
   cprow = 4 : cpcol = 27 : cstr = 5 : gosub say
   cprow = 5 : cpcol = 27 : cstr = 6 : gosub say
   cprow = 6 : cpcol = 27 : cstr = 7 : gosub say
+  cprow = 7 : cpcol = 27 : cstr = 33 : gosub say
   cprow = 8 : cpcol = 27 : cstr = 8 : gosub say
   cprow = 9 : cpcol = 27 : cstr = 9 : gosub say
+  gosub homeupd
   clearscreen
   asm
   jsr c_draw
@@ -121,17 +132,9 @@ end
 cwait
   gosub newfire1
   if u = 0 then goto cshow
-  if ctimer = 1 then goto cnextjob
-  if ctimer = 3 then goto cdone
+  if ctimer = 1 then goto cdone
   rem not a match, or a jam: back to the card
   cstate = 0 : gosub clearmsg
-  goto cshow
-cnextjob
-  cjob = cjob + 1
-  if cjob < 3 then goto cjobstart
-  gosub clearmsg
-  cprow = 11 : cpcol = 0 : cstr = 24 : gosub say
-  ctimer = 3
   goto cshow
 cdone
   asm
@@ -157,11 +160,24 @@ cstickrep
   if crep then return
   crep = 4
 cmove
+  t = crow
   if cdir = 1 && crow > 0 then crow = crow - 1
-  if cdir = 2 && crow < 11 then crow = crow + 1
+  if cdir = 2 && crow < 12 then crow = crow + 1
   if cdir = 3 && ccol > 0 then ccol = ccol - 1
   if cdir = 4 && ccol < 19 then ccol = ccol + 1
-  return
+  if t = crow then return
+  if t < 12 && crow < 12 then return
+  rem onto GO HOME, or back off it
+  gosub homeupd
+  gosub clearmsg
+  cprow = 11 : cpcol = 0
+  cstr = cjobhint[cjob] : if crow = 12 then cstr = 34
+  goto say
+  rem GO HOME, marked while the cursor's on it (row 12)
+homeupd
+  cprow = 10 : cpcol = 32 : cstr = 32
+  if crow = 12 then cstr = 31
+  goto say
 
   rem button 1 punches, button 2 runs the card; both feed the Konami code
 cbuttons
@@ -180,6 +196,7 @@ cb1
   if u = 0 then return
   w = 6 : gosub konami
   if ckon = 10 then goto cassistgo
+  if crow = 12 then pop : goto cdone
   rem punch, or un-punch, the hole under the cursor
   if crow < 5 then cop[ccol] = cop[ccol] ^ cmop[crow] else cval[ccol] = cval[ccol] ^ cmval[crow]
   sfxid = 9 : goto playsfx
@@ -209,9 +226,10 @@ cassistgo
 
   rem ---- running the card ----
 crunstart
-  cpc = 0 : cacc = 0 : csteps = 0 : coutn = 0 : ctimer = 0
+  cpc = 0 : cacc = 0 : ccnt = 0 : csteps = 0 : coutn = 0 : ctimer = 0
   for x = 0 to 31 : coutrow[x] = 0 : next
   cstate = 1
+  crow = 0 : gosub homeupd
   if cassist then return
   gosub clearmsg
   cprow = 11 : cpcol = 0 : cstr = 17 : gosub say
@@ -234,11 +252,12 @@ crun
   if w then cstr = 20 : goto cjam
   if t = 1 then cacc = u
   if t = 2 then cacc = cacc + u : cacc = cacc & 127
-  if t = 4 then cacc = cacc + cacc : cacc = cacc & 127
+  if t = 4 then ccnt = u
   if t = 16 then gosub cprint
   if t <> 8 then cpc = cpc + 1 : return
-  rem JMP n: to column n, if A isn't 0
-  if cacc = 0 then cpc = cpc + 1 : return
+  rem LOOP n: C = C - 1, and to column n if C isn't 0 yet
+  ccnt = ccnt - 1
+  if ccnt = 0 then cpc = cpc + 1 : return
   if u = 0 || u > 20 then cstr = 22 : goto cjam
   cpc = u - 1
   return
@@ -285,6 +304,8 @@ cpanelupd
   t = cval[ccol]
   cprow = 6 : cpcol = 31 : gosub num
   gosub showchar
+  t = ccnt
+  cprow = 7 : cpcol = 31 : gosub num
   t = cacc
   cprow = 8 : cpcol = 31 : gosub num
   gosub showchar
@@ -331,28 +352,34 @@ num
 end
   return
 
-  rem ---- the jobs (day 1) ----
-  rem the solutions, all three jobs one after another: opcode, operand
+  rem ---- the jobs, one a day ----
+  rem the solutions, one after another: opcode (1 LOAD, 2 ADD, 4 CNT,
+  rem 8 LOOP, 16 OUT), operand
+  rem  day 1 HELLO: H, E (punched), L twice (OUT, OUT), O
+  rem  day 2 CART 123456789: the text, then LOAD '1', CNT 9, OUT, ADD 1,
+  rem    LOOP 13
+  rem  day 3 PONG PONG PONG PONG 54321!: CNT 4, PONG and a space, LOOP 2;
+  rem    LOAD '5', CNT 5, OUT, ADD 127 (-1), LOOP 15; LOAD '!', OUT
   data csolop
-  1, 16, 1, 16
   1, 16, 1, 16, 1, 16, 16, 1, 16
-  1, 16, 1, 16, 1, 16, 1, 16
+  1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 4, 16, 2, 8
+  4, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 8, 1, 4, 16, 2, 8, 1, 16
 end
   data csolval
-  72, 0, 73, 0
   72, 0, 69, 0, 76, 0, 0, 79, 0
-  80, 0, 79, 0, 78, 0, 71, 0
+  67, 0, 65, 0, 82, 0, 84, 0, 32, 0, 49, 9, 0, 1, 13
+  4, 80, 0, 79, 0, 78, 0, 71, 0, 32, 0, 2, 53, 5, 0, 127, 15, 33, 0
 end
   rem each job's first solution column, its length, how much comes punched,
   rem its target (c_strs), its hint
   data cjobfirst
-  0, 4, 13
+  0, 9, 24
 end
   data cjobn
-  4, 9, 8
+  9, 15, 19
 end
   data cjobpre
-  2, 0, 0
+  4, 0, 0
 end
   data cjobtarget
   25, 26, 27

@@ -5,7 +5,8 @@
   rem  For now a menu of prototypes:
   rem    1  SUPER PADDLE BALL DELUXE, the first slop ROM (below)
   rem    2  THE PORCH: yelling at the Cloud, then the rain (porch.bas)
-  rem    3  THE DAY JOB: punch cards at NimbusWorks (cards.bas)
+  rem    3  THE DAY JOB: punch cards at NimbusWorks, a job a day (cards.bas)
+  rem  Left and right pick the night / day (1-3) for both.
   rem
   rem  Prototype 1: SUPER PADDLE BALL DELUXE, the first slop ROM.
   rem  An overblown title, then a broken Pong. Every hit scores the COMBO
@@ -112,7 +113,7 @@ end
   plotchars 'PROTOTYPES' 3 40 4
   plotchars 'SUPER PADDLE BALL' 0 16 6
   plotchars 'THE PORCH: NIGHT' 0 16 7
-  plotchars 'THE DAY JOB' 0 16 8
+  plotchars 'THE DAY JOB: DAY' 0 16 8
   plotchars 'POKEYS FOUND:' 3 16 10
   savescreen
   fireheld = 1 : stickheld = 1
@@ -125,6 +126,7 @@ menuloop
   plotchars '>' 2 4 t
   dnum = night + night : dnum = dnum + 32
   plotchars dnum 2 152 7 1
+  plotchars dnum 2 152 8 1
   dnum2 = pkey2 + pkey2 : dnum2 = dnum2 + 34
   plotchars dnum2 2 128 10 1
   drawscreen

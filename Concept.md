@@ -71,12 +71,12 @@ The regulars are the same people Arthur argues with in the forum scenes, so the 
 
 | | Day job | Evening forum | Night porch |
 |---|---|---|---|
-| **Day 1 (Mon)** | 3 punch-card puzzles | Break *SUPER PADDLE BALL DELUXE* | Yell. Cloud's first line. |
-| **Day 2 (Wed)** | 3 puzzles | Break *CYBER NEON BLAST* | Yell. Arthur's lines get softer. |
-| **Day 3 (Fri)** | 3 puzzles | Break *QUANTUM PIXEL QUEST*. Then the MIRROR thread appears. | Yell. The Cloud's key line. |
+| **Day 1 (Mon)** | 1 punch-card job | Break *SUPER PADDLE BALL DELUXE* | Yell. Cloud's first line. |
+| **Day 2 (Wed)** | 1 job | Break *CYBER NEON BLAST* | Yell. Arthur's lines get softer. |
+| **Day 3 (Fri)** | 1 job (the whole card) | Break *QUANTUM PIXEL QUEST*. Then the MIRROR thread appears. | Yell. The Cloud's key line. |
 | **Finale (Sat)** | **The mirror ROM:** gather the cards, solve the two-person puzzles, run the deck. | | **Potluck on the porch.** Ending. |
 
-Totals: 9 puzzles, 3 slop ROMs, 3 porch nights, 1 mirror chapter, the ending. Short cutscenes (picture or portrait over 40-column teletype text, as in Gamma Force) link the scenes.
+Totals: 3 punch-card jobs, 3 slop ROMs, 3 porch nights, 1 mirror chapter, the ending. Short cutscenes (picture or portrait over 40-column teletype text, as in Gamma Force) link the scenes.
 
 ---
 
@@ -88,28 +88,32 @@ Totals: 9 puzzles, 3 slop ROMs, 3 porch nights, 1 mirror chapter, the ending. Sh
 
 **The card:** **20 columns by 12 rows.** Each column is one instruction.
 
-- **Rows 0–4: opcode.** Punch exactly one: `LOAD`, `ADD`, `SHIFT`, `JMP`, `OUT`.
+- **Rows 0–4: opcode.** Punch exactly one: `LOAD`, `ADD`, `CNT`, `LOOP`, `OUT`.
 - **Rows 5–11: operand,** 7 bits, 0–127. That's 7-bit ASCII, so `OUT` really does print a letter, and the manual includes an ASCII chart.
 
-**The machine:** one register, **A** (7 bits, wraps at 128).
+**The machine:** two registers: **A** (7 bits, wraps at 128) and the counter **C**.
 
 | Opcode | Effect |
 |---|---|
 | `LOAD n` | A = n |
 | `ADD n` | A = A + n (mod 128). `ADD 127` subtracts 1, a trick the manual hints at. |
-| `SHIFT` | A = A × 2 (mod 128) |
-| `JMP n` | If A ≠ 0, go to column n |
+| `CNT n` | C = n |
+| `LOOP n` | C = C − 1; if C ≠ 0, go to column n (the Z80's `DJNZ`) |
 | `OUT` | Print A as an ASCII character |
+
+*(Revised after play-testing: with SHIFT and JMP-if-A, every job could be done with LOAD and OUT alone. A loop needs its own counter so A is free to hold the character; and since LOAD + OUT is two columns a character, any target over 10 characters can't fit on a card without a loop.)*
 
 Running past column 20 halts. A step limit stops infinite loops, and the reader jams with a comic *KA-CHUNK*.
 
 **Controls:** the joystick moves the cursor, button 1 punches or un-punches a hole, and button 2 feeds the card into the reader. The output prints, and if it matches the target, the puzzle is done.
 
-**Puzzle arc:**
+**Puzzle arc:** one job a day (revised after play-testing).
 
-- **Day 1** teaches LOAD/OUT/ADD: print `HI`, then `HELLO`, then `ABCDE` cheaply using ADD.
-- **Day 2** teaches SHIFT and loops with JMP: print `AAAAAAAA` in fewer columns than letters.
-- **Day 3** uses everything. The targets turn uncomfortable: `PONG`, `PONG PONG`, `MAKE GAME=PONG`. Arthur realizes NimbusWorks is feeding the slop machine.
+- **Day 1: `HELLO`.** The card comes with `HE` punched (LOAD 72, OUT, LOAD 69, OUT). Teaches LOAD and OUT, and that OUT twice prints the L twice.
+- **Day 2: `CART 123456789`.** Text and a simple count: the text by hand, then LOAD '1', CNT 9, OUT, ADD 1, LOOP back to the OUT. Too long for the card without the loop. (NimbusWorks is numbering cartridges. Why?)
+- **Day 3: `PONG PONG PONG PONG 54321!`.** The whole card (19 of 20 columns) and every instruction: a counted loop for the PONGs, a countdown loop with ADD 127, and the "!". Arthur realizes NimbusWorks is feeding the slop machine.
+
+**Going home:** below the card's last row is **GO HOME** (back to the menu for now; in the story, home to the porch to yell it out and come back). The card isn't kept.
 
 **Cloud Assist (the Konami code):** on the puzzle screen, enter **↑ ↑ ↓ ↓ ← → ← → B A**, where B is button 2 and A is button 1. Stray cursor moves or punches during the code don't matter, because the solution overwrites the card. The reader solves the card instantly, and the Soul Meter dips (see 4.5). **We want people to try it, so it's hinted in two places:** the manual has a coffee-stained margin note (*"heard you can make the reader do it for you… ask a Contra fan"*), and on Day 1 a forum regular posts it as a rumor. Neither spells out the whole code.
 
@@ -118,9 +122,11 @@ Running past column 20 halts. A step limit stops infinite loops, and the reader 
 - **The card:** the 12 card rows fit in 6 text rows, two to a character. The cell, label and ruler glyphs use the font's odd codes. The card is cream "on" pixels, and a hole is "off" pixels, so the dark screen shows through.
 - **The panel:** beside the card, it decodes the cursor's column (OP, VAL and its character) and shows A and the step count while the card runs.
 - **Running:** the reader steps through the card every 6 frames with a clack. The output prints in green under the target, and a match rings a bell. Two opcodes in one column, a JMP to nowhere, or 200 steps jams the reader with a KA-CHUNK.
-- **The jobs, day 1 only for now:** HI (the first two columns come punched, as a tutorial), HELLO, and PONG.
+- **The jobs:** one a day, picked on the menu, as in the puzzle arc above. A match ends the shift.
 - **Cloud Assist:** the Konami code, ending with B (button 2) and A (button 1). The B is held back so it doesn't run the card, and the card punches itself and runs.
-- Days 2 and 3 (SHIFT, loops with JMP, and NimbusWorks' darker targets) and the Soul Meter come later.
+- **GO HOME:** the cursor goes below row 11 onto GO HOME (gold, at the help line's end); button 1 there goes back to the menu.
+- **Music:** `MUS_OFFICE`, F major muzak (F, Dm, Gm, C) with a soft thump and tick, under the TIA clacks.
+- The Soul Meter comes later.
 
 ### 4.2 The Evening: AtariAge Forum and Slop Pong (160A)
 
@@ -206,7 +212,7 @@ Arthur's yell phrases change over the nights. By Night 3 a few are quieter: *"WH
 
 - **SolderSue:** finish her card by fixing three bad columns, a short punch puzzle.
 - **Hi_Score_Hal:** a two-paddle Pong rally, played properly for once, cooperating to keep the ball alive for 20 hits. This is the one game in the story you play straight, and it's a good one. With one joystick, Hal plays the other paddle (a forgiving CPU partner). With two, **Player 2 takes Hal's paddle.**
-- **DocMaria:** a punch-card puzzle using `SHIFT` tricks to produce her card's characters.
+- **DocMaria:** a punch-card puzzle using loop and `ADD 127` tricks to produce her card's characters.
 
 **pixelkid_07:** Arthur finds them in the hub. The dialogue depends on which reviews Arthur wrote, but every branch ends with pixelkid admitting they didn't know how to start and were afraid to ask. Arthur realizes the target of his anger was a kid who wanted in. Then pixelkid joins and follows Arthur for the rest of the chapter.
 
@@ -274,7 +280,7 @@ The unlock is kept in the High Score Cart or SaveKey if one is present. Without 
 | Scene | Sound |
 |---|---|
 | Slop ROMs | **TIA only**, deliberately harsh: off-key square waves and rude buzzes. TIA's natural detuning is the joke. Both POKEYs go silent, so the contrast is total. |
-| Punch cards | Mechanical clacks and reader *KA-CHUNK*s, with a quiet POKEY office hum. |
+| Punch cards | Mechanical clacks and reader *KA-CHUNK*s over POKEY office muzak (`MUS_OFFICE`). |
 | Forum | A light POKEY "dial-up nostalgia" loop. |
 | Porch (yelling) | A POKEY beat that drives the Cloud's breathing, and gets tenser as the Cloud darkens. |
 | Rain | Warm POKEY bass and pads plus a filtered noise downpour. |

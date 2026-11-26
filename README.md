@@ -17,8 +17,10 @@ and enjoy the meal.
 2. *The porch*: Arthur yells at the Cloud on the beat of the POKEY music
    until it breaks into rain and says one thing to him (nights 1 to 3).
 3. *The day job*: punch cards at NimbusWorks, in 320A, 40 columns. Punch
-   a 20-column program (LOAD, ADD, SHIFT, JMP, OUT, and a 7-bit operand)
-   that prints the target. Three jobs: HI, HELLO, and... PONG.
+   a 20-column program (LOAD, ADD, CNT, LOOP, OUT, and a 7-bit operand)
+   that prints the target, to the office's POKEY muzak. A job a day (left
+   and right on the menu pick it): HELLO, a count, and a whole card of
+   PONG. GO HOME (below the card) goes back to the menu.
 
 The menu shows how many POKEYs it found: the music plays on two, or falls
 back to lead, bass and drums on one. See [Concept.md](Concept.md)
@@ -33,7 +35,7 @@ Needs [wasmtime](https://wasmtime.dev) (7800basic is vendored in
 tools/build.sh        # -> build/myac.a78
 tools/test_break.sh   # a bot breaks the slop ROM, headless (a7800 fork)
 tools/test_porch.sh   # a bot plays the porch (ONEPOKEY=1: one POKEY)
-tools/test_cards.sh   # a bot punches a card, and Cloud Assists the rest
+tools/test_cards.sh   # GO HOME, a card punched by hand, days 2-3 Cloud Assisted
 ```
 
 The porch's controls: just the buttons. Arthur's aim swings across the

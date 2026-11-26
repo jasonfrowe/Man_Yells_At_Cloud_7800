@@ -133,7 +133,7 @@ GARB = [
 #               text row r, column k), ink ("off") on the card
 #     i 36-45   ruler digits 0-9, ink on the card
 #     i 46      plain card
-CARD_LABELS = ["LOAD", "ADD ", "SHFT", "JMP ", "OUT ", "  64", "  32", "  16",
+CARD_LABELS = ["LOAD", "ADD ", "CNT ", "LOOP", "OUT ", "  64", "  32", "  16",
                "   8", "   4", "   2", "   1"]
 
 

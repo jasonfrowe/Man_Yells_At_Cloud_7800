@@ -9,7 +9,7 @@
 ;   row 2       OUTPUT: and the printer strip   white, then green
 ;   rows 3-9    the card (columns 0-25)         cream
 ;               the column's decode (27-39)     white
-;   row 10      the help line                   white
+;   row 10      the help line, GO HOME (32-39)  white, gold
 ;   row 11      messages                        gold
 ;
 ; The card: rows 3 (the ruler) and 4-9 (six text rows, two card rows
@@ -25,7 +25,7 @@ c_op      = $2200   ; [20] each card column's opcode rows: 1 LOAD, 2 ADD,
                     ;   4 SHIFT, 8 JMP, 16 OUT
 c_val     = $2214   ; [20] ... its operand rows (7 bits, 64 at the top)
 c_col     = $2269   ; the cursor's column (0-19) and card row (0-11)
-c_row     = $226A
+c_row     = $226A   ;   (12: GO HOME, below the card)
 c_curon   = $2274   ; draw the cursor (it blinks)
 c_prow    = $2277   ; c_puts / c_num: where
 c_pcol    = $2278
@@ -376,4 +376,4 @@ c_rowhi
 c_seg_row .byte 0, 0, 1, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 4, 5, 6, 7, 8, 9, 10, 10, 11, 11, $FF
 c_seg_col .byte 0, 32, 0, 32, 0, 8, 0, 0, 0, 0, 0, 0, 0, 27, 27, 27, 27, 27, 27, 0, 32, 0, 32
 c_seg_len .byte 32, 8, 32, 8, 8, 32, 26, 26, 26, 26, 26, 26, 26, 13, 13, 13, 13, 13, 13, 32, 8, 32, 8
-c_seg_pal .byte 3, 3, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3
+c_seg_pal .byte 3, 3, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3
