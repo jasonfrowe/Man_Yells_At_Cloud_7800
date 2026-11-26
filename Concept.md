@@ -111,7 +111,9 @@ Running past column 20 halts. A step limit stops infinite loops, and the reader 
 
 - **Day 1: `HELLO`.** The card comes with `HE` punched (LOAD 72, OUT, LOAD 69, OUT). Teaches LOAD and OUT, and that OUT twice prints the L twice.
 - **Day 2: `CART 123456789`.** Text and a simple count: the text by hand, then LOAD '1', CNT 9, OUT, ADD 1, LOOP back to the OUT. Too long for the card without the loop. (NimbusWorks is numbering cartridges. Why?)
-- **Day 3: `PONG PONG PONG PONG 54321!`.** The whole card (19 of 20 columns) and every instruction: a counted loop for the PONGs, a countdown loop with ADD 127, and the "!". Arthur realizes NimbusWorks is feeding the slop machine.
+- **Day 3: `PONG PONG PONG PONG 54321!`.** The whole card (19 of 20 columns) and every instruction: a counted loop for the PONGs, a countdown loop with ADD 127, and the "!". Arthur realizes NimbusWorks is feeding the slop machine. **A hard challenge on purpose:** no on-screen hint about ADD 127 (the hint line is just "...PONG? WHAT DO THEY WANT WITH PONG?"). The manual has it, and Cloud Assist is always there.
+
+**Hints live in the manual.** A throwback to when computers came with full manuals: the on-screen hints stay short, and the manual has the real help. It's a NimbusWorks operator's guide with the opcode table, an ASCII chart, worked examples (printing a word, a counted loop), the `ADD 127` trick ("the reader has no SUBTRACT; A wraps at 128"), and the coffee-stained Konami note.
 
 **Going home:** below the card's last row is **GO HOME** (back to the menu for now; in the story, home to the porch to yell it out and come back). The card isn't kept.
 

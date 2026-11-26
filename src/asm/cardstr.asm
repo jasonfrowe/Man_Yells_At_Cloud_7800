@@ -31,7 +31,7 @@ c_s26 .byte "CART 123456789",0
 c_s27 .byte "PONG PONG PONG PONG 54321!",0
 c_s28 .byte "H AND E ARE DONE. L IS 76, O IS 79.",0
 c_s29 .byte "CNT N: C=N. LOOP N: C-1, IF C>0 GO TO N",0
-c_s30 .byte "PONG? AGAIN? (ADD 127 TAKES ONE AWAY.)",0
+c_s30 .byte "...PONG? WHAT DO THEY WANT WITH PONG?",0
 c_s31 .byte ">GO HOME",0
 c_s32 .byte " GO HOME",0
 c_s33 .byte "C =",0
