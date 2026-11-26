@@ -1,0 +1,31 @@
+# Man Yells at Cloud (Atari 7800)
+
+A story game for the Atari 7800. Arthur, a retired mainframe programmer,
+spends his days punching cards, his evenings breaking the AI-generated
+Pong clones flooding the AtariAge forums, and his nights yelling at a very
+patient cloud. Then a strange ROM shows him his own living room, and the
+people he's been arguing with every night.
+
+Everyone is welcome in retrogaming. Don't just leave slop and run: stay
+and enjoy the meal.
+
+**Status:** concept. See [Concept.md](Concept.md) for the design
+([Concept_v1.md](Concept_v1.md) is the original pitch).
+
+## Hardware
+
+- Atari 7800, two-button joystick (a second joystick for the co-op finale
+  is optional)
+- SuperGame-style cart with dual POKEY ($0450 + $0440)
+- No AstroCart Math Unit needed: the game is meant to run for everyone
+- Tested on real hardware with the AstroCart V4
+
+## Related projects
+
+- [AtariGammaForce](https://github.com/jasonfrowe/AtariGammaForce): toolchain, cutscenes, jukebox
+- [Cosmic_Arc_II_7800](https://github.com/jasonfrowe/Cosmic_Arc_II_7800): dual-POKEY music
+- [a7800 fork](https://github.com/jasonfrowe/a7800): headless emulation and scripted testing
+
+## License
+
+GPL-3.0, as for the other projects in the series.
