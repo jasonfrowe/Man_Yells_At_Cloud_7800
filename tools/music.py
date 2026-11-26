@@ -14,7 +14,8 @@ the driver's mus_frame (wrapping at 256) keeps the beat: a quarter is 32
 frames, beat = mus_frame & 31 (the porch's on-beat window).
 
   MUS_PORCH  E minor, 112 BPM, tense: Arthur yells, the Cloud breathes on
-             every quarter (kick or snare on each)
+             every quarter (a clean thump on each; the aim crosses the Cloud
+             on it)
   MUS_RAIN   C major, slower, warm: the rain
 
 The generated songs (Cosmic Arc II's tools/musicgen) can come in later.
@@ -79,8 +80,12 @@ DRUMS = [
     ("hat", [(0x85, 0), (0x83, 0), (0x81, 0)]),
     ("ohat", [(0x85, 0), (0x84, 0), (0x84, 0), (0x83, 0), (0x83, 0), (0x82, 0), (0x82, 0), (0x81, 0)]),
     ("tom", [(0xAD, 100), (0xAB, 120), (0xA9, 140), (0xA7, 160), (0xA5, 180), (0xA3, 200)]),
+    # the porch's: a clean kick (pure tone falling, no poly4 burst) on every
+    # beat, and a quiet short tick between (voice 5: two POKEYs only)
+    ("thump", [(0xAC, 120), (0xAB, 150), (0xAA, 185), (0xA8, 215), (0xA6, 240), (0xA4, 255), (0xA2, 255)]),
+    ("tick", [(0x84, 1), (0x82, 1)]),
 ]
-HATS = {"hat", "ohat"}
+HATS = {"hat", "ohat", "tick"}
 DR = {n: i for i, (n, _) in enumerate(DRUMS)}
 
 ROOT_OF = {"Dm": "D", "Bb": "A#", "C": "C", "Am": "A", "Gm": "G", "A": "A"}
@@ -214,8 +219,10 @@ F#5:4 E5:4 B4:8
 C5:2 E5:2 G5:2 C6:6 B5:4
 B5:4 A5:4 F#5:4 D#5:4
 """
-DRUM_PORCH = "kick:4 snare:4 kick:2 kick:2 snare:4"
-DRUM_PORCHFILL = "kick:4 snare:4 kick:2 tom:2 snare:2 snare:2"
+# A clean thump on every beat (the Cloud breathes to it, the aim crosses
+# it), a quiet tick between: no white-noise snare.
+DRUM_PORCH = "thump:2 tick:2 thump:2 tick:2 thump:2 tick:2 thump:2 tick:2"
+DRUM_PORCHFILL = "thump:2 tick:2 thump:2 tick:2 thump:2 tick:2 thump:2 tick:1 tick:1"
 
 
 def song_porch():
@@ -239,8 +246,8 @@ B5:4 A5:4 E5:8
 F5:4 A5:4 C6:4 A5:4
 G5:12 r:4
 """
-DRUM_RAIN = "kick:8 hat:4 hat:4"
-DRUM_RAINFILL = "kick:8 hat:4 tom:4"
+DRUM_RAIN = "thump:8 tick:4 tick:4"
+DRUM_RAINFILL = "thump:8 tick:4 tom:4"
 
 
 def song_rain():
@@ -269,14 +276,14 @@ def sweep(c, f0, f1, v0, v1, n):
 
 
 SFX = [
-    ("YELL", 0, 2, sweep(1, 10, 16, 12, 6, 10)),          # a yell: a rough bark
-    ("YELLBEAT", 0, 3, sweep(1, 6, 14, 15, 8, 12)),       # ... on the beat
-    ("WINDUP", 0, 1, sweep(4, 28, 20, 2, 5, 8)),          # winding up a fist
-    ("FIST", 0, 3, sweep(8, 4, 20, 12, 3, 14)),           # the fist flies
-    ("POOF", 1, 2, sweep(8, 16, 26, 10, 1, 12)),          # the Cloud swallows it
-    ("SOFT", 1, 3, notes_fx(4, [11, 9], 3, 8)),           # the soft spot
-    ("DIZZY", 1, 5, [(4, f, 9) for f in (12, 16, 12, 16, 14, 18, 14, 18, 16, 20, 16, 20)]),
-    ("THUNDER", 1, 6, sweep(8, 28, 31, 15, 0, 60)),       # the Cloud breaks
+    ("YELL", 0, 2, sweep(12, 10, 16, 9, 3, 8)),           # a yell: a short bark
+    ("FIST", 0, 2, sweep(12, 16, 10, 9, 3, 8)),           # a fist shaken
+    ("GOOD", 1, 3, notes_fx(4, [14, 11], 3, 7)),          # it lands
+    ("PERFECT", 1, 4, notes_fx(4, [14, 11, 8], 3, 8)),    # dead centre
+    ("MISS", 1, 3, sweep(12, 18, 26, 6, 1, 10)),          # it goes by
+    ("TOOFAST", 1, 4, notes_fx(12, [20, 24], 4, 7)),      # mashing
+    ("DIZZY", 1, 5, [(4, f, 7) for f in (12, 16, 12, 16, 14, 18, 14, 18, 16, 20, 16, 20)]),
+    ("THUNDER", 1, 6, sweep(8, 28, 31, 12, 0, 60)),       # the Cloud breaks
 ]
 
 

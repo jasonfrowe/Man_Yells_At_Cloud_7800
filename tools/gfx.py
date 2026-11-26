@@ -157,10 +157,10 @@ CHAIR = (["..cc............"] + ["..cbc..........."] * 17 + ["..cccccccccc...."]
 # what he yells: a grawlix bubble, 8 x 8
 BUBBLE = ["..cccc..", ".cccccc.", "ccaccacc", "cacaacac", "ccaccacc", ".cccccc.", "..cc....", ".c......"]
 FIST = ["..aaaa..", ".aaaaaa.", "aacacaca", "aaaaaaaa", "aaaaaaaa", ".aaaaaa.", "..bbbb..", "..bbbb.."]
-AIMDOT = ["aa..", "aa.."]
+AIMDOT = [".aa.", "aaaa", ".aa."]
+# where the yell will reach the Cloud: a crosshair
+RETICLE = ["...aa...", "...aa...", "aa....aa", "...aa...", "...aa..."]
 DROP = [".c..", ".c..", "cc..", "cc..", "cc..", ".c.."]
-SPLASH = [["....", "....", "c..c", ".cc."], ["c..c", "....", "....", "c..c"]]
-SOFTSPOT = ["..aaaa..", ".aaaaaa.", "aaaaaaaa", ".aaaaaa.", "..aaaa.."]
 
 
 def cloud(scale):
@@ -230,10 +230,9 @@ def main():
     sprite("bubble", BUBBLE)
     sprite("fist", FIST)
     sprite("aimdot", AIMDOT)
+    sprite("reticle", RETICLE)
     sprite("drop", DROP)
-    for i, sp in enumerate(SPLASH):
-        sprite(f"splash{i}", sp)
-    sprite("softspot", SOFTSPOT)
+
     print(f"wrote {GFX.relative_to(ROOT)}/: font, padp, padc, ball, ballcut0-4, garb0-1, spark0-2, porch")
 
 

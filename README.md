@@ -32,10 +32,11 @@ tools/test_break.sh   # a bot breaks the slop ROM, headless (a7800 fork)
 tools/test_porch.sh   # a bot plays the porch (ONEPOKEY=1: one POKEY)
 ```
 
-The porch's controls: the stick aims (left and right), button 1 yells,
-button 2 winds up a fist (hold) and throws it (let go). Yell on the beat
-(the Cloud swells), hit the blue soft spot, and pace yourself: mash, and
-Arthur's blood pressure sends him to the rocking chair.
+The porch's controls: just the buttons. Arthur's aim swings across the
+Cloud on every beat; yell (either button) while the dots are yellow, over
+the Cloud. Hits build CALM (more for a streak, double for dead centre);
+misses and mashing cost CALM and raise his blood pressure, and at the top
+he's off to the rocking chair.
 
 The graphics in `src/gfx/` are committed. After changing the art, remake
 them with Pillow: `python3 -m venv .venv && .venv/bin/pip install pillow`,

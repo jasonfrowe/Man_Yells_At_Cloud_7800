@@ -70,8 +70,8 @@
   dim musframe = $2581
   dim sfxon = $2582
   dim sfxid = $2253
-  rem TIA effects (tools/music.py SFX): 1 YELL, 2 YELLBEAT, 3 WINDUP,
-  rem 4 FIST, 5 POOF, 6 SOFT, 7 DIZZY, 8 THUNDER
+  rem TIA effects (tools/music.py SFX): 1 YELL, 2 FIST, 3 GOOD,
+  rem 4 PERFECT, 5 MISS, 6 TOOFAST, 7 DIZZY, 8 THUNDER
 
   rem ---- the menu ----
   dim menusel = $2254
@@ -444,35 +444,36 @@ reviewloop
 
   rem ======================================================================
   rem  THE PORCH (prototype 2)
-  rem  Arthur yells at the Cloud. The stick aims (left / right), button 1
-  rem  yells, button 2 winds up a fist (hold) and throws it (let go). The
-  rem  Cloud breathes on every beat of the music: a yell or a fist let go
-  rem  on the beat counts double. The soft spot (the blue glow drifting
-  rem  along the Cloud's underside) doubles a hit. Every yell raises his
-  rem  blood pressure; it falls when he paces himself; at the top he's
-  rem  dizzy, sits in the rocking chair for a while and a little calm
-  rem  drains away. No failing: CALM fills, the Cloud breaks, and it rains.
-  rem  The music opens up as the Cloud darkens (the voice mask follows CALM).
+  rem  Arthur yells at the Cloud. His aim swings to and fro like a
+  rem  metronome, across the Cloud on every beat of the music (the dots go
+  rem  green while it's over the Cloud). Either button yells (button 2
+  rem  shakes a fist). Over the Cloud, it lands: CALM builds, more for a
+  rem  streak of them, double for dead centre (PERFECT). Off it, he misses:
+  rem  a little CALM lost, his blood pressure up. Yelling again within half
+  rem  a beat is TOO FAST: more blood pressure, the streak gone. BP falls
+  rem  while he paces himself; at the top he's dizzy, sits in the rocking
+  rem  chair for a while and a little CALM drains away. No failing: CALM
+  rem  fills, the Cloud breaks, and it rains. The music opens up as the
+  rem  Cloud darkens (the voice mask follows CALM).
   rem ======================================================================
 
-  rem projectiles, 4 slots: type (0 none, 1 yell, 2 fist), x, y, dx, dy,
-  rem on the beat, the fist's power
+  rem yells in flight, 4 slots: type (0 none, 1 yell, 2 fist), x (and a
+  rem fraction), y, the x step (and its fraction), PERFECT when thrown
   dim pt = $2200
   dim px = $2204
   dim py = $2208
   dim pdx = $220C
-  dim pdy = $2210
-  dim pon = $2214
-  dim pw = $2218
+  dim pdl = $2210
+  dim pperf = $2214
+  dim pxl = $2218
   dim bpbar = $2220
   dim calmbar = $2228
   dim rainrow = $2230
-  dim aimheld = $2250
   dim fire2held = $2251
   dim fbt = $2257
   dim fbk = $2258
-  dim onbeat = $2259
-  dim spotdir = $225A
+  dim aimoff = $2259
+  dim aimx = $225A
   dim clouddir = $225B
   dim cloudf = $225C
   dim tc = $225D
@@ -480,14 +481,14 @@ reviewloop
   dim pagedone = $225F
   dim raint = $2260
   dim stage = $2261
+  dim streak = $2263
+  dim sinceyell = $2264
+  dim inwin = $2265
   rem the porch's letters (the slop ROM's are free here)
   dim cloudx = a
-  dim spotx = b
-  dim aim = c
   dim bp = d
   dim calm = e
   dim dizzyt = f
-  dim windup = g
   dim pose = h
   dim poset = i
   dim phrase = l
@@ -499,71 +500,63 @@ porch
   lda #MUS_PORCH
   jsr mus_play
 end
-  musmask = $32
+  musmask = $36
   sfxon = 1
   for x = 0 to 3 : pt[x] = 0 : next
-  cloudx = 36 : clouddir = 1 : spotx = 20 : spotdir = 1
-  aim = 2 : bp = 0 : calm = 0 : dizzyt = 0 : windup = 0
+  cloudx = 36 : clouddir = 1
+  bp = 0 : calm = 0 : dizzyt = 0 : streak = 0 : sinceyell = 255
   pose = 0 : poset = 0 : phraset = 0 : fbt = 0
   BACKGRND = $70
   P0C1 = $0F : P0C3 = $9C
   P2C1 = $3A : P2C2 = $E4 : P2C3 = $08
   P3C1 = $44 : P3C3 = $0E
   P4C1 = $44 : P4C3 = $06
-  P5C1 = $98 : P5C3 = $06
+  P5C1 = $1E : P5C3 = $06
   P6C1 = $C2 : P6C2 = $C6
   P7C1 = $22 : P7C2 = $26 : P7C3 = $2A
   gosub porchscene
   plotchars 'BP' 0 0 0
   plotchars 'CALM' 0 80 0
   savescreen
-  fireheld = 1 : fire2held = 1 : aimheld = 1
+  fireheld = 1 : fire2held = 1
 porchloop
   restorescreen
   frm = frm + 1
   beat = musframe & 31
-  onbeat = 0
-  if beat < 6 then onbeat = 1
-  if beat > 26 then onbeat = 1
   rem the Cloud breathes: swells on the beat, then lets it out
   cloudf = 0
   if beat < 10 then cloudf = 1
+  gosub driftcloud
+  gosub swingaim
+  if sinceyell < 255 then sinceyell = sinceyell + 1
   gosub porchinput
   gosub moveproj
-  gosub driftcloud
-  rem blood pressure falls when he paces himself: 16 a beat, so a yell
-  rem (12) on every beat holds steady and mashing tips him over
+  rem blood pressure falls while he paces himself: 16 a beat
   t = frm & 1
   if t = 0 && bp then bp = bp - 1
   if dizzyt then dizzyt = dizzyt - 1
   if bp >= 128 && dizzyt = 0 then gosub getdizzy
   if poset then poset = poset - 1
   if poset = 0 then pose = 0
-  if windup then pose = 2
 
-  rem the Cloud darkens as it fills
+  rem the Cloud darkens as it fills, and the music opens up
   stage = calm / 16
   P1C1 = cloudc1[stage] : P1C2 = cloudc2[stage] : P1C3 = cloudc3[stage]
-  musmask = $32
-  if calm >= 32 then musmask = $36
-  if calm >= 64 then musmask = $37
+  musmask = $36
+  if calm >= 48 then musmask = $37
   if calm >= 96 then musmask = $3F
 
   rem (at y 16, on a zone boundary: 4 zones, not 5; a spill into zone 5
   rem tipped MARIA over its limit in the rain)
   plotsprite cloud0 1 cloudx 16 cloudf 4
-  t = cloudx + spotx
-  plotsprite softspot 5 t 62
   for x = 0 to 3
   t = px[x] : u = py[x]
-  if pt[x] = 1 then plotsprite bubble 3 t u
-  if pt[x] = 2 then plotsprite fist 2 t u
+  w = pt[x] : if w > 2 then w = w - 2
+  if w = 1 then plotsprite bubble 3 t u
+  if w = 2 then plotsprite fist 2 t u
   next
   gosub drawarthur
-  if dizzyt then goto porchhud
-  t = aimx1[aim] : u = aimy1[aim] : plotsprite aimdot 0 t u
-  t = aimx2[aim] : u = aimy2[aim] : plotsprite aimdot 0 t u
-porchhud
+  if dizzyt = 0 then gosub drawaim
   if phraset then phraset = phraset - 1 : gosub drawphrase
   if fbt then fbt = fbt - 1 : gosub drawfeedback
   t = bp / 5 : gosub buildbar
@@ -577,62 +570,82 @@ porchhud
   if calm >= 128 then goto rain
   goto porchloop
 
-  rem the stick aims; button 1 yells; button 2 winds up and throws
+  rem the aim swings across the Cloud's middle, a sine wave (aimsweep, 56
+  rem pixels each way) that crosses it on every beat; aimx is where a
+  rem yell would reach the Cloud's underside (line 68)
+swingaim
+  t = musframe & 63
+  aimoff = aimsweep[t]
+  t = cloudx + 42
+  aimx = t + aimoff
+  if aimx < 24 then aimx = 24
+  if aimx > 156 then aimx = 156
+  rem over the Cloud (its body spans 12-72 of the sprite, about +-30)
+  inwin = 0
+  t = aimoff + 30
+  if t < 61 then inwin = 1
+  return
+
+  rem three dots from Arthur's hand (24, 100) and a crosshair under the
+  rem aim point, yellow
+  rem while it's over the Cloud
+drawaim
+  w = 0 : if inwin then w = 5
+  t = aimx - 24 : t = t / 4
+  u = t + 22 : plotsprite aimdot w u 91
+  u = t + t : u = u + 22 : plotsprite aimdot w u 83
+  u = t + t + t : u = u + 22 : plotsprite aimdot w u 75
+  u = aimx - 4 : plotsprite reticle w u 72
+  return
+
+  rem either button yells (button 2 shakes a fist), once a press
 porchinput
-  t = 0
-  if joy0left then t = 1
-  if joy0right then t = 2
-  if t = 0 then aimheld = 0
-  if aimheld then goto pibuttons
-  if t then aimheld = 1
-  if t = 1 && aim > 0 then aim = aim - 1
-  if t = 2 && aim < 5 then aim = aim + 1
-pibuttons
-  if dizzyt then windup = 0 : return
+  if dizzyt then return
   if joy0fire1 then goto piheld1
   fireheld = 0
   goto pibutton2
 piheld1
   if fireheld then goto pibutton2
   fireheld = 1
-  gosub yell
+  w = 1 : gosub yell
 pibutton2
   if joy0fire0 then goto piheld2
-  if windup then gosub throwfist
-  windup = 0
+  fire2held = 0
   return
 piheld2
-  if windup = 0 then sfxid = 3 : gosub playsfx
-  t = frm & 1
-  if t && windup < 32 then windup = windup + 1
-  if windup = 0 then windup = 1
-  return
+  if fire2held then return
+  fire2held = 1
+  w = 2 : goto yell
 
+  rem a yell (w = 1) or a fist (w = 2) towards aimx
 yell
   gosub freeslot
   if x = 255 then return
-  pt[x] = 1 : px[x] = 20 : py[x] = 100
-  pdx[x] = aimdx[aim] : pdy[x] = aimdy[aim]
-  pon[x] = onbeat
-  bp = bp + 12
-  pose = 1 : poset = 12
+  pt[x] = w : px[x] = 20 : pxl[x] = 0 : py[x] = 96
+  rem 16 frames up to line 68 (2 lines a frame): x steps (aimx - 24) / 16
+  t = aimx - 24
+  pdx[x] = t / 16
+  u = t & 15 : pdl[x] = u * 16
+  pperf[x] = 0
+  t = aimoff + 8
+  if t < 17 then pperf[x] = 1
+  pose = w : poset = 12
   gosub pickphrase
   phraset = 45
-  sfxid = 1 : if onbeat then sfxid = 2
+  rem TOO FAST: within half a beat of the last one
+  if sinceyell < 16 then gosub toofast
+  sinceyell = 0
+  sfxid = w
   goto playsfx
 
-throwfist
-  gosub freeslot
-  if x = 255 then return
-  pt[x] = 2 : px[x] = 20 : py[x] = 100
-  pdx[x] = aimdx[aim] : pdy[x] = aimdy[aim]
-  pon[x] = onbeat : pw[x] = windup
-  t = windup / 4 : bp = bp + t : bp = bp + 6
-  pose = 1 : poset = 12
-  sfxid = 4
-  goto playsfx
+toofast
+  bp = bp + 16
+  if calm >= 2 then calm = calm - 2 else calm = 0
+  streak = 0
+  fbk = 4 : fbt = 30
+  return
 
-  rem x = a free projectile slot, or 255
+  rem x = a free slot, or 255
 freeslot
   for x = 0 to 3
   if pt[x] = 0 then return
@@ -641,61 +654,74 @@ freeslot
   return
 
 getdizzy
-  dizzyt = 150 : bp = 48 : windup = 0
+  dizzyt = 150 : bp = 48 : streak = 0
   if calm >= 8 then calm = calm - 8 else calm = 0
   sfxid = 7
   goto playsfx
 
-  rem projectiles fly straight; one that reaches the Cloud is absorbed
+  rem yells fly straight; at the Cloud's underside one lands or goes by
 moveproj
   for x = 0 to 3
   if pt[x] = 0 then goto mpnext
+  u = pxl[x]
+  pxl[x] = pxl[x] + pdl[x]
+  if pxl[x] < u then px[x] = px[x] + 1
   px[x] = px[x] + pdx[x]
-  py[x] = py[x] + pdy[x]
-  if py[x] < 12 then pt[x] = 0 : goto mpnext
-  if px[x] > 152 then pt[x] = 0 : goto mpnext
-  t = py[x] + 4
-  if t >= 68 then goto mpnext
+  py[x] = py[x] - 2
+  if pt[x] >= 3 then goto mpgone
+  if py[x] <> 64 then goto mpnext
+  rem at the underside: under the Cloud's body?
   t = px[x] + 4
   u = cloudx + 12
-  if t < u then goto mpnext
+  if t < u then goto mpmiss
   u = cloudx + 72
-  if t >= u then goto mpnext
+  if t >= u then goto mpmiss
   gosub cloudhit
   pt[x] = 0
+  goto mpnext
+mpmiss
+  rem it flies on past (type 3, 4: already counted), out of the sky
+  pt[x] = pt[x] + 2
+  gosub missed
+  goto mpnext
+mpgone
+  if py[x] < 12 then pt[x] = 0
+  if px[x] > 152 then pt[x] = 0
 mpnext
   next
   return
 
-  rem slot x hits the Cloud at x = t: how much calm it brings
+  rem a yell lands: 2, a streak adds 1 from 4 in a row, 2 from 8, 3 from
+  rem 12; PERFECT doubles it
 cloudhit
+  streak = streak + 1
   w = 2
-  if pt[x] = 2 then w = pw[x] / 8 : w = w + 3
-  y = 0
-  if pon[x] then w = w + w : y = 1
-  u = cloudx + spotx : u = u + 4
-  if t >= u then u = t - u else u = u - t
-  if u < 8 then w = w + w : y = y | 2
+  if streak >= 4 then w = 3
+  if streak >= 8 then w = 4
+  if streak >= 12 then w = 5
+  fbk = 1
+  if pperf[x] then w = w + w : fbk = 2
   calm = calm + w
   if calm > 128 then calm = 128
-  fbk = y : fbt = 30
+  bp = bp + 4
+  fbt = 30
+  sfxid = 3 : if pperf[x] then sfxid = 4
+  goto playsfx
+missed
+  streak = 0
+  if calm >= 2 then calm = calm - 2 else calm = 0
+  bp = bp + 14
+  fbk = 3 : fbt = 30
   sfxid = 5
-  t = y & 2 : if t then sfxid = 6
   goto playsfx
 
-  rem the Cloud drifts to and fro; the soft spot wanders under it
+  rem the Cloud drifts to and fro
 driftcloud
   t = frm & 7
-  if t then goto driftspot
+  if t then return
   cloudx = cloudx + clouddir
   if cloudx <= 16 then clouddir = 1
   if cloudx >= 72 then clouddir = 255
-driftspot
-  t = frm & 1
-  if t then return
-  spotx = spotx + spotdir
-  if spotx <= 12 then spotdir = 1
-  if spotx >= 60 then spotdir = 255
   return
 
   rem Arthur and his rocking chair; dizzy, he's in it with stars round him
@@ -706,7 +732,7 @@ drawarthur
   return
 drawdizzy
   t = 3 : plotsprite arthur0 2 30 112 t 2
-  t = frm / 8 : t = t & 1 : u = frm / 4 : u = u & 3
+  t = frm / 8 : t = t & 1
   w = 32 : x = 104 : if t then w = 40 : x = 100
   plotsprite spark0 0 w x 2
   w = 44 : x = 102 : if t then w = 36 : x = 106
@@ -721,9 +747,17 @@ buildbar
   return
 
 drawfeedback
-  if fbk = 1 then plotchars 'ON THE BEAT!' 3 64 6
-  if fbk = 2 then plotchars 'SOFT SPOT!' 3 72 6
-  if fbk = 3 then plotchars 'PERFECT!' 3 88 6
+  if fbk = 1 then plotchars 'GOOD!' 5 96 6
+  if fbk = 2 then plotchars 'PERFECT!' 5 88 6
+  if fbk = 3 then plotchars 'MISSED' 4 96 6
+  if fbk = 4 then plotchars 'TOO FAST!' 4 80 6
+  if fbk > 2 then return
+  if streak < 4 then return
+  t = streak : gosub todec
+  dnum = x + x : dnum = dnum + 32 : dnum2 = y + y : dnum2 = dnum2 + 32
+  plotchars 'STREAK' 0 88 7
+  if x then plotchars dnum 0 144 7 1
+  plotchars dnum2 0 152 7 1
   return
 
   rem what he yells: night 1 the classics, night 2 more, night 3 a few
@@ -978,25 +1012,13 @@ end
 end
 
   rem ---- the porch ----
-  rem aims, from straight up to low and right: a frame's move, and the
-  rem two aiming dots
-  data aimdx
-  0, 1, 1, 2, 2, 3
-end
-  data aimdy
-  252, 252, 253, 253, 254, 254
-end
-  data aimx1
-  22, 27, 27, 32, 32, 37
-end
-  data aimy1
-  83, 83, 88, 88, 93, 93
-end
-  data aimx2
-  22, 32, 32, 42, 42, 52
-end
-  data aimy2
-  63, 63, 73, 73, 83, 83
+  rem the aim's swing: 56 sin(2 pi n / 64), n = mus_frame & 63 (a beat is
+  rem 32 frames): through the middle on every beat
+  data aimsweep
+  0, 5, 11, 16, 21, 26, 31, 36, 40, 43, 47, 49, 52, 54, 55, 56
+  56, 56, 55, 54, 52, 49, 47, 43, 40, 36, 31, 26, 21, 16, 11, 5
+  0, 251, 245, 240, 235, 230, 225, 220, 216, 213, 209, 207, 204, 202, 201, 200
+  200, 200, 201, 202, 204, 207, 209, 213, 216, 220, 225, 230, 235, 240, 245, 251
 end
   rem the Cloud's colors by CALM / 16: white to storm grey
   data cloudc1
@@ -1106,5 +1128,5 @@ end
   incgraphic gfx/bubble.png 160A 0 1 2 3
   incgraphic gfx/fist.png 160A 0 1 2 3
   incgraphic gfx/aimdot.png 160A 0 1 2 3
+  incgraphic gfx/reticle.png 160A 0 1 2 3
   incgraphic gfx/drop.png 160A 0 1 2 3
-  incgraphic gfx/softspot.png 160A 0 1 2 3

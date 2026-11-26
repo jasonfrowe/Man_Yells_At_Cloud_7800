@@ -252,43 +252,63 @@ mr_v5_loop
     .byte $83,<drum_rainfill_h,>drum_rainfill_h
     .byte $82,<mr_v5_loop,>mr_v5_loop
 drum_porch_k
-    .byte 0,32
-    .byte 1,32
-    .byte 0,16
-    .byte 0,16
-    .byte 1,32
+    .byte 5,16
+    .byte $80,16
+    .byte 5,16
+    .byte $80,16
+    .byte 5,16
+    .byte $80,16
+    .byte 5,16
+    .byte $80,16
     .byte $84
 drum_porch_h
-    .byte $80,128
+    .byte $80,16
+    .byte 6,16
+    .byte $80,16
+    .byte 6,16
+    .byte $80,16
+    .byte 6,16
+    .byte $80,16
+    .byte 6,16
     .byte $84
 drum_porchfill_k
-    .byte 0,32
-    .byte 1,32
-    .byte 0,16
-    .byte 4,16
-    .byte 1,16
-    .byte 1,16
+    .byte 5,16
+    .byte $80,16
+    .byte 5,16
+    .byte $80,16
+    .byte 5,16
+    .byte $80,16
+    .byte 5,16
+    .byte $80,16
     .byte $84
 drum_porchfill_h
-    .byte $80,128
+    .byte $80,16
+    .byte 6,16
+    .byte $80,16
+    .byte 6,16
+    .byte $80,16
+    .byte 6,16
+    .byte $80,16
+    .byte 6,8
+    .byte 6,8
     .byte $84
 drum_rain_k
-    .byte 0,72
+    .byte 5,72
     .byte $80,72
     .byte $84
 drum_rain_h
     .byte $80,72
-    .byte 2,36
-    .byte 2,36
+    .byte 6,36
+    .byte 6,36
     .byte $84
 drum_rainfill_k
-    .byte 0,72
+    .byte 5,72
     .byte $80,36
     .byte 4,36
     .byte $84
 drum_rainfill_h
     .byte $80,72
-    .byte 2,36
+    .byte 6,36
     .byte $80,36
     .byte $84
 ins_env_0 .byte 12,13,12,11,10,10,9,9,9,8,8,8,8,7,$FF
@@ -313,8 +333,10 @@ drum_1 .byte $8F,5,$8D,7,$8B,9,$89,10,$87,11,$85,12,$83,13,$82,14,$81,15,0
 drum_2 .byte $85,0,$83,0,$81,0,0
 drum_3 .byte $85,0,$84,0,$84,0,$83,0,$83,0,$82,0,$82,0,$81,0,0
 drum_4 .byte $AD,100,$AB,120,$A9,140,$A7,160,$A5,180,$A3,200,0
-drum_lo .byte <drum_0,<drum_1,<drum_2,<drum_3,<drum_4
-drum_hi .byte >drum_0,>drum_1,>drum_2,>drum_3,>drum_4
+drum_5 .byte $AC,120,$AB,150,$AA,185,$A8,215,$A6,240,$A4,255,$A2,255,0
+drum_6 .byte $84,1,$82,1,0
+drum_lo .byte <drum_0,<drum_1,<drum_2,<drum_3,<drum_4,<drum_5,<drum_6
+drum_hi .byte >drum_0,>drum_1,>drum_2,>drum_3,>drum_4,>drum_5,>drum_6
 f16lo
     .byte 221,221,51,219,208,13,142,80,79,136,246,153
     .byte 107,107,150,234,100,3,196,165,164,192,248,73

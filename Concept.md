@@ -160,7 +160,7 @@ The phrase lists grow each day. On **Day 3** a new kind of option appears in eve
 
 **The tension (no failure, only friction):**
 
-1. **The beat.** The Cloud *breathes*, swelling and shrinking in time with the POKEY music. Yells and fist releases that land on the beat fill the **Catharsis Meter** much more than ones that don't.
+1. **The beat.** The Cloud *breathes*, swelling and shrinking in time with the POKEY music, and Arthur's aim swings across it on every beat. A yell lands only when it's let go on the beat. (See "As built" below.)
 2. **Blood pressure.** Every yell raises Arthur's **BP gauge**, and it drops when he pauses. Mash the button and he gets dizzy, stumbles back into the rocking chair, and sits for a few seconds while the meter drains slightly. Pacing wins.
 3. **Drift.** The Cloud slowly drifts and changes shape, so you have to keep re-aiming. The "soft spot" that counts double moves around.
 
@@ -172,11 +172,14 @@ When the Catharsis Meter fills, the Cloud breaks into warm POKEY rain music and 
 
 Arthur's yell phrases change over the nights. By Night 3 a few are quieter: *"WHY DOESN'T ANYONE ANSWER?"*, *"…I MISS THE OLD THREADS."*
 
-**As built (prototype 2):**
-- The Cloud is an 80 × 64 sprite in two breathing frames. It swells for the first 10 frames of each beat. A yell or fist let go within about 5 frames of the beat counts double, and so does a soft-spot hit.
-- Points: a yell is worth 2 and a fist 3 + power / 8, against a CALM of 128. Perfect play breaks the Cloud in about 13 seconds; a typical player takes closer to a minute.
-- BP: +12 a yell (a fist +6 + power / 4), and it falls by 16 a beat. One yell on every beat holds steady, while mashing makes Arthur dizzy in about 2 seconds. Dizzy lasts 2½ seconds and costs 8 CALM.
-- The music builds with CALM: bass and drums first, then harmony at 32, lead at 64, and everything at 96.
+**As built (prototype 2), after the first play test:** aiming *and* timing was too hard, so the aim now does the timing.
+- Arthur's aim swings back and forth across the Cloud on a sine wave, 56 pixels each way. It crosses the Cloud's middle on every beat of the music, and the aim dots and crosshair turn yellow while they're over the Cloud. Either button yells: button 1 shouts, button 2 shakes a fist.
+- **Hit:** CALM +2, rising to +3, +4 and +5 for a streak of 4, 8 or 12 hits in a row. Dead centre is PERFECT and doubles it. BP +4.
+- **Miss:** CALM −2, BP +14, and the streak resets.
+- **Too fast** (yelling within half a beat of the last yell): CALM −2, BP +16, and the streak resets.
+- BP falls by 16 a beat. Mashing makes Arthur dizzy in about 1 second. Dizzy lasts 2½ seconds and costs 8 CALM.
+- The soft spot and the fist wind-up were removed.
+- The Cloud is an 80 × 64 sprite in two breathing frames, swelling on each beat. The music builds with CALM: bass, harmony and the beat to start, the lead at 48, everything at 96. The beat is now a clean POKEY thump with a quiet tick between, with no white-noise snare. Perfect play breaks the Cloud in about 9 seconds; mostly-GOOD play takes about 40.
 - The Cloud's line is typed out in the rain, a page at a time (night 3 has two pages). The TIA hisses the rain.
 
 ### 4.4 The Finale: `0x7800_MIRROR.BIN` (160A)

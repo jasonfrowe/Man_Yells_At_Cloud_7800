@@ -103,26 +103,34 @@ snd_init
     sta AUDV0
     sta AUDV1
 mus_silence
+; (POKEY 2's registers only if it's really there: on a cart that mirrors
+; POKEY 1 at $0440 they'd undo POKEY 1's)
     lda #0
     sta PKA_SKCTL
-    sta PKB_SKCTL
     ldx #7
 mus_silence_s
     sta PKA,x
-    sta PKB,x
     dex
     bpl mus_silence_s
     lda #3
     sta PKA_SKCTL
-    sta PKB_SKCTL
-    lda #$78                ; 1+2 and 3+4 joined, both at 1.79 MHz
-    ldx pk2
-    bne mus_silence_2
     lda #$50                ; one POKEY: 1+2 joined at 1.79 MHz, 3 and 4 at 64 kHz
-mus_silence_2
-    sta PKA_AUDCTL
-    lda #$00                ; four 8-bit channels on the 64 kHz clock
+    ldx pk2
+    beq mus_silence_1
+    lda #0
+    sta PKB_SKCTL
+    ldx #7
+mus_silence_t
+    sta PKB,x
+    dex
+    bpl mus_silence_t
+    lda #3
+    sta PKB_SKCTL
+    lda #$00                ; POKEY 2: four 8-bit channels on the 64 kHz clock
     sta PKB_AUDCTL
+    lda #$78                ; POKEY 1: 1+2 and 3+4 joined, both at 1.79 MHz
+mus_silence_1
+    sta PKA_AUDCTL
     rts
 
 ; mus_stop: the music off, both POKEYs quiet
@@ -132,33 +140,62 @@ mus_stop
     jmp mus_silence
 
 ; snd_detect: is there a second POKEY at $0440, apart from the one at $0450?
-; With POKEY 1 held in reset (SKCTL 0, its RANDOM frozen) and POKEY 2
-; running, $044A (POKEY 2's RANDOM) changes from read to read only if a
-; chip is there: open bus, or POKEY 1 mirrored at $0440, stays put.
+; Two checks on the RANDOM registers (offset 10), which only change while a
+; POKEY is out of reset (SKCTL bits 0-1 set):
+;   1. POKEY 1 running, $0440's SKCTL written 0. If POKEY 1's RANDOM stops,
+;      that write reached it: $0440 is POKEY 1 again (a mirror). One POKEY.
+;   2. POKEY 1 held in reset, $0440's SKCTL written 3. If $044A changes, a
+;      chip is there (open bus stays put). Two POKEYs.
 snd_detect
     lda #0
     sta pk2
+    lda #3
     sta PKA_SKCTL
+    lda #0
     sta PKB_SKCTL
+    jsr snd_detect_a
+    bcc snd_detect_out      ; POKEY 1 stopped: a mirror
+    lda #0
+    sta PKA_SKCTL
     lda #3
     sta PKB_SKCTL
-    lda PKB+10
-    ldx #16
-snd_detect_l
-    cmp PKB+10
-    bne snd_detect_yes
-    nop
-    nop
-    nop
-    dex
-    bne snd_detect_l
-    beq snd_detect_out
-snd_detect_yes
+    jsr snd_detect_b
+    bcc snd_detect_out      ; nothing at $0440
     lda #1
     sta pk2
 snd_detect_out
     lda #3
     sta PKA_SKCTL
+    sta PKB_SKCTL
+    rts
+; carry set if POKEY 1's RANDOM changes over 16 reads
+snd_detect_a
+    lda PKA+10
+    ldx #16
+snd_detect_al
+    nop
+    nop
+    cmp PKA+10
+    bne snd_detect_yes
+    dex
+    bne snd_detect_al
+    clc
+    rts
+; carry set if $044A changes over 16 reads
+snd_detect_b
+    lda PKB+10
+    ldx #16
+snd_detect_bl
+    nop
+    nop
+    cmp PKB+10
+    bne snd_detect_yes
+    dex
+    bne snd_detect_bl
+    clc
+    rts
+snd_detect_yes
+    sec
     rts
 
 ; mus_play: song A
