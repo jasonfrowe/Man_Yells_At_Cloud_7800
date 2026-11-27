@@ -51,6 +51,9 @@
   dim cfire2 = $227B
   dim cbase = $227C
   dim ccnt = $227D
+  rem where the cursor was when the card was run (it goes back there)
+  dim csavec = $227E
+  dim csaver = $227F
   rem row 10 from column 32 (GO HOME), row 7 from column 31 (C)
   dim chome = $24A0
 
@@ -138,8 +141,9 @@ cwait
   gosub newfire1
   if u = 0 then goto cshow
   if ctimer = 1 then goto cdone
-  rem not a match, or a jam: back to the card
+  rem not a match, or a jam: back to the card, the cursor where it was
   cstate = 0 : gosub clearmsg
+  ccol = csavec : crow = csaver : gosub homeupd
   goto cshow
 cdone
   asm
@@ -231,6 +235,7 @@ cassistgo
 
   rem ---- running the card ----
 crunstart
+  csavec = ccol : csaver = crow
   cpc = 0 : cacc = 0 : ccnt = 0 : csteps = 0 : coutn = 0 : ctimer = 0
   for x = 0 to 31 : coutrow[x] = 0 : next
   cstate = 1

@@ -58,8 +58,8 @@ emu.register_frame_done(function()
   local mm = m()
   local held = {}
   -- the title: PROTOTYPES (down, fire), for the menu
-  if f >= 135 and f < 139 then held["P1 Down"] = true end
-  if f >= 145 and f < 149 then held["P1 Button 1"] = true end
+  if f >= 150 and f < 154 then held["P1 Down"] = true end
+  if f >= 160 and f < 164 then held["P1 Button 1"] = true end
   local s = plan[step]
   -- (TRANSITIONS: every frame around a talk's start and end, and a room change)
   if os.getenv("TRANSITIONS") then

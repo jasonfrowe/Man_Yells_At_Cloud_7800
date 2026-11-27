@@ -123,7 +123,6 @@ startgame
   if night = 2 then P6C1 = $46 : P6C3 = $CC : nhue = $50
   if night = 3 then gosub arena
   rem (day 3's crash is the switch: the game says so, in the bottom wall)
-  if night = 3 then plotchars 'FLIP LEFT DIFFICULTY' 0 0 11
   savescreen
 playloop
   restorescreen
@@ -156,6 +155,13 @@ skipcpu
   plotchars dcombo 0 64 0 3
   plotchars dcpu 0 136 0 2
   if combot then combot = combot - 1 : P4C1 = frm : plotchars 'COMBO!!' 4 52 5
+  rem day 3's crash is the switch: the game says so, in the bottom wall,
+  rem and once it's flipped, to keep going
+  if night <> 3 then goto nohint
+  if padg = 0 then plotchars 'FLIP LEFT DIFFICULTY' 0 0 11 : goto nohint
+  t = frm & 16
+  if t then plotchars 'KEEP FLIPPING IT!' 0 12 11
+nohint
   gosub sndtick
   drawscreen
   if switchreset then reboot

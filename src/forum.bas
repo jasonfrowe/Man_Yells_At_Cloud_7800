@@ -24,6 +24,9 @@
   dim ffire2 = $229D
   dim flast = $229E
   dim fisrel = $229F
+  dim fhp2 = $22D6
+  rem row 11 from column 30: where DOWN: MORE blinks
+  dim fmoretxt = $24D6
 
 forum
   fday = night - 1
@@ -114,6 +117,14 @@ fthread
 end
   savescreen
 fthreadloop
+  rem more posts below: DOWN: MORE, blinking (gold)
+  if fmore = 0 then goto fthreadmore
+  t = frm & 32
+  for x = 0 to 9 : fmoretxt[x] = 0 : next
+  if t = 0 then goto fthreadmore
+  for x = 0 to 9 : fmoretxt[x] = moretxt[x] : next
+fthreadmore
+  frm = frm + 1
   gosub fframe
   gosub fstick
   if w = 1 && ftop > 0 then ftop = ftop - 1 : goto fthread
@@ -130,6 +141,11 @@ end
   jsr c_leave
 end
   goto title bank2
+
+  rem "DOWN: MORE"
+  data moretxt
+  72, 94, 110, 92, 52, 0, 90, 94, 100, 74
+end
 
 fleave
   asm
@@ -156,7 +172,7 @@ end
   P5C1 = $3C : P5C2 = $3C : P5C3 = $3C
   P6C1 = $CC : P6C2 = $CC : P6C3 = $CC
   P7C1 = $6C : P7C2 = $6C : P7C3 = $6C
-  fslot = 0 : fdir = 0 : ffire1 = 1 : ffire2 = 1
+  fslot = 0 : fdir = 0 : ffire1 = 1 : ffire2 = 1 : fhp2 = 2
   return
 
 fframe

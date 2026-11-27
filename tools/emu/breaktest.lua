@@ -17,18 +17,19 @@ local edge = os.getenv("EDGE") or "middle"
 local day = tonumber(os.getenv("DAY") or "1")
 local aim
 local sw = 0
+local keepn = 0
 math.randomseed(tonumber(os.getenv("SEED") or "7800"))
 emu.register_frame_done(function()
   f = f + 1
   local mm = m()
   local held = {}
   -- the title: PROTOTYPES (down, fire), for the menu
-  if f >= 135 and f < 139 then held["P1 Down"] = true end
-  if f >= 145 and f < 149 then held["P1 Button 1"] = true end
+  if f >= 150 and f < 154 then held["P1 Down"] = true end
+  if f >= 160 and f < 164 then held["P1 Button 1"] = true end
   -- the menu's first item (SUPER PADDLE BALL), then the slop title
   -- (right picks the day: night, 1-3)
   for k = 1, day - 1 do
-    if f >= 150 + 20 * k and f < 154 + 20 * k then held["P1 Right"] = true end
+    if f >= 180 + 20 * k and f < 184 + 20 * k then held["P1 Right"] = true end
   end
   if f >= 230 and f < 234 then held["P1 Button 1"] = true end
   if f == start - 10 or (os.getenv("SNAPS") and f > start and (f - start) % 97 == 0 and f < start + 900) then manager:machine().screens[":screen"]:snapshot() end
@@ -80,6 +81,10 @@ emu.register_frame_done(function()
   -- (SNAPS, day 2: the tunnelling ball as it wraps)
   if os.getenv("SNAPS") and day == 2 and not gl and m():read_u8(0x2207) ~= 0 and f % 12 == 0 then
     manager:machine().screens[":screen"]:snapshot()
+  end
+  -- (KEEPSNAP, day 3: the bottom wall's words after the first flip)
+  if os.getenv("KEEPSNAP") and not gl and m():read_u8(0x2209) == 2 and f % 8 == 0 and keepn < 4 then
+    keepn = keepn + 1; manager:machine().screens[":screen"]:snapshot()
   end
   if gl and f == gl + 340 then
     print(string.format("result %d %d", gl - start, mm:read_u8(0x0172)))

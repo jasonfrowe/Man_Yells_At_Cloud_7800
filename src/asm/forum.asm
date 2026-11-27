@@ -43,6 +43,7 @@ f_listn   = $22D0   ; [3]
 f_pick    = $22D3   ; [3] each slot's pick (in f_list)
 f_segs    = $2600   ; the display objects (c_draw's records)
 f_last    = $229E
+f_hp2     = $22D6   ; f_help: the right end's palette (2 dim, 1 gold: MORE)
 f_isrel   = $229F
 
 ; the reviews (the whole game's: dims in myac.bas)
@@ -112,9 +113,26 @@ f_help
     sta c_pcol
     pla
     jsr f_print
+    ; (columns 0-29 dim; 30-39, where DOWN: MORE goes, f_hp2's palette)
+    lda #11
+    sta fs_r
     lda #2
-    ldx #11
-    jmp f_row2
+    sta fs_p
+    lda #0
+    sta fs_c
+    lda #30
+    sta fs_l
+    jsr f_addseg
+    lda f_hp2
+    sta fs_p
+    lda #30
+    sta fs_c
+    lda #10
+    sta fs_l
+    jsr f_addseg
+    lda #2
+    sta f_hp2
+    rts
 
 ; ---- the thread list -------------------------------------------------------
 f_list_draw
@@ -335,18 +353,14 @@ f_td_h2
     lda #<f_hthr
     ldy #>f_hthr
 f_td_h
-    jsr f_help
-    lda f_more
-    beq f_td_r2
-    lda #11
-    sta c_prow
-    lda #32
-    sta c_pcol
-    lda #<f_moretxt
-    ldy #>f_moretxt
-    jsr f_print
-f_td_r2
-    rts
+    ; more posts below: the help's right end gold (forum.bas blinks
+    ; DOWN: MORE there)
+    ldx f_more
+    beq f_td_h3
+    ldx #1
+    stx f_hp2
+f_td_h3
+    jmp f_help
 
 ; f_getpost: post f_rel of the thread: f_who, f_lns, f_lplo/hi
 f_getpost
@@ -767,7 +781,6 @@ f_replies  .byte "REPLIES",0
 f_hlist    .byte "UP/DOWN, 1: READ, 2: LOG OFF",0
 f_hthr     .byte "UP/DOWN: SCROLL   2: BACK",0
 f_hrel     .byte "UP/DOWN, 1: DOWNLOAD, 2: BACK",0
-f_moretxt  .byte "MORE...",0
 f_viewing  .byte "PIXELKID_07 IS VIEWING THIS THREAD.",0
 f_revhdr   .byte "REVIEW:",0
 f_hrev     .byte "LEFT-RIGHT: SELECT RESPONSE   1: POST",0

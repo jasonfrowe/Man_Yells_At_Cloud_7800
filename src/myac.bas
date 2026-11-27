@@ -137,7 +137,6 @@ end
   plotchars 'at cloud' 1 48 6
   plotchars 'STORY' 0 60 8
   plotchars 'PROTOTYPES' 0 60 9
-  plotchars 'FREE. NEVER SOLD.' 3 12 11
   savescreen
   fireheld = 1 : stickheld = 1
 titleloop0
