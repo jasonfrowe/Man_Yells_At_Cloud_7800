@@ -6,7 +6,8 @@
   rem  boot code, then words for anyone who reads hex. The racks light one
   rem  by one; then 0X7800_MIRROR.BIN, WRITTEN, FOR: ARTHUR. Button 1 at
   rem  the end goes on (scenedone). Its graphics: gen/stormgfx.asm
-  rem  (tools/gfx.py S_TILES), its own block at $A000.
+  rem  (tools/gfx.py S_TILES), its own block at $A000. The potluck (below)
+  rem  lives here too, its people in the same block.
   rem ======================================================================
 
   dim stt = $2200
@@ -218,6 +219,185 @@ end
 end
   data written2
   110, 100, 82, 104, 104, 74, 92, 28, 0, 76, 94, 100, 52, 0, 66, 100, 104, 80, 106, 100
+end
+
+  rem ======================================================================
+  rem  THE POTLUCK (prototype 6, bank 8, with the storm): Saturday, 6 PM, the porch at dusk. The
+  rem  regulars and pixelkid on the grass, a card table with a CRT, the
+  rem  7800 and the dishes. The Cloud comes; Arthur waves instead of
+  rem  yelling; a last light shower; the Cloud parts for the stars and
+  rem  says its last line. (Its people share the storm's graphics block: gen/stormgfx.asm.)
+  rem ======================================================================
+
+  dim pkt = $2200
+  dim pkcx = $2201
+  dim pkn = $2202
+  dim pkbg = $2203
+  dim pkline = $2300
+
+potluck
+  asm
+  lda #MUS_POTLUCK
+  jsr mus_play
+end
+  musmask = $3F
+  sfxon = 1 : AUDV0 = 0 : AUDV1 = 0
+  pkbg = $46 : BACKGRND = pkbg
+  P0C1 = $0F
+  P1C1 = $06 : P1C2 = $0A : P1C3 = $0E
+  P2C1 = $3A : P2C2 = $E4 : P2C3 = $08
+  P3C1 = $3A : P3C2 = $26 : P3C3 = $F4
+  P4C1 = $3A : P4C2 = $46 : P4C3 = $02
+  P5C1 = $3A : P5C2 = $0C : P5C3 = $74
+  P0C1 = $3A : P0C2 = $56 : P0C3 = $84
+  P6C1 = $C2 : P6C2 = $C6
+  P7C1 = $22 : P7C2 = $26 : P7C3 = $2A
+  for x = 0 to 19 : pkline[x] = 0 : next
+  gosub pkscene
+  plotsprite chair 7 30 112 0 2
+  plotsprite ptablet 7 76 112
+  plotsprite ptableb 7 76 128
+  plotchars pkline 1 8 2 20
+  savescreen
+  pkt = 0 : pkcx = 160 : pkn = 0 : fireheld = 1
+
+potloop
+  restorescreen
+  frm = frm + 1
+  if pkt < 255 then pkt = pkt + 1
+  rem the friends, breathing (a line's bob, out of step)
+  t = frm / 32 : t = t & 1 : u = 112 + t : v = 113 - t
+  plotsprite psuet 3 56 u
+  w = u + 16 : plotsprite psueb 3 56 w
+  plotsprite phalt 4 110 v
+  w = v + 16 : plotsprite phalb 4 110 w
+  plotsprite pmariat 5 126 u
+  w = u + 16 : plotsprite pmariab 5 126 w
+  plotsprite pkidt 0 142 v
+  w = v + 16 : plotsprite pkidb 0 142 w
+  gosub pkstage
+  drawscreen
+  BACKGRND = pkbg
+  if switchreset then reboot
+  if pkn < 99 then goto potloop
+  gosub newfire
+  if u = 0 then goto potloop
+  goto scenedone
+
+  rem the stages, by pkn: 0 the Cloud comes, 1 Arthur waves, 2 the shower,
+  rem 3 the Cloud parts, 4 the stars and the line, 99 done
+pkstage
+  if pkn = 0 then goto pkcome
+  if pkn = 1 then goto pkwave
+  if pkn = 2 then goto pkshower
+  if pkn = 3 then goto pkpart
+  goto pkstars
+pkcome
+  gosub pkarthur
+  t = frm & 1 : if t then pkcx = pkcx - 1
+  t = frm / 32 : t = t & 1
+  plotsprite cloud0 1 pkcx 8 t 4
+  if pkcx > 40 then return
+  pkn = 1 : pkt = 0
+  return
+pkwave
+  rem he doesn't yell: he waves
+  t = frm & 16
+  if t = 0 then gosub pkarthur : goto pkwave2
+  plotsprite pwavet 2 12 112
+  plotsprite pwaveb 2 12 128
+pkwave2
+  gosub pkcloud
+  if pkt < 150 then return
+  pkn = 2 : pkt = 0
+  return
+pkshower
+  gosub pkarthur
+  gosub pkcloud
+  rem a few drops, falling from under the Cloud
+  for x = 0 to 5
+  t = frm + dropoff[x] : t = t & 63 : t = t + t : t = t + 64
+  u = dropx[x]
+  if t < 176 then plotsprite drop 1 u t
+  next
+  if pkt < 200 then return
+  pkn = 3 : pkt = 0
+  return
+pkpart
+  rem the Cloud thins, and goes up and away: dusk becomes night
+  gosub pkarthur
+  t = frm & 1 : if t then pkcx = pkcx + 1
+  if pkt = 40 then P1C1 = $04 : P1C2 = $06 : P1C3 = $08 : pkbg = $54
+  if pkt = 80 then P1C1 = $02 : P1C2 = $04 : P1C3 = $06 : pkbg = $62
+  if pkt = 120 then pkbg = $80
+  t = frm / 32 : t = t & 1
+  if pkt < 140 then plotsprite cloud0 1 pkcx 8 t 4
+  if pkt < 150 then return
+  rem (palette 1 is the sky's now: white text, white stars)
+  P1C1 = $0E : P1C2 = $0E : P1C3 = $0E
+  pkn = 4 : pkt = 0
+  return
+pkstars
+  gosub pkarthur
+  plotchars pkstar 1 120 0 1
+  plotchars pkstar 1 16 1 1
+  plotchars pkstar 1 144 3 1
+  plotchars pkstar 1 72 4 1
+  plotchars pkstar 1 40 5 1
+  rem the line, a letter every 6 frames
+  if pkt < 30 then return
+  t = pkt - 30 : t = t / 6
+  if t < 20 then pkline[t] = stayline[t]
+  if pkt > 230 then pkn = 99
+  return
+pkcloud
+  t = frm / 32 : t = t & 1
+  plotsprite cloud0 1 pkcx 8 t 4
+  return
+pkarthur
+  plotsprite arthur0 2 12 112 0 2
+  return
+
+  rem the shower's drops: their places, and how far each is behind
+  data dropx
+  52, 64, 76, 88, 100, 112
+end
+  data dropoff
+  0, 11, 22, 33, 44, 55
+end
+  rem "STAY FOR THE MEAL." (centred in 18 of the 20)
+  data stayline
+  0, 102, 104, 66, 114, 0, 76, 94, 100, 0, 104, 80, 74, 0, 90, 74, 66, 88, 28, 0
+end
+
+  rem the porch's scenery (as porch.bas's porchscene: its rows must be in
+  rem this bank, where MARIA reads them)
+pkscene
+  clearscreen
+  for t = 3 to 8
+  plotchars pksiding 7 0 t 1
+  next
+  plotchars pkplanks 7 0 9 6
+  plotchars pkgrass 6 48 9 14
+  plotchars pksiding 7 0 10 6
+  plotchars pkdirt 6 48 10 14
+  plotchars pksiding 7 0 11 6
+  plotchars pkdirt 6 48 11 14
+  return
+  data pkstar
+  250
+end
+  data pksiding
+  230, 230, 230, 230, 230, 230
+end
+  data pkplanks
+  228, 228, 228, 228, 228, 228
+end
+  data pkgrass
+  224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224
+end
+  data pkdirt
+  226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226
 end
 
   asm

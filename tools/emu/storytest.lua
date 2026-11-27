@@ -15,8 +15,11 @@ end
 local function m() return manager:machine().devices[":maincpu"].spaces["program"] end
 local function snap() manager:machine().screens[":screen"]:snapshot() end
 -- each step's kind (storystep): 1 cut, 2 job, 3 forum, 4 porch, 5 storm, 6 mirror
-local KIND = {1, 2, 1, 3, 1, 4, 1, 2, 1, 3, 1, 4, 1, 2, 1, 3, 1, 4, 5, 1, 6, 1, 7}
-local NAME = {"cutscene", "day job", "evening", "porch", "storm", "mirror", "end"}
+local KIND = {1, 2, 1, 3, 1, 4, 1, 2, 1, 3, 1, 4, 1, 2, 1, 3, 1, 4, 5, 1, 6, 1, 8, 1, 3, 1, 7}
+local NAME = {"cutscene", "day job", "evening", "porch", "storm", "mirror", "end", "potluck"}
+-- ENDING=1: from the first cutscene, skip to after the mirror (it has its
+-- own test): the potluck, Sunday's forum, the credits, and the title again
+local ending = os.getenv("ENDING")
 local KONAMI = {"P1 Up", "P1 Up", "P1 Down", "P1 Down", "P1 Left", "P1 Right", "P1 Left", "P1 Right",
                 "P1 Button 2", "P1 Button 1"}
 local f, t0, chap, started = 0, 0, -1, false
@@ -31,6 +34,7 @@ emu.register_frame_done(function()
     if f > 170 then started = true end
   else
     local c = mm:read_u8(0x2715)
+    if ending and c == 0 and chap == -1 then mm:write_u8(0x2715, 20); c = 20 end
     if c ~= chap then
       chap = c; t0 = f
       print(string.format("frame %d: step %d, %s", f, c, NAME[KIND[c + 1]] or "?"))
@@ -43,8 +47,22 @@ emu.register_frame_done(function()
       local i = (dt - 60) // 12 + 1
       if dt >= 60 and i <= #KONAMI and (dt - 60) % 12 < 4 then held[KONAMI[i]] = true end
       if dt > 600 and dt % 30 < 3 then held["P1 Button 1"] = true end
+    elseif k == 3 and chap == 24 then
+      -- Sunday: open the first thread, look, back, log off
+      if dt >= 60 and dt < 64 then held["P1 Button 1"] = true end
+      if dt == 100 then snap() end
+      if dt > 120 and dt % 30 < 3 then held["P1 Button 2"] = true end
     elseif k == 3 then
       if dt > 60 and dt % 30 < 3 then held["P1 Button 2"] = true end
+    elseif k == 8 then
+      if dt == 200 or dt == 420 or dt == 620 or dt == 1000 then snap() end
+      if dt > 1150 and dt % 30 < 3 then held["P1 Button 1"] = true end
+    elseif k == 7 or (ending and c == 255) then
+      if dt == 60 then
+        snap()
+        print(string.format("result %d %d", chap, f))
+        manager:machine():exit()
+      end
     elseif k == 4 then
       if (mm:read_u8(0x2581) & 31) == 0 then held["P1 Button 1"] = true end
       if dt == 600 then snap() end
@@ -52,6 +70,9 @@ emu.register_frame_done(function()
       if dt == 400 or dt == 800 or dt == 1050 then snap() end
       if os.getenv("STORMSNAPS") and dt >= 450 and dt < 560 then snap() end
       if dt > 1060 and dt % 30 < 3 then held["P1 Button 1"] = true end
+    elseif k == 6 and ending then
+      -- (the intro's cutscene, still up: the step was skipped under it)
+      if dt > 20 and dt % 16 < 3 then held["P1 Button 1"] = true end
     elseif k == 6 then
       if dt == 120 then
         snap()

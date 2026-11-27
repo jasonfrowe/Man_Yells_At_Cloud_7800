@@ -87,8 +87,10 @@ def main():
             after[(day - 1, kind)] = len(posts) - 1
         else:
             fail(n, f"unknown {cmd}")
-    if len(days) != 3:
-        sys.exit("forum.txt: three days, please")
+    if len(days) != 4:
+        sys.exit("forum.txt: four days, please (three evenings and Sunday's epilogue)")
+    if any(t["release"] for t in days[3]["threads"]):
+        sys.exit("forum.txt: Sunday's epilogue has no release thread")
     for d in range(3):
         rel = [t for t in days[d]["threads"] if t["release"]]
         if len(rel) != 1 or not days[d]["threads"][0]["release"]:
@@ -126,7 +128,7 @@ def main():
     ptrs("f_dn", [s(d["name"]) for d in days])
     ptrs("f_dg", [s(d["game"]) for d in days])
     th = [t for d in days for t in d["threads"]]
-    table("f_dth0", [sum(len(days[k]["threads"]) for k in range(d)) for d in range(3)])
+    table("f_dth0", [sum(len(days[k]["threads"]) for k in range(d)) for d in range(4)])
     table("f_dthn", [len(d["threads"]) for d in days])
     ptrs("f_tt", [s(t["title"]) for t in th])
     table("f_tby", [t["by"] for t in th])

@@ -318,6 +318,8 @@ The Cloud drifts overhead. For the first time Arthur doesn't yell. He waves. The
 
 **Epilogue screen:** the new-releases board again, and pixelkid_07 is everywhere on it: replying in Hal's high-score thread, answering DocMaria's "how did you all start?", thanking people for feedback, and posting a better game with its source. The top thread: *"Our first game. Made by five of us (and a cloud?)"*, posted by pixelkid_07, with replies from everyone. Arthur's review: ★★★★★. Then the credits.
 
+**As built (prototype 6):** the potluck shares the storm's bank (8). Dusk on the porch; Sue, Hal, Maria and pixelkid on the grass round a card table (a CRT, the 7800, the dishes). The Cloud comes; Arthur waves; a last light shower; the Cloud thins and goes, night falls, the stars come out, and its line types itself across the sky. Then Sunday: a cutscene ("LET'S SEE WHAT THE KIDS ARE MAKING."), the forum's epilogue (Sunday's threads: pixelkid's first real game, made with everyone, "THANKS FOR THE REVIEWS. ALL OF THEM.", and pixelkid answering in the others), the credits, and the title.
+
 ### 4.6 The Soul Meter
 
 The Soul Meter is **flavor, not a fail state.**
@@ -375,6 +377,8 @@ The rain's noise and the porch beat's kick get their own channels, so the beat t
 - **Graphics modes, one per scene:** **320A** for the punch cards and the forum (one 40-column text engine, `text40.asm`); **160A** for the slop ROMs, porch and mirror. Modes switch only between scenes, never mid-screen. No display-list interrupt tricks needed.
 - **Rain and text effects:** the rain is **animated character tiles** (cheap for MARIA), with a few sprite drops near Arthur. Speech bubbles are sprites, with a small cap on how many exist at once. Measure the DMA load per line with `tools/dmalog.py`.
 - **Text:** 40-column teletype text in the Gamma Force cutscene style. The script lives in one file (`storyboard/script.txt`) and is generated into banks.
+- **As built (prototype 6):** the title (STORY or PROTOTYPES) and the story's sequencer are in the fixed bank: a table of steps (a cutscene, the day job, the evening, the porch, the storm, the mirror, the potluck), each scene ending at `scenedone`, which goes on to the next. The cutscenes (bank 7) are the 40-column engine with the forum's portraits (and the Cloud's), typed two letters a frame. The storm (bank 8) has its own graphics block: the data centre, the bolt; the Cloud's hex is a 7800's real boot code, then ASCII ("7800 MIRROR STAY FOR THE MEAL. FOR: ARTHUR"). Title and potluck music are generated (`MUS_TITLE`, `MUS_POTLUCK`). The manual is `docs/manual/` (`tools/make_manual.py`: HTML to PDF with Chrome, the screenshots from the tests).
+- **Not yet:** the Soul Meter (4.6) isn't built; nothing depends on it.
 - **Bank layout (rough):** core and title; punch-card engine and puzzles; forum and review builder; the slop ROMs (one engine with each game's bug as a flag); porch; mirror; cutscenes and text; music.
 - **Testing:** headless scripted play with the a7800 fork (`play.sh`-style input scripts, screenshots and memory peeks). Each slop ROM's exploit and each puzzle's solution should be an automated test.
 - **Reused from Gamma Force:** the build script, vendored 7800basic, text-art sprite pipeline, palette preview, cutscene generator, jukebox, profiler, and the manual generator.
@@ -414,4 +418,4 @@ The rain's noise and the porch beat's kick get their own channels, so the beat t
 
 ## 9. Open Questions
 
-- None right now. Next: prototype 6, the story pass (the storm cutscene, the potluck, the credits, the manual).
+- None right now. Next: prototype 7, Free Play (the slop ROMs, Hal's rally and the jukebox after the credits, and saves).

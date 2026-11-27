@@ -515,7 +515,7 @@ def block_gfx(tiles, sprites, outname, fontname, nglyphs):
     sp = src.load()
     glyph = lambda c, x, y: bool(sp[c * 8 + x, y])
     g = [["." * 8 for _ in range(ZONE)] for _ in range(nglyphs)]
-    for i in range(64):
+    for i in range(min(64, nglyphs)):
         for y in range(8):
             g[i][4 + y] = "".join("a" if glyph(32 + i, x, y) else "." for x in range(8))
     for n, (_, rows) in tiles.items():
@@ -572,6 +572,52 @@ BOLT = [
     ["...cc...", "....cc..", "....cc..", ".....cc.", "....ccc.", "...ccc..", "...cc...", "..cc....",
      "..cc....", "...cc...", "....cc..", "....cc..", "...cc...", "..cc....", "...cc...", "...cc..."],
 ]
+
+# The potluck (bank 3, its own block at $A000 beside the porch's code):
+# the regulars and pixelkid side on, 16 x 32 (a skin, b clothes, c hair /
+# trousers / coat), a card table with the CRT and the 7800 and the dishes,
+# 32 x 32, and Arthur waving. Each 32-line one is two 16-line halves.
+def _person(head, body, legs):
+    rows = head + body + legs
+    assert len(rows) == 32, len(rows)
+    return rows
+
+
+SUE_P = _person(
+    ["................", "....cccc........", "...cccccc.......", "..ccaaaacc......", "..cbbabba.......",
+     "...aaaaaa.......", "....aaaa........", ".....aa........."],
+    ["...bbbbbb.......", "..bbbbbbbb......", "..bbbbbbbb......", ".abbbbbbbba.....", ".a.bbbbbb.a.....",
+     "...bbbbbb.......", "...bbbbbb.......", "...bbbbbb......."],
+    ["...bbbbbb.......", "...bbb.bbb......"] + ["...bbb.bbb......"] * 12 + ["..cccc.cccc.....", "................"])
+HAL_P = _person(
+    ["................", "....cccc........", "..bcccccc.......", "..bcaaaab.......", "..baacaab.......",
+     "...aaaaaa.......", "....aaaa........", ".....aa........."],
+    ["...bbbbbb.......", "..bbbbbbbb......", "..bbbbbbbb......", ".abbbbbbbba.....", ".a.bbbbbb.a.....",
+     "...bbbbbb.......", "...bbbbbb.......", "...cccccc......."],
+    ["...cccccc.......", "...ccc.ccc......"] + ["...ccc.ccc......"] * 12 + ["..bbbb.bbbb.....", "................"])
+MARIA_P = _person(
+    ["................", "...cccccc.......", "..cccccccc......", "..cbabbab.......", "..caaaaaa.......",
+     "...aaaaaa.......", "....aaaa........", ".....aa........."],
+    ["...cccccc.......", "..cccccccc......", "..cccccccc......", ".acccccccca.....", ".a.cccccc.a.....",
+     "...cccccc.......", "..cccccccc......", "..cccccccc......"],
+    ["..cccccccc......", "..cccccccc......", "..cccccccc......", "..cccccccc......"] + ["....a..a........"] * 10
+    + ["...bb..bb.......", "................"])
+KID_P = _person(
+    ["................", "................", "....bbbb........", "...bbbbbbb......", "...bcaaaa.......",
+     "...aacaca.......", "....aaaa........", ".....aa........."],
+    ["...bbbbbb.......", "..bbbbbbbb......", "..bbbbbbbb......", ".abbbbbbbba.....", "...bbbbbb.......",
+     "...bbbbbb.......", "...cccccc.......", "...cccccc......."],
+    ["...ccc.ccc......"] * 12 + ["..bbbb.bbbb.....", "................", "................", "................"])
+# the card table: the CRT (the game on it), the 7800, the dishes
+TABLE_P = (["................................"] * 6
+           + ["........aaaaaaaaaaaa............", "........abbbbbbbbbba............", "........abccccccccba............",
+              "........abcbbbbbbcba............", "........abcbccbbbcba............", "........abcbbbbbbcba............",
+              "........abccccccccba............", "........abbbbbbbbbba..cccc..cc..", "........aaaaaaaaaaaa.cbbbbc.cbbc",
+              ".aaa.....aaaaaaaaaa..aaaaaa.aaaa", "abbba..cccccc.......cccc....cccc", "aaaaa.aaaaaaaa..b.b.aaaaaaaaaaaa"]
+           + ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
+           + [".a............................a."] * 10)
+assert len(TABLE_P) == 32 and all(len(r) == 32 for r in TABLE_P)
 
 
 # The mirror's people, 8 x 16 (a skin, b clothes, c hair / trousers), drawn
@@ -654,7 +700,17 @@ def main():
     sprite("shell", SHELL)
     sprite("rock0", ROCK)
     sprite("rock1", ROCK2)
-    block_gfx(S_TILES, [("bolt0", BOLT[0]), ("bolt1", BOLT[1])], "stormgfx", "sfont", 72)
+    # Arthur waving: the yell's arm, the hand open
+    wave = list(ARTHUR_YELL)
+    wave[0:3] = ["....cccc...a.a..", "...cccccc..aaa..", "...caaaac...aa.."]
+    halves = []
+    for nm, sp in (("psue", SUE_P), ("phal", HAL_P), ("pmaria", MARIA_P), ("pkid", KID_P),
+                   ("ptable", TABLE_P), ("pwave", wave)):
+        w = len(sp[0])
+        sp = [r_ + "." * ((-w) % 8) for r_ in sp]
+        halves += [(nm + "t", sp[:16]), (nm + "b", sp[16:32])]
+    # the storm's block (bank 8) holds the potluck's people too
+    block_gfx(S_TILES, [("bolt0", BOLT[0]), ("bolt1", BOLT[1])] + halves, "stormgfx", "sfont", 72)
     mirror_gfx([(f"marthur{i}", f) for i, f in enumerate(ARTHUR_M)]
                + [(f"mkid{i}", f) for i, f in enumerate(PIXELKID_M)]
                + [("msue", SUE_M), ("mhal", HAL_M), ("mmaria", MARIA_M)])

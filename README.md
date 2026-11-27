@@ -9,7 +9,10 @@ people he's been arguing with every night.
 Everyone is welcome in retrogaming. Don't just leave slop and run: stay
 and enjoy the meal.
 
-**Status:** five prototypes, picked from a menu:
+**Status:** the whole story plays from the title (STORY): a week of
+cutscenes, day jobs, evenings and nights, the storm over NimbusWorks, the
+mirror, the potluck, Sunday's forum and the credits. PROTOTYPES has each
+scene on its own:
 
 1. *The slop ROMs*: pixelkid_07's games, one a day (SUPER PADDLE BALL
    DELUXE, CYBER NEON BLASTER, 7800 SKYWOLFENDOOMRIM), from the overblown
@@ -56,6 +59,8 @@ tools/test_porch.sh   # a bot plays the porch (ONEPOKEY=1: one POKEY)
 tools/test_cards.sh   # GO HOME, a card punched by hand, days 2-3 Cloud Assisted
 tools/test_forum.sh   # read, download, break, review and post (days 1-3)
 tools/test_mirror.sh  # the mirror: pixelkid, player 2, the door, the rally, the cards
+tools/test_story.sh   # the story, title to the mirror (ENDING=1: the potluck to the end)
+.venv/bin/python tools/make_manual.py [--shots]   # the manual: docs/manual/*.pdf
 ```
 
 The porch's controls: just the buttons. Arthur's aim swings across the
@@ -80,6 +85,10 @@ then `.venv/bin/python tools/gfx.py`.
 | `src/mirror.bas`, `src/asm/mirror.asm` | The mirror: rooms, pixelkid, player 2, the plates, Hal's rally (bank 6) |
 | `storyboard/mirror.txt` | The mirror's rooms (maps drawn as text) and everything said in them |
 | `tools/mirror.py` | The mirror's rooms and talk to `src/gen/mirrordat.asm` |
+| `src/cut.bas`, `src/asm/cut.asm` | The cutscenes (bank 7) |
+| `storyboard/script.txt`, `tools/script.py` | The cutscenes' words, to `src/gen/cuttxt.asm` |
+| `src/storm.bas` | The storm over NimbusWorks, and the potluck (bank 8) |
+| `docs/manual/` | The manual (HTML, and the PDF `tools/make_manual.py` prints) |
 | `src/asm/text40.asm` | The 40-column (320A) text screens the day job and the forum share |
 | `tools/gfx.py` | The art, drawn as text, and the fonts (the forum's avatars too) |
 | `tools/test_break.sh`, `tools/emu/breaktest.lua` | Headless test: break the slop ROM |

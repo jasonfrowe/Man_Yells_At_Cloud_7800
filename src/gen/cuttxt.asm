@@ -10,15 +10,19 @@ CUT_DAY3 = 6
 CUT_EVENING3 = 7
 CUT_NIGHT3 = 8
 CUT_SATURDAY = 9
-CUT_TBC = 10
-cut_first .byte 0,4,6,9,12,13,15,17,18,20,24
-cut_count .byte 4,2,3,3,1,2,2,1,2,4,1
+CUT_POTLUCK = 10
+CUT_SUNDAY = 11
+CUT_CREDITS = 12
+cut_first .byte 0,4,6,9,12,13,15,17,18,20,24,31,33
+cut_count .byte 4,2,3,3,1,2,2,1,2,4,7,2,6
 cut_pglo .byte <cut_pg0,<cut_pg1,<cut_pg2,<cut_pg3,<cut_pg4,<cut_pg5,<cut_pg6,<cut_pg7,<cut_pg8,<cut_pg9,<cut_pg10,<cut_pg11,<cut_pg12,<cut_pg13,<cut_pg14,<cut_pg15
- .byte <cut_pg16,<cut_pg17,<cut_pg18,<cut_pg19,<cut_pg20,<cut_pg21,<cut_pg22,<cut_pg23,<cut_pg24
-cut_hdrlo .byte <cut_h0,<cut_h1,<cut_h2,<cut_h3,<cut_h4,<cut_h5,<cut_h6,<cut_h7,<cut_h8,<cut_h9,<cut_h10
+ .byte <cut_pg16,<cut_pg17,<cut_pg18,<cut_pg19,<cut_pg20,<cut_pg21,<cut_pg22,<cut_pg23,<cut_pg24,<cut_pg25,<cut_pg26,<cut_pg27,<cut_pg28,<cut_pg29,<cut_pg30,<cut_pg31
+ .byte <cut_pg32,<cut_pg33,<cut_pg34,<cut_pg35,<cut_pg36,<cut_pg37,<cut_pg38
+cut_hdrlo .byte <cut_h0,<cut_h1,<cut_h2,<cut_h3,<cut_h4,<cut_h5,<cut_h6,<cut_h7,<cut_h8,<cut_h9,<cut_h10,<cut_h11,<cut_h12
 cut_pghi .byte >cut_pg0,>cut_pg1,>cut_pg2,>cut_pg3,>cut_pg4,>cut_pg5,>cut_pg6,>cut_pg7,>cut_pg8,>cut_pg9,>cut_pg10,>cut_pg11,>cut_pg12,>cut_pg13,>cut_pg14,>cut_pg15
- .byte >cut_pg16,>cut_pg17,>cut_pg18,>cut_pg19,>cut_pg20,>cut_pg21,>cut_pg22,>cut_pg23,>cut_pg24
-cut_hdrhi .byte >cut_h0,>cut_h1,>cut_h2,>cut_h3,>cut_h4,>cut_h5,>cut_h6,>cut_h7,>cut_h8,>cut_h9,>cut_h10
+ .byte >cut_pg16,>cut_pg17,>cut_pg18,>cut_pg19,>cut_pg20,>cut_pg21,>cut_pg22,>cut_pg23,>cut_pg24,>cut_pg25,>cut_pg26,>cut_pg27,>cut_pg28,>cut_pg29,>cut_pg30,>cut_pg31
+ .byte >cut_pg32,>cut_pg33,>cut_pg34,>cut_pg35,>cut_pg36,>cut_pg37,>cut_pg38
+cut_hdrhi .byte >cut_h0,>cut_h1,>cut_h2,>cut_h3,>cut_h4,>cut_h5,>cut_h6,>cut_h7,>cut_h8,>cut_h9,>cut_h10,>cut_h11,>cut_h12
 cut_h0 .byte "MONDAY, 6:45 AM.",0
 cut_h1 .byte "MONDAY, 7:30 PM.",0
 cut_h2 .byte "MONDAY, 10:15 PM. THE PORCH.",0
@@ -29,7 +33,9 @@ cut_h6 .byte "FRIDAY, 8:55 AM.",0
 cut_h7 .byte "FRIDAY, 7:30 PM.",0
 cut_h8 .byte "FRIDAY, 11:00 PM. THE PORCH.",0
 cut_h9 .byte "SATURDAY, 9:30 AM.",0
-cut_h10 .byte "SATURDAY, 6:00 PM.",0
+cut_h10 .byte "SATURDAY, 6:00 PM. ARTHUR'S PORCH.",0
+cut_h11 .byte "SUNDAY, 10:00 AM.",0
+cut_h12 .byte "MAN YELLS AT CLOUD",0
 cut_pg0 .byte 255,0,2
     .byte "ARTHUR. SEVENTY-ONE. WROTE COBOL FOR",0
     .byte "THIRTY YEARS. KNOWS 6502 COLD.",0
@@ -89,5 +95,39 @@ cut_pg22 .byte 0,9,1
     .byte "...FOR ME?",0
 cut_pg23 .byte 255,9,1
     .byte "HE DOWNLOADS IT.",0
-cut_pg24 .byte 255,10,1
-    .byte "TO BE CONTINUED: THE POTLUCK.",0
+cut_pg24 .byte 255,10,2
+    .byte "HE SWEPT THE PORCH. HE PUT OUT THE GOOD",0
+    .byte "CHAIRS. HE MADE A CASSEROLE.",0
+cut_pg25 .byte 255,10,1
+    .byte "HE DIDN'T KNOW IF ANYONE WOULD COME.",0
+cut_pg26 .byte 0,10,1
+    .byte "...THEY WON'T COME.",0
+cut_pg27 .byte 2,10,1
+    .byte "ARTHUR! WE BROUGHT A CRT.",0
+cut_pg28 .byte 3,10,1
+    .byte "AND A SECOND JOYSTICK.",0
+cut_pg29 .byte 4,10,1
+    .byte "AND A FLAN. IT'S SHAPED LIKE A MARIA.",0
+cut_pg30 .byte 1,10,1
+    .byte "...HI. I BROUGHT CHIPS.",0
+cut_pg31 .byte 255,11,2
+    .byte "TEA. THE 7800 HOMEBREW FORUM, NEW",0
+    .byte "RELEASES.",0
+cut_pg32 .byte 0,11,1
+    .byte "LET'S SEE WHAT THE KIDS ARE MAKING.",0
+cut_pg33 .byte 255,12,2
+    .byte "A GAME FOR THE ATARIAGE COMMUNITY.",0
+    .byte "FREE. NEVER SOLD. SOURCE ON GITHUB.",0
+cut_pg34 .byte 255,12,1
+    .byte "DESIGN, CODE AND WORDS: JASON ROWE",0
+cut_pg35 .byte 255,12,2
+    .byte "MADE WITH 7800BASIC (MIKE SAARNA),",0
+    .byte "THE A7800 EMULATOR, AND DASM.",0
+cut_pg36 .byte 255,12,2
+    .byte "THE MUSIC: TOOLS/MUSICGEN, BY WAY OF",0
+    .byte "COSMIC ARC II.",0
+cut_pg37 .byte 255,12,2
+    .byte "THE REGULARS' NAMES ARE PLACEHOLDERS:",0
+    .byte "ATARIAGE MEMBERS, YOURS GO HERE.",0
+cut_pg38 .byte 255,12,1
+    .byte "THANK YOU FOR PLAYING.",0

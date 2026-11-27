@@ -172,6 +172,7 @@ titleloop0
   rem  step, or (prototypes) the menu.
   rem    1 a cutscene (bank 7)   2 the day job   3 the evening (forum)
   rem    4 the porch   5 the storm (bank 8)   6 the mirror   7 the end
+  rem    8 the potluck (bank 8, with the storm)
   rem ======================================================================
 storyrun
   t = chap + chap
@@ -182,6 +183,7 @@ storyrun
   if u = 4 then night = v : goto porch bank3
   if u = 5 then goto storm bank8
   if u = 6 then goto mirror bank6
+  if u = 8 then goto potluck bank8
   goto gametitle
 scenedone
   characterset font
@@ -193,7 +195,7 @@ scenedone
   1, 0, 2, 1, 1, 1, 3, 1, 1, 2, 4, 1
   1, 3, 2, 2, 1, 4, 3, 2, 1, 5, 4, 2
   1, 6, 2, 3, 1, 7, 3, 3, 1, 8, 4, 3
-  5, 0, 1, 9, 6, 0, 1, 10, 7, 0
+  5, 0, 1, 9, 6, 0, 1, 10, 8, 0, 1, 11, 3, 4, 1, 12, 7, 0
 end
 
   rem ======================================================================

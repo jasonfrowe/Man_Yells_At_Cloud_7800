@@ -138,6 +138,48 @@ A BLINKING LED. TOOK ME A WEEK.
 A PONG CLONE. A BAD ONE. :)
 
 # ---------------------------------------------------------------------------
+# Sunday: the epilogue (after the potluck). pixelkid_07 is in every thread.
+@day 4 | SUN
+@game | -
+
+@thread pixelkid | OUR FIRST GAME! BY FIVE OF US (+CLOUD)
+@post pixelkid
+WE MADE IT AT ARTHUR'S POTLUCK.
+IT'S PONG. A GOOD ONE, THIS TIME.
+THE SOURCE IS IN THE THREAD.
+@post hal
+42 HITS. IT DIDN'T CRASH ONCE.
+@post maria
+HOLEY DMA, DONE PROPERLY.
+I'M SO PROUD I COULD CRY.
+@post sue
+I BUILT THE CART. ONE OF ONE.
+@post arthur
+5 STARS. -- ARTHUR.
+
+@thread pixelkid | THANKS FOR THE REVIEWS. ALL OF THEM.
+@post pixelkid
+I READ EVERY ONE. EVEN THE ONE
+STARS. ESPECIALLY THOSE.
+@post arthur
+...SORRY ABOUT THOSE.
+@post pixelkid
+DON'T BE. YOU STAYED.
+
+@thread maria | HOW DID YOU ALL START?
+@post pixelkid
+WITH A GENERATOR. THEN WITH
+FRIENDS. THE SECOND ONE WORKED.
+@post maria
+THE BEST ANSWER YET.
+
+@thread hal | HIGH SCORES: PONG CLONES (LOL)
+@post pixelkid
+42 ON OURS. BEAT THAT, HAL.
+@post hal
+CHALLENGE ACCEPTED.
+
+# ---------------------------------------------------------------------------
 # The review builder: three lines, a slot each.
 
 @phrase opener 1 | NO SOUL.

@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Man Yells at Cloud: the Manual</title>
+<!--
+  The game's manual, a 16-page pocket booklet (5 x 7 inches): a page a
+  .page. tools/make_manual.py prints it to PDF with Chrome. Open it in a
+  browser to read or edit. The hints live here, not in the game
+  (Concept.md): explain how things work, never give a job's answer.
+-->
+<style>
+:root { --ink: #1b1a17; --paper: #fbf8ef; --muted: #66625a; --sky: #1d2a6b; --gold: #e2b23a; --cream: #f3e4bd;
+  --red: #c8442e; --green: #4f8a3a; --card: #f1dfae; }
+@page { size: 5in 7in; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #777; }
+body { font-family: Georgia, "Times New Roman", serif; font-size: 9pt; line-height: 1.38; color: var(--ink); }
+.page { width: 5in; height: 7in; padding: 0.4in 0.42in 0.45in; background: var(--paper); position: relative; overflow: hidden;
+  page-break-after: always; break-after: page; margin: 0 auto; }
+@media screen { .page { margin: 0.3in auto; box-shadow: 0 2px 12px rgba(0,0,0,.4); } }
+.folio { position: absolute; bottom: 0.18in; left: 0; right: 0; text-align: center; font-family: "Courier New", monospace; font-size: 0.85em; color: var(--muted); }
+h1, h2, h3 { font-family: "Courier New", Courier, monospace; font-weight: 700; text-transform: uppercase; margin: 0; letter-spacing: .04em; }
+h2 { font-size: 1.45em; border-bottom: 0.12em solid var(--ink); padding-bottom: 0.15em; margin-bottom: 0.7em; }
+h3 { font-size: 1.02em; margin: 0.9em 0 0.3em; }
+p { margin: 0 0 0.6em; } ul, ol { margin: 0 0 0.6em; padding-left: 1.2em; } li { margin-bottom: 0.25em; }
+.shot { display: block; width: 100%; image-rendering: pixelated; border: 0.08em solid #222; }
+.cap { font-size: 0.82em; color: var(--muted); margin: 0.25em 0 0.7em; text-align: center; font-style: italic; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6em; }
+.note { border-left: 0.3em solid var(--gold); padding: 0.35em 0.6em; background: #f6ecd2; margin: 0.6em 0; }
+code, .mono { font-family: "Courier New", Courier, monospace; font-weight: 700; }
+table { border-collapse: collapse; width: 100%; margin: 0.3em 0 0.7em; }
+td, th { padding: 0.18em 0.3em; text-align: left; border-bottom: 0.06em solid #d8d0bb; vertical-align: top; }
+th { font-family: "Courier New", monospace; text-transform: uppercase; font-size: 0.85em; color: var(--muted); }
+.keys { display: grid; grid-template-columns: 7.2em 1fr; gap: 0.5em 0.7em; align-items: start; margin: 0.5em 0; }
+.key { background: var(--ink); color: #fff; font-family: "Courier New", monospace; font-weight: 700; text-transform: uppercase;
+  font-size: 0.85em; text-align: center; padding: 0.3em 0.2em; border-radius: 0.3em; }
+/* the cover */
+.cover { background: var(--sky); color: #fff; padding: 0; }
+.cover .top { background: #000; text-align: center; font-family: "Courier New", monospace; letter-spacing: .3em; padding: 0.5em 0; font-size: 0.9em; }
+.cover .cloud { display: block; width: 80%; margin: 0.6in auto 0.2in; image-rendering: pixelated; }
+.cover h1 { text-align: center; font-size: 2.6em; line-height: 1.05; color: var(--gold); text-shadow: 0.06em 0.06em 0 #000; }
+.cover .sub { text-align: center; font-family: "Courier New", monospace; letter-spacing: .25em; margin-top: 0.9em; color: #cfd6ee; }
+.cover .foot { position: absolute; bottom: 0; left: 0; right: 0; background: #000; text-align: center; padding: 0.55em 0;
+  font-family: "Courier New", monospace; letter-spacing: .12em; font-size: 0.85em; }
+/* the operator's guide pages */
+.guide { background: #f4efe2; }
+.guide .banner { font-family: "Courier New", monospace; font-size: 0.8em; letter-spacing: .2em; color: var(--muted); margin-bottom: 0.3em; }
+.ascii td { font-family: "Courier New", monospace; font-size: 0.92em; padding: 0.08em 0.2em; text-align: center; border: 0.06em solid #d8d0bb; }
+.ascii td.c { font-weight: 700; background: #fff8e2; }
+.cardrow { font-family: "Courier New", monospace; font-size: 0.95em; background: var(--card); padding: 0.4em 0.6em; border-radius: 0.2em; margin: 0.3em 0 0.7em; white-space: pre; }
+.stain { position: relative; margin: 1em 0 0.4em; padding: 0.9em 1em; background: #fffdf4; transform: rotate(-1.6deg);
+  box-shadow: 0 0.06em 0.3em rgba(0,0,0,.25); font-family: "Bradley Hand", "Comic Sans MS", cursive; font-size: 1.05em; }
+.stain::before { content: ""; position: absolute; right: -0.3em; top: -0.5em; width: 5em; height: 5em; border-radius: 50%;
+  border: 0.45em solid rgba(120, 72, 30, .28); box-shadow: inset 0 0 0.6em rgba(120,72,30,.25); }
+.toc { list-style: none; padding: 0; } .toc li { display: flex; margin-bottom: 0.4em; }
+.toc li .d { flex: 1; border-bottom: 0.1em dotted #999; margin: 0 0.4em; transform: translateY(-0.3em); }
+.lines div { border-bottom: 0.06em solid #c9c1ad; height: 1.75em; }
+.back { background: var(--sky); color: #dfe4f5; }
+.back blockquote { font-size: 1.35em; font-style: italic; text-align: center; margin: 2.2in 0.2in 0; color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- 1: the cover -->
+<section class="page cover">
+  <div class="top">ATARI 7800 &middot; PROSYSTEM</div>
+  <img class="cloud" src="img/cloud.png" alt="">
+  <h1>MAN YELLS<br>AT CLOUD</h1>
+  <div class="sub">A STORY GAME</div>
+  <div class="foot">FREE &middot; NEVER SOLD &middot; FOR THE ATARIAGE COMMUNITY</div>
+</section>
+
+<!-- 2: contents -->
+<section class="page">
+  <h2>Contents</h2>
+  <ul class="toc">
+    <li><span>The story</span><span class="d"></span><span>3</span></li>
+    <li><span>Getting started</span><span class="d"></span><span>4</span></li>
+    <li><span>A week in Arthur's life</span><span class="d"></span><span>5</span></li>
+    <li><span>The day job: NimbusWorks Operator's Guide</span><span class="d"></span><span>6</span></li>
+    <li><span>The evening: the forum</span><span class="d"></span><span>10</span></li>
+    <li><span>Breaking slop</span><span class="d"></span><span>11</span></li>
+    <li><span>Writing a review</span><span class="d"></span><span>12</span></li>
+    <li><span>The night: the porch</span><span class="d"></span><span>13</span></li>
+    <li><span>Saturday, and a second player</span><span class="d"></span><span>14</span></li>
+    <li><span>About this game</span><span class="d"></span><span>15</span></li>
+  </ul>
+  <h3>Before you begin</h3>
+  <p>Man Yells at Cloud runs on any Atari 7800 with a cartridge that can hold a 144K game: an AstroCart or a 7800GD, for example. A ProLine joystick is best: you'll want both buttons.</p>
+  <p>The music is for two POKEY sound chips. With one (a 7800GD, most carts) it plays lead, bass and drums, and nothing you need is lost. The title's PROTOTYPES menu says how many it found.</p>
+  <div class="folio">2</div>
+</section>
+
+<!-- 3: the story -->
+<section class="page">
+  <h2>The story</h2>
+  <p>Arthur is seventy-one. He wrote COBOL for thirty years and knows 6502 cold. These days he punches cards, part time, for a company called NimbusWorks, and nobody there will say what the cards are for.</p>
+  <p>In the evenings he reads the 7800 homebrew forum. Lately the new-releases board is full of hyped games with glossy promises, and every one is a broken Pong clone, posted by someone called <b>pixelkid_07</b> who never answers a single reply.</p>
+  <p>Arthur tears into each one, gives it one star, and goes out on his porch to yell at the sky.</p>
+  <p>The sky listens. There is a cloud over Arthur's porch, a big patient one, and it takes everything he yells and rains it back on him until he feels better. Each night it says one thing, in the rain.</p>
+  <p>Nobody can explain the Cloud. It isn't a computer, whatever Arthur says. It just knows things: about porches, and people who sit on them alone.</p>
+  <img class="shot" src="img/cutscene.png" alt="" style="width:72%;margin:0 auto">
+  <div class="cap">Between the scenes, the story goes on in teletype. Button 1 finishes a page, then turns it.</div>
+  <div class="folio">3</div>
+</section>
+
+<!-- 4: getting started -->
+<section class="page">
+  <h2>Getting started</h2>
+  <img class="shot" src="img/title.png" alt="">
+  <div class="cap">The title. Push the stick up or down to choose, and a button to start.</div>
+  <p><b>STORY</b> is the game: a week of Arthur's life, a scene after another. <b>PROTOTYPES</b> lets you visit any scene on its own (left and right choose the day).</p>
+  <h3>The controls</h3>
+  <div class="keys">
+    <div class="key">Joystick</div><div>Move, choose, steer.</div>
+    <div class="key" style="background:var(--red)">Button 1</div><div>Do it: punch, read, yell, talk, turn the page.</div>
+    <div class="key" style="background:#2f5fb0">Button 2</div><div>The other thing: run the card, go back, shake a fist, wait/follow.</div>
+    <div class="key">Reset</div><div>Back to the title.</div>
+    <div class="key">Difficulty</div><div>Usually nothing. Usually.</div>
+  </div>
+  <div class="note">There's no way to lose. Arthur can have a bad night, but the week always goes on.</div>
+  <div class="folio">4</div>
+</section>
+
+<!-- 5: the week -->
+<section class="page">
+  <h2>A week in Arthur's life</h2>
+  <p>Monday, Wednesday and Friday each have three parts.</p>
+  <table>
+    <tr><th>When</th><th>Where</th><th>What you do</th></tr>
+    <tr><td>Morning</td><td>NimbusWorks</td><td>Punch the day's job onto a card and run it.</td></tr>
+    <tr><td>Evening</td><td>The forum</td><td>Read the threads, download pixelkid_07's latest, break it, review it.</td></tr>
+    <tr><td>Night</td><td>The porch</td><td>Yell at the Cloud until it rains.</td></tr>
+  </table>
+  <p>What happens on Saturday, you'll have to see.</p>
+  <div class="two">
+    <div><img class="shot" src="img/card.png" alt=""><div class="cap">Morning</div></div>
+    <div><img class="shot" src="img/forum.png" alt=""><div class="cap">Evening</div></div>
+  </div>
+  <img class="shot" src="img/porch.png" alt="" style="width:50%;margin:0 auto">
+  <div class="cap">Night</div>
+  <div class="folio">5</div>
+</section>
+
+<!-- 6: operator's guide 1 -->
+<section class="page guide">
+  <div class="banner">NIMBUSWORKS DATA ENTRY &middot; OPERATOR'S GUIDE &middot; REV. 3</div>
+  <h2>The card</h2>
+  <p>Welcome to data entry. Your card has <b>20 columns</b>. Each column is one instruction, read left to right by the card reader. A column has 12 rows:</p>
+  <ul>
+    <li><b>Rows LOAD, ADD, CNT, LOOP, OUT</b>: the instruction. Punch exactly one.</li>
+    <li><b>Rows 64, 32, 16, 8, 4, 2, 1</b>: the number that goes with it. Add up the holes: 64 + 8 + 1 punched is 73.</li>
+  </ul>
+  <p>A column with no instruction punched is skipped.</p>
+  <img class="shot" src="img/card.png" alt="" style="width:80%;margin:0 auto">
+  <div class="cap">The day's TARGET is at the top. Make the OUTPUT match it.</div>
+  <h3>At the console</h3>
+  <p>The stick moves the cursor. <b>Button 1</b> punches a hole, or un-punches it (we're generous). <b>Button 2</b> runs the card. The panel on the right decodes the column under the cursor and shows the reader's registers.</p>
+  <p>Below the last row is <span class="mono">GO HOME</span>. Nobody will stop you.</p>
+  <div class="folio">6</div>
+</section>
+
+<!-- 7: operator's guide 2 -->
+<section class="page guide">
+  <div class="banner">NIMBUSWORKS DATA ENTRY &middot; OPERATOR'S GUIDE &middot; REV. 3</div>
+  <h2>The instructions</h2>
+  <p>The reader has two registers: <b>A</b>, which holds a number from 0 to 127, and the counter <b>C</b>.</p>
+  <table>
+    <tr><th>Row</th><th>Does</th></tr>
+    <tr><td><code>LOAD n</code></td><td>A = n</td></tr>
+    <tr><td><code>ADD n</code></td><td>A = A + n. A only goes to 127, then starts again at 0.</td></tr>
+    <tr><td><code>CNT n</code></td><td>C = n</td></tr>
+    <tr><td><code>LOOP n</code></td><td>C = C &minus; 1. If C isn't 0 yet, go back to column n.</td></tr>
+    <tr><td><code>OUT</code></td><td>Print A, as a letter (the chart, overleaf).</td></tr>
+  </table>
+  <h3>When the reader jams</h3>
+  <p>KA-CHUNK. The reader stops if a column has two instructions punched, if a LOOP goes to a column that isn't there, or if a card runs for more than 200 steps (a loop that never ends). Fix the card and run it again.</p>
+  <h3>There is no SUBTRACT</h3>
+  <p>Management says it isn't needed. They're right, as it happens: A wraps round at 128, so <code>ADD 127</code> is the same as taking one away. <code>ADD 126</code> takes two.</p>
+  <div class="folio">7</div>
+</section>
+
+<!-- 8: operator's guide 3: the chart -->
+<section class="page guide">
+  <div class="banner">NIMBUSWORKS DATA ENTRY &middot; OPERATOR'S GUIDE &middot; REV. 3</div>
+  <h2>The character chart</h2>
+  <p>What <code>OUT</code> prints for each number. Numbers outside 32&ndash;95 print a <code>?</code>.</p>
+  <table class="ascii" id="ascii"></table>
+  <script>
+    // the chart: 32-95, eight a row
+    const t = document.getElementById("ascii");
+    for (let r = 0; r < 8; r++) {
+      const tr = document.createElement("tr");
+      for (let c = 0; c < 8; c++) {
+        const n = 32 + r * 8 + c, ch = n === 32 ? "SP" : String.fromCharCode(n);
+        tr.innerHTML += `<td>${n}</td><td class="c">${ch.replace("<", "&lt;").replace(">", "&gt;")}</td>`;
+      }
+      t.appendChild(tr);
+    }
+  </script>
+  <p>The letters run in order, so once you have one, the next is <code>ADD 1</code> away. The digits do too: <code>0</code> is 48.</p>
+  <div class="folio">8</div>
+</section>
+
+<!-- 9: operator's guide 4: examples -->
+<section class="page guide">
+  <div class="banner">NIMBUSWORKS DATA ENTRY &middot; OPERATOR'S GUIDE &middot; REV. 3</div>
+  <h2>Worked examples</h2>
+  <h3>1. Printing a word: HI</h3>
+  <div class="cardrow">1 LOAD 72   2 OUT   3 LOAD 73   4 OUT</div>
+  <p>Two letters, two columns each. The same letter twice? <code>OUT</code> twice: A doesn't change when it's printed.</p>
+  <h3>2. A counted loop: AAAA</h3>
+  <div class="cardrow">1 LOAD 65   2 CNT 4   3 OUT   4 LOOP 3</div>
+  <p>Column 4 sends the reader back to column 3 until C runs out: four A's from four columns.</p>
+  <h3>3. Counting: 0123</h3>
+  <div class="cardrow">1 LOAD 48   2 CNT 4   3 OUT   4 ADD 1   5 LOOP 3</div>
+  <p>Change <code>ADD 1</code> to <code>ADD 127</code> and start somewhere higher, and it counts down instead.</p>
+  <div class="stain">If the reader's giving you grief: up, up, down, down, left, right, left, right, 2, 1.<br>Don't tell the day shift. &mdash; N.</div>
+  <div class="folio">9</div>
+</section>
+
+<!-- 10: the forum -->
+<section class="page">
+  <h2>The evening: the forum</h2>
+  <p>The 7800 homebrew forum's new-releases board. Push the stick to pick a thread and <b>button 1</b> to read it; up and down scroll the posts. <b>Button 2</b> goes back, and on the list, logs off.</p>
+  <img class="shot" src="img/thread.png" alt="">
+  <div class="cap">pixelkid_07's release thread. They're always reading.</div>
+  <p>The first thread each evening is pixelkid_07's latest release. In it, <b>button 1</b> downloads the game.</p>
+  <p>Read the other threads too. The regulars (SolderSue, Hi_Score_Hal, DocMaria) know things, and they don't always know they're telling you.</p>
+  <div class="folio">10</div>
+</section>
+
+<!-- 11: breaking slop -->
+<section class="page">
+  <h2>Breaking slop</h2>
+  <div class="two">
+    <div><img class="shot" src="img/slop.png" alt=""></div>
+    <div><img class="shot" src="img/slopgame.png" alt=""></div>
+  </div>
+  <div class="cap">Each one promises the moon. Each one is Pong.</div>
+  <p>pixelkid_07's games can't be won. They can be <b>broken</b>, and you can't review a game until you've broken it. Each has its own way to crash, and they show the mistakes everyone makes with their first 7800 program: things in the wrong zones, scores that aren't decimal, a chip pushed past its time.</p>
+  <ul>
+    <li>Keep the ball in play. Some things only happen in a long rally.</li>
+    <li>Watch the score, and the edges of the screen.</li>
+    <li>Hal posts about high scores. Hal notices things.</li>
+    <li>A game that tells you to do something is probably telling you how it breaks.</li>
+  </ul>
+  <img class="shot" src="img/crash.png" alt="" style="width:55%;margin:0 auto">
+  <div class="cap">You broke it.</div>
+  <div class="folio">11</div>
+</section>
+
+<!-- 12: the review -->
+<section class="page">
+  <h2>Writing a review</h2>
+  <img class="shot" src="img/review.png" alt="">
+  <div class="cap">Three lines, a choice each.</div>
+  <p>After the crash, Arthur writes his review: an <b>opener</b>, the <b>bugs</b>, a <b>verdict</b>. Up and down pick the line; left and right pick the words; <b>button 1</b> posts it.</p>
+  <p>Arthur can only complain about bugs he actually saw. As the week goes on, kinder words turn up too. Which you pick is up to you. pixelkid_07 reads every review.</p>
+  <div class="note">A bad game and a chat about it beats a good game and an empty chair. Add more than you take away.</div>
+  <div class="folio">12</div>
+</section>
+
+<!-- 13: the porch -->
+<section class="page">
+  <h2>The night: the porch</h2>
+  <div class="two">
+    <div><img class="shot" src="img/porch.png" alt=""></div>
+    <div><img class="shot" src="img/rain.png" alt=""></div>
+  </div>
+  <p>Arthur's aim swings across the sky like a metronome, in time with the music. <b>Button 1</b> yells; <b>button 2</b> shakes a fist. Either one, thrown as the aim crosses the Cloud, <b>lands</b>.</p>
+  <ul>
+    <li>Landing yells builds <b>CALM</b>. A streak builds it faster; dead centre is PERFECT.</li>
+    <li>Missing raises Arthur's blood pressure, <b>BP</b>, and high BP drains CALM.</li>
+    <li>Yelling again too soon is TOO FAST. Mash, and he gets dizzy and has to sit down.</li>
+  </ul>
+  <p>Fill CALM and the Cloud breaks, and rains, and says what it has to say. Listen to the music: the beat is the Cloud breathing.</p>
+  <div class="folio">13</div>
+</section>
+
+<!-- 14: saturday -->
+<section class="page">
+  <h2>Saturday, and a second player</h2>
+  <img class="shot" src="img/storm.png" alt="">
+  <div class="cap">Friday night, something happens at NimbusWorks.</div>
+  <p>On Saturday there's a strange new thread on the forum, and the week goes somewhere new. Walk with the stick; <b>button 1</b> talks, and uses whatever's in front of Arthur. The top line of the screen says what that will do.</p>
+  <h3>Two players</h3>
+  <p>Some things take two people. When the time comes, a friend can pick up the second joystick and press fire, and play alongside you. Alone? Arthur can ask his companion to <b>wait</b> or <b>follow</b> with button 2. Nothing ever needs two hands at once.</p>
+  <div class="folio">14</div>
+</section>
+
+<!-- 15: about -->
+<section class="page">
+  <h2>About this game</h2>
+  <p><b>Man Yells at Cloud</b> is a free game for the Atari 7800 and the people who keep it alive. It's never sold. The source is on GitHub, for anyone who wants to see how it's done, or to make something of their own.</p>
+  <p>Everyone is welcome in retrogaming. To the old hands: the next generation of homebrewers is reading your replies. To the newcomers: dumping something and vanishing isn't joining in. Stay, ask, learn, and make something with people.</p>
+  <h3>Credits</h3>
+  <p>Design, code and words: Jason Rowe.<br>
+  Made with 7800basic (Mike Saarna), the a7800 emulator, and DASM.<br>
+  Music by tools/musicgen, by way of Cosmic Arc II.</p>
+  <p>The regulars' names are placeholders. AtariAge members: yours could go here.</p>
+  <div class="folio">15</div>
+</section>
+
+<!-- 16: the back -->
+<section class="page back">
+  <blockquote>&ldquo;Stay for the meal.&rdquo;</blockquote>
+  <div class="folio" style="color:#8f9bc6">16</div>
+</section>
+
+</body>
+</html>
