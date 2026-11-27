@@ -657,6 +657,9 @@ def kid_sun():
 
 
 SUN_P = kid_sun()
+# the moon, crossing the night between the porch and the next day (8 x 16)
+MOON = ["..cccc..", ".cccccc.", "cccbcccc", "cccccbcc", "ccbccccc", "cccccccc", ".ccccbc.", "..cccc.."]
+MOON = [r for r in MOON for _ in (0, 1)]
 
 
 # The mirror's people, 8 x 16 (a skin, b clothes, c hair / trousers), drawn
@@ -744,10 +747,13 @@ def main():
     wave[0:3] = ["....cccc...a.a..", "...cccccc..aaa..", "...caaaac...aa.."]
     halves = []
     for nm, sp in (("psue", SUE_P), ("phal", HAL_P), ("pmaria", MARIA_P), ("pkid", KID_P),
-                   ("ptable", TABLE_P), ("pwave", wave), ("psun", SUN_P)):
+                   ("ptable", TABLE_P), ("pwave", wave), ("psun", SUN_P), ("moon", MOON)):
         w = len(sp[0])
         sp = [r_ + "." * ((-w) % 8) for r_ in sp]
-        halves += [(nm + "t", sp[:16]), (nm + "b", sp[16:32])]
+        if len(sp) <= 16:
+            halves.append((nm, sp))
+        else:
+            halves += [(nm + "t", sp[:16]), (nm + "b", sp[16:32])]
     # the storm's block (bank 8) holds the potluck's people too
     block_gfx(S_TILES, [("bolt0", BOLT[0]), ("bolt1", BOLT[1])] + halves, "stormgfx", "sfont", 72)
     # the TVs' glow on the floor (16 x 16, two flickers; down for a TV on

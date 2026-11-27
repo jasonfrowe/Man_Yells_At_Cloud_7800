@@ -13,7 +13,7 @@ LOG=$("$A7800" a7800 -cart "$ROOT/build/myac.a78" -video none -sound none -nothr
   -skip_gameinfo -nomouse 2>&1 | grep -E "^frame|^result")
 echo "$LOG" | grep -v "^result"
 R=$(echo "$LOG" | sed -n 's/^result //p')
-WANT=20; [ -n "$ENDING" ] && WANT=26
+WANT=25; [ -n "$ENDING" ] && WANT=31
 case "$R" in
   "$WANT "[0-9]*) echo "story test: PASS (step $WANT in $(echo "$R" | awk '{printf "%.0f", $2 / 60}') s)" ;;
   *) echo "story test: FAIL ($R)"; exit 1 ;;

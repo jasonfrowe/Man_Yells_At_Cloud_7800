@@ -46,15 +46,7 @@ end
   srow7[x] = rackrow[x] : srow8[x] = rackrow[x]
   hex10[x] = 0 : hex11[x] = 0
   next
-  clearscreen
-  plotchars 'NIMBUSWORKS' 2 36 4
-  plotchars mastc 5 112 5 1
-  plotchars roofrow 5 0 6 20
-  plotchars srow7 5 0 7 20
-  plotchars srow8 5 0 8 20
-  plotchars doorrow 5 0 9 20
-  plotchars groundrow 7 0 10 20
-  plotchars groundrow 7 0 11 20
+  t = 2 : gosub dcscene
   plotchars hex10 0 0 10 20
   plotchars hex11 0 0 11 20
   savescreen
@@ -88,6 +80,20 @@ stormloop
   if u = 0 then goto stormloop
   characterset font
   goto scenedone
+
+  rem the data centre (the storm's, and the commute's): its sign in
+  rem palette t
+dcscene
+  clearscreen
+  plotchars 'NIMBUSWORKS' t 36 4
+  plotchars mastc 5 112 5 1
+  plotchars roofrow 5 0 6 20
+  plotchars srow7 5 0 7 20
+  plotchars srow8 5 0 8 20
+  plotchars doorrow 5 0 9 20
+  plotchars groundrow 7 0 10 20
+  plotchars groundrow 7 0 11 20
+  return
 
   rem 0: the Cloud drifts in from the right, over the building
 senter
@@ -391,6 +397,133 @@ end
 end
   data pkdirt
   226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226, 226
+end
+
+  rem ======================================================================
+  rem  BETWEEN THE DAYS (prototype 6): after a night on the porch, Arthur
+  rem  goes in to bed; the moon comes up over the yard, crosses, and sets;
+  rem  dawn (nightfall, to scenedone). Then, after the morning's cutscene,
+  rem  the commute: the porch in the morning, Arthur sets off; NimbusWorks
+  rem  by day, and he goes in (commute, to the day job).
+  rem ======================================================================
+
+  dim nax = $2210
+  dim nmx = $2211
+
+nightfall
+  asm
+  jsr mus_stop
+end
+  characterset font
+  sfxon = 1 : AUDV0 = 0 : AUDV1 = 0
+  pkbg = $80 : BACKGRND = pkbg
+  gosub ncolours
+  P0C1 = $0F : P0C3 = $9C
+  P1C1 = $08 : P1C2 = $0A : P1C3 = $0E
+  gosub pkscene
+  plotsprite chair 7 30 112 0 2
+  plotchars nstar 0 120 1 1
+  plotchars nstar 0 16 2 1
+  plotchars nstar 0 144 3 1
+  plotchars nstar 0 64 2 1
+  plotchars nstar 0 96 4 1
+  savescreen
+  pkt = 0 : pkn = 0 : nax = 12 : nmx = 158
+nloop
+  restorescreen
+  frm = frm + 1
+  if pkt < 255 then pkt = pkt + 1
+  if pkn = 0 then gosub nin
+  if pkn = 1 then gosub nmoon
+  if pkn = 2 then gosub ndawn
+  drawscreen
+  BACKGRND = pkbg
+  if switchreset then reboot
+  if pkn < 3 then goto nloop
+  goto scenedone
+  rem 0: Arthur goes in (left, into the house)
+nin
+  t = frm & 1 : if t then nax = nax - 1
+  if nax then plotsprite arthur0 2 nax 112 0 2
+  if nax = 0 then pkn = 1 : pkt = 0
+  return
+  rem 1: zzz from the house; the moon rises over the yard, crosses, sets
+nmoon
+  t = frm / 32 : t = t & 3 : t = 5 - t
+  u = frm & 32 : if u then plotchars 'Z' 0 16 t
+  t = frm & 1 : if t then nmx = nmx - 1
+  t = nmx / 8 : u = moonarc[t]
+  plotsprite moon 1 nmx u
+  if nmx > 2 then return
+  pkn = 2 : pkt = 0
+  return
+  rem 2: dawn
+ndawn
+  if pkt = 20 then pkbg = $82
+  if pkt = 40 then pkbg = $44
+  if pkt = 60 then pkbg = $36
+  if pkt = 80 then pkbg = $98
+  if pkt > 120 then pkn = 3
+  return
+
+  rem the commute: out of the house, and in at NimbusWorks
+commute
+  asm
+  jsr mus_stop
+end
+  characterset font
+  sfxon = 1 : AUDV0 = 0 : AUDV1 = 0
+  pkbg = $98 : BACKGRND = pkbg
+  gosub ncolours
+  gosub pkscene
+  plotsprite chair 7 30 112 0 2
+  savescreen
+  nax = 1 : pkn = 0
+cloop1
+  restorescreen
+  frm = frm + 1
+  t = frm & 1 : if t then nax = nax + 1
+  t = frm & 8 : t = t / 8 : u = 112 + t
+  plotsprite arthur0 2 nax u 0 2
+  drawscreen
+  if switchreset then reboot
+  if nax < 160 then goto cloop1
+  rem NimbusWorks, by day
+  drawwait
+  characterset sfont
+  P0C1 = $44
+  P5C1 = $02 : P5C2 = $06 : P5C3 = $C6
+  P7C1 = $04
+  for x = 0 to 19 : srow7[x] = rackrow[x] : srow8[x] = rackrow[x] : next
+  t = 0 : gosub dcscene
+  savescreen
+  nax = 1
+cloop2
+  restorescreen
+  frm = frm + 1
+  t = frm & 1 : if t then nax = nax + 1
+  t = frm & 8 : t = t / 8 : u = 128 + t
+  rem (in at the door: column 9)
+  if nax < 70 then plotsprite arthur0 2 nax u 0 2
+  drawscreen
+  if switchreset then reboot
+  if nax < 100 then goto cloop2
+  characterset font
+  goto scenedone
+
+  rem the porch's colours (and Arthur's)
+ncolours
+  P2C1 = $3A : P2C2 = $E4 : P2C3 = $08
+  P6C1 = $C2 : P6C2 = $C6
+  P7C1 = $22 : P7C2 = $26 : P7C3 = $2A
+  return
+
+  data nstar
+  250
+end
+  rem the moon's height across the sky (by x / 8, right to left)
+  data moonarc
+  140, 112, 92, 76, 62, 50, 40, 32, 26, 22, 20, 22, 26, 32, 40, 50, 62, 76, 92, 112
 end
 
   asm
