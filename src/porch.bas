@@ -195,8 +195,8 @@ yell
   t = aimoff + 8
   if t < 17 then pperf[x] = 1
   pose = w : poset = 12
-  rem a new phrase once the last has been up 1.5 s (time to read it)
-  if phraset = 0 || phraset > 90 then gosub pickphrase : phraset = 1
+  rem every yell is a new phrase (it stays up until the next)
+  gosub pickphrase : phraset = 1
   rem TOO FAST: within half a beat of the last one
   if sinceyell < 16 then gosub toofast
   sinceyell = 0
