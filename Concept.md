@@ -285,6 +285,17 @@ EVERYONE WELCOME.
 
 That's the "real-world puzzle": the community's combined program turns out to be an invitation, and it only works because everyone contributed a card.
 
+**As built (prototype 5a):**
+
+- **Rooms:** 20 x 11 tiles of 8 x 16 in 160A, drawn from text maps in `storyboard/mirror.txt` (the same file holds everything said). The map lives in RAM and MARIA reads it live, so a door opening or a plate going down is one byte. The rooms: Arthur's living room, the hub ("THE FORUM": three TVs to the regulars, server racks, the plate door and the card reader's alcove), Sue's workshop, Hal's arcade, Maria's library.
+- **Graphics:** the mirror has its own 4K block in its bank (at $A000, the tiles' font and the people's sprites side by side; the code and tables around it, in the DMA holes), since the fixed bank's graphics are full.
+- **Talk:** the room's bottom three rows become the text (the speaker and two lines of 20); button 1 turns the page.
+- **pixelkid_07** hides between the racks. Their lines depend on the kind phrases Arthur posted (none, some, or three or more), and every branch ends the same way: they didn't know how to start and were afraid to ask. Arthur: "MY FIRST PROGRAM DIDN'T WORK EITHER. NOBODY'S DOES. THE TRICK IS STAYING." Then they follow Arthur's trail; button 2 is wait / follow.
+- **Player 2:** joystick 2's fire at any time. Before pixelkid joins it's remembered; after, player 2 walks pixelkid and plays Hal's paddle in the rally.
+- **The plate door:** both plates at once; a plate stays down a second after you step off (too short to run between them alone, long enough for one person with two sticks to switch hands). Once open it stays open.
+- **Hal's rally:** 20 hits in a row, together. Hal never misses; a miss resets the count. Button 2 gives up.
+- **Still to come (5b):** Sue's and Maria's card puzzles (they hand their cards over for now), pixelkid's blank card, the card reader (hold the lever, drop the cards in order), the timing lock, and the printout.
+
 ### 4.5 The Ending: The Potluck
 
 The porch at dusk, side view again. Arthur, SolderSue, Hal, DocMaria and pixelkid_07 are there with casserole dishes, a CRT on an extension cord, a stack of carts, and a 7800 on a card table.
@@ -391,4 +402,4 @@ The rain's noise and the porch beat's kick get their own channels, so the beat t
 
 ## 9. Open Questions
 
-- None right now. Next: prototype step 4, the forum and the review builder.
+- None right now. Next: prototype 5b, the card puzzles and the card reader.

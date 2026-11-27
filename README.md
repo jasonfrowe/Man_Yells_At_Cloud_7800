@@ -9,7 +9,7 @@ people he's been arguing with every night.
 Everyone is welcome in retrogaming. Don't just leave slop and run: stay
 and enjoy the meal.
 
-**Status:** three prototypes, picked from a menu:
+**Status:** five prototypes, picked from a menu:
 
 1. *The slop ROMs*: pixelkid_07's games, one a day (SUPER PADDLE BALL
    DELUXE, CYBER NEON BLASTER, 7800 SKYWOLFENDOOMRIM), from the overblown
@@ -28,6 +28,13 @@ and enjoy the meal.
    pixelkid_07's latest release, break it, and post a review built from
    canned phrases: a complaint for each bug Arthur saw, and on day 3 a kind
    option in every slot. A regular answers him. With its own POKEY loop.
+5. *The mirror*: the finale's rooms, top-down in 160A. Walk through
+   Arthur's living-room TV into the forum as a room, and through its TVs
+   to Sue's workshop, Hal's arcade and Maria's library. pixelkid_07 hides
+   in the hub; what they say depends on Arthur's reviews, then they follow
+   (button 2: wait / follow). Joystick 2's fire, any time: a second player
+   takes pixelkid. Two plates open the hub's door; Hal's rally is 20 hits
+   together (player 2 takes Hal's paddle). Select goes back to the menu.
 
 The menu shows how many POKEYs it found: the music plays on two, or falls
 back to lead, bass and drums on one. See [Concept.md](Concept.md)
@@ -44,7 +51,8 @@ tools/test_break.sh   # a bot breaks the slop ROM, headless (a7800 fork;
                       # DAY=2/3 the other ROMs, SLOPPY=1 MISS=3 a clumsier bot)
 tools/test_porch.sh   # a bot plays the porch (ONEPOKEY=1: one POKEY)
 tools/test_cards.sh   # GO HOME, a card punched by hand, days 2-3 Cloud Assisted
-tools/test_forum.sh   # read, download, break, review and post (days 1 and 3)
+tools/test_forum.sh   # read, download, break, review and post (days 1-3)
+tools/test_mirror.sh  # the mirror: pixelkid, player 2, the door, the rally, the cards
 ```
 
 The porch's controls: just the buttons. Arthur's aim swings across the
@@ -66,6 +74,9 @@ then `.venv/bin/python tools/gfx.py`.
 | `src/forum.bas`, `src/asm/forum.asm` | The evening: the forum and the review builder (bank 5) |
 | `storyboard/forum.txt` | The forum's script: the regulars (swap in a forum name here), threads, posts, review phrases |
 | `tools/forum.py` | The forum's script to `src/gen/forumtxt.asm` |
+| `src/mirror.bas`, `src/asm/mirror.asm` | The mirror: rooms, pixelkid, player 2, the plates, Hal's rally (bank 6) |
+| `storyboard/mirror.txt` | The mirror's rooms (maps drawn as text) and everything said in them |
+| `tools/mirror.py` | The mirror's rooms and talk to `src/gen/mirrordat.asm` |
 | `src/asm/text40.asm` | The 40-column (320A) text screens the day job and the forum share |
 | `tools/gfx.py` | The art, drawn as text, and the fonts (the forum's avatars too) |
 | `tools/test_break.sh`, `tools/emu/breaktest.lua` | Headless test: break the slop ROM |
@@ -74,6 +85,7 @@ then `.venv/bin/python tools/gfx.py`.
 | `tools/test_porch.sh`, `tools/emu/porchtest.lua` | Headless test: the porch |
 | `tools/test_cards.sh`, `tools/emu/cardtest.lua` | Headless test: the day job |
 | `tools/test_forum.sh`, `tools/emu/forumtest.lua` | Headless test: the evening |
+| `tools/test_mirror.sh`, `tools/emu/mirrortest.lua` | Headless test: the mirror |
 | `tools/dmalog.py` | MARIA's DMA load per line (`A7800_DMA_LOG`, from the a7800 fork) |
 | `tools/snap.sh` | Headless screenshots, with scripted inputs |
 

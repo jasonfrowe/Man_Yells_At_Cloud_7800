@@ -15,6 +15,7 @@ PATH="$HOME/.wasmtime/bin:$PATH"
 
 python3 "$ROOT/tools/music.py"
 python3 "$ROOT/tools/forum.py"
+python3 "$ROOT/tools/mirror.py"
 
 rm -rf "$WORK"
 mkdir -p "$WORK"

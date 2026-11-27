@@ -8,6 +8,7 @@
   rem    2  THE PORCH: yelling at the Cloud, then the rain (porch.bas)
   rem    3  THE DAY JOB: punch cards at NimbusWorks, a job a day (cards.bas)
   rem    4  THE EVENING: the forum, the day's slop ROM, the review (forum.bas)
+  rem    5  THE MIRROR: the finale's rooms, pixelkid, the rally (mirror.bas)
   rem  Left and right pick the night / day (1-3) for both.
   rem
   rem  Prototype 1: the slop ROMs. Day 1 SUPER PADDLE BALL DELUXE, day 2
@@ -127,6 +128,7 @@ end
   plotchars 'THE PORCH: NIGHT' 0 16 7
   plotchars 'THE DAY JOB: DAY' 0 16 8
   plotchars 'THE EVENING: DAY' 0 16 9
+  plotchars 'THE MIRROR' 0 16 10
   plotchars 'POKEYS FOUND:' 3 16 11
   savescreen
   fireheld = 1 : stickheld = 1
@@ -154,7 +156,7 @@ menuloop
   if t = 0 then stickheld = 0
   if stickheld then goto menufire
   if t then stickheld = 1
-  if t = 2 && menusel < 3 then menusel = menusel + 1
+  if t = 2 && menusel < 4 then menusel = menusel + 1
   if t = 1 && menusel > 0 then menusel = menusel - 1
   if t = 3 && night > 1 then night = night - 1
   if t = 4 && night < 3 then night = night + 1
@@ -164,6 +166,7 @@ menufire
   if menusel = 1 then goto porch bank3
   if menusel = 2 then goto cards bank4
   if menusel = 3 then goto forum bank5
+  if menusel = 4 then goto mirror bank6
   goto title bank2
 
 
@@ -226,6 +229,8 @@ end
   incbasic forum.bas
 
   bank 6
+  incbasic mirror.bas
+
   bank 7
   bank 8
 

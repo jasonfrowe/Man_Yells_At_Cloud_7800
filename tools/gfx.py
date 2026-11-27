@@ -416,6 +416,168 @@ ROCK = [
 ROCK2 = ["".join(ROCK[11 - x][y] for x in range(12)) for y in range(12)]
 
 
+# ---------------------------------------------------------------------------
+# The mirror ROM (bank 6, with its code): top-down rooms in 160A.
+# Its own font, mfont: glyphs 0-63 the same ASCII as the game's font (so the
+# alphachars codes still work), 64 up the rooms' tiles. Walkable tiles come
+# first (64-69): every code from 2 x 70 up is solid (tools/mirror.py, the
+# map legend, must match).
+M_TILES = {
+    64: ("floor", ["bbbbbbbb", "bbbbbbbb", "bbbbbbbb", "aaaaaaaa"] * 2 + ["bbbbabbb", "bbbbabbb", "bbbbabbb", "aaaaaaaa"] * 2),
+    65: ("rug", ["cccccccc", "cbcccbcc", "cccbcccc", "cccccccc"] * 4),
+    66: ("grid", ["a......."] + ["........"] * 7 + ["a......."] + ["........"] * 7),
+    67: ("plate", ["........", ".cccccc.", "cbbbbbbc", "cbbbbbbc", "cbbbbbbc", "cbbbbbbc", "cbbbbbbc", "cbbbbbbc",
+                   "cbbbbbbc", "cbbbbbbc", "cbbbbbbc", "cbbbbbbc", "cbbbbbbc", ".cccccc.", "aaaaaaaa", "........"]),
+    68: ("plated", ["........"] * 3 + [".cccccc.", "cccccccc"] + ["cccccccc"] * 9 + [".cccccc.", "........"]),
+    69: ("dooropen", ["a......a"] * 16),
+    70: ("wallcap", ["aaaaaaaa"] * 16),
+    71: ("wall", ["bcbbbcbb"] * 13 + ["aaaaaaaa", "aaaaaaaa", "aaaaaaaa"]),
+    72: ("window", ["bbbbbbbb", "baaaaaab", "bacccaab", "bacccaab", "baacccab", "baacccab", "baaaaaab", "baacccab",
+                    "bacccaab", "baaaaaab", "bbbbbbbb", "bcbbbcbb", "bcbbbcbb", "aaaaaaaa", "aaaaaaaa", "aaaaaaaa"]),
+    73: ("poster", ["bcbbbcbb", "cccccccc", "caaaaaac", "cabbbbac", "cabccbac", "cabbbbac", "caaaaaac", "caccccac",
+                    "caaaaaac", "cccccccc", "bcbbbcbb", "bcbbbcbb", "bcbbbcbb", "aaaaaaaa", "aaaaaaaa", "aaaaaaaa"]),
+    74: ("tvl", ["........", "aaaaaaaa", "accccccc", "acbbbbbb", "acbcbbbb", "acbbbbbb", "acbbbbcb", "acbbbbbb",
+                 "acbbcbbb", "acbbbbbb", "accccccc", "aaaaaaaa", "aaaaaaaa", ".a......", ".a......", "........"]),
+    75: ("tvr", ["........", "aaaaaaaa", "cccccca.", "bbbbbca.", "bbbbbca.", "bcbbbca.", "bbbbbca.", "bbcbbca.",
+                 "bbbbbca.", "bbbbbca.", "cccccca.", "aaaaaaa.", "aacaca..", "......a.", "......a.", "........"]),
+    76: ("couchl", ["........", "........", "..aaaaaa", ".abbbbbb", "abbbbbbb", "abbbbbbb", "abbbbbbb", "abcccccc",
+                    "abcccccc", "abcccccc", "abbbbbbb", "abbbbbbb", "aaaaaaaa", ".a......", "........", "........"]),
+    77: ("couchm", ["........", "........", "aaaaaaaa", "bbbbbbbb", "bbbbbbbb", "bbbbbbbb", "bbbbbbbb", "cccccccc",
+                    "cccbcccc", "cccccccc", "bbbbbbbb", "bbbbbbbb", "aaaaaaaa", "........", "........", "........"]),
+    78: ("couchr", [r[::-1] for r in ["........", "........", "..aaaaaa", ".abbbbbb", "abbbbbbb", "abbbbbbb", "abbbbbbb", "abcccccc",
+                                      "abcccccc", "abcccccc", "abbbbbbb", "abbbbbbb", "aaaaaaaa", ".a......", "........", "........"]]),
+    79: ("chair", ["........", ".aaaaaa.", "abbbbbba", "abbbbbba", "abbbbbba", "abbbbbba", "abccccba", "abccccba",
+                   "abccccba", "abbbbbba", "abbbbbba", "aaaaaaaa", ".a....a.", ".a....a.", "........", "........"]),
+    80: ("table", ["........", "........", "aaaaaaaa", "cccccccc", "cbbbbbbc", "cbbbbbbc", "cbbbbbbc", "cccccccc",
+                   "aaaaaaaa", ".a....a.", ".a....a.", ".a....a.", ".a....a.", "........", "........", "........"]),
+    81: ("shelf", ["aaaaaaaa", "abcbcabc", "abcbcabc", "abcbcabc", "abcbcabc", "aaaaaaaa", "acbbcacb", "acbbcacb",
+                   "acbbcacb", "acbbcacb", "aaaaaaaa", "abccbbca", "abccbbca", "abccbbca", "aaaaaaaa", "a......a"]),
+    82: ("bench", ["........", "..c..b..", ".ccc.b..", "..c.bbb.", "aaaaaaaa", "cccccccc", "abbbbbba", "abbbbbba",
+                   "abaaaaba", "abbbbbba", "aaaaaaaa", "a......a", "a......a", "a......a", "a......a", "........"]),
+    83: ("cabtop", [".aaaaaa.", "aaaaaaaa", "acccccca", "aaaaaaaa", "abbbbbba", "abaaaaba", "abaccaba", "abacaaba",
+                    "abaaaaba", "abaaacba", "abaaaaba", "abbbbbba", "aaaaaaaa", "acbaacba", "aaaaaaaa", "abbbbbba"]),
+    84: ("cabbot", ["abbbbbba", "aaaaaaaa", "abbbbbba", "abbbbbba", "abbccbba", "abbbbbba", "abbbbbba", "abbbbbba",
+                    "abbbbbba", "abbbbbba", "abbbbbba", "abbbbbba", "aaaaaaaa", "aaaaaaaa", "........", "........"]),
+    85: ("rack", ["aaaaaaaa", "abbbbbba", "abcbabba", "abbbbbba", "aaaaaaaa", "abbbbbba", "abbacbba", "abbbbbba",
+                  "aaaaaaaa", "abbbbbba", "abcbbcba", "abbbbbba", "aaaaaaaa", "abbbbbba", "aaaaaaaa", "a......a"]),
+    86: ("door", ["aaaaaaaa", "acbcbcba", "acbcbcba", "acbcbcba", "acbcbcba", "acbcbcba", "acbcbcba", "acbcbcba",
+                  "acbcbcba", "acbcbcba", "acbcbcba", "acbcbcba", "acbcbcba", "acbcbcba", "acbcbcba", "aaaaaaaa"]),
+    87: ("readtl", ["aaaaaaaa", "abbbbbbb", "abcccccc", "abcaaaaa", "abcacccc", "abcacccc", "abcaaaaa", "abcccccc",
+                    "abbbbbbb", "abbbbbbb", "abbcbcbb", "abbbbbbb", "abbbbbbb", "abbbbbbb", "abbbbbbb", "abbbbbbb"]),
+    88: ("readtr", ["aaaaaaaa", "bbbbbbba", "ccccccba", "aaaaacba", "ccccacba", "ccccacba", "aaaaacba", "ccccccba",
+                    "bbbbbbba", "bbbbbbba", "bbbbbbba", "bbcbbbba", "bbbbbbba", "bbbbbbba", "bbbbbbba", "bbbbbbba"]),
+    89: ("readbl", ["abbbbbbb", "abaaaaaa", "abacccca", "abaaaaaa", "abbbbbbb", "abbbbbbb", "abbbbbbb", "aaaaaaaa",
+                    ".a......", ".a......", "........", "........", "........", "........", "........", "........"]),
+    90: ("readbr", ["bbbbbbba", "aaaaaaba", "acccccba", "aaaaaaba", "bbbbbbba", "bbbbbbba", "bbbbbbba", "aaaaaaaa",
+                    "......a.", "......a.", "........", "........", "........", "........", "........", "........"]),
+    91: ("lever", ["........", "...cc...", "...cc...", "...a....", "...a....", "...a....", "...a....", "...a....",
+                   "..aaa...", ".abbba..", ".abbba..", ".aaaaa..", "........", "........", "........", "........"]),
+    92: ("leverd", ["........"] * 5 + [".cc.....", ".cca....", "...a....", "....a...", "..aaa...", ".abbba..", ".abbba..",
+                                       ".aaaaa..", "........", "........", "........"]),
+    93: ("plant", ["...c....", ".c.cc.c.", ".cccccc.", "cc.cc.cc", ".cccccc.", "..cccc..", "...c....", "..aaaa..",
+                   "..abba..", "..abba..", "..abba..", "...aa...", "........", "........", "........", "........"]),
+    94: ("lamp", ["..cccc..", ".cccccc.", "cccccccc", "........", "...a....", "...a....", "...a....", "...a....",
+                  "...a....", "...a....", "...a....", "..aaa...", ".aaaaa..", "........", "........", "........"]),
+    95: ("box", ["bbbbbbbb"] * 16),
+}
+M_LEGEND = {}
+
+
+def mirror_gfx(sprites):
+    """src/gen/mirrorgfx.asm: the mirror's 4K graphics block (bank 6, $A000):
+    MARIA's layout, page p holding line 15 - p. Bytes 0-191 the font (96
+    glyphs, 2 bytes each, doublewide); then the sprites side by side, each
+    with the symbols 7800basic's plotsprite wants (frames: consecutive
+    sprites of one width)."""
+    src = Image.open(FONT_SRC)
+    sp = src.load()
+    glyph = lambda c, x, y: bool(sp[c * 8 + x, y])
+    g = [["." * 8 for _ in range(ZONE)] for _ in range(96)]
+    for i in range(64):
+        for y in range(8):
+            g[i][4 + y] = "".join("a" if glyph(32 + i, x, y) else "." for x in range(8))
+    for n, (_, rows) in M_TILES.items():
+        assert len(rows) == 16 and all(len(r) == 8 for r in rows), n
+        g[n] = rows
+    cols = [g[i] for i in range(96)]                  # 8-pixel columns
+    syms = ["mfont = $A000", "mfont_mode = $00", "mfont_width = 192"]
+    off = 192
+    for name, rows in sprites:
+        w = len(rows[0])
+        assert w % 8 == 0 and len(rows) == 16, name
+        syms += [f"{name} = $A000 + {off}", f"{name}_mode = $00",
+                 f"{name}_width = {w // 4}", f"{name}_width_twoscompliment = ${(32 - w // 4) & 31:02x}"]
+        for k in range(0, w, 8):
+            cols.append([r[k:k + 8] for r in rows])
+        off += w // 4
+    assert off <= 256, f"the mirror's graphics: {off} bytes wide"
+    out = ["; Generated by tools/gfx.py (the mirror). Do not edit.", "; The mirror's graphics block, at $A000 in bank 6."]
+    out += syms
+    for p in range(16):
+        line = 15 - p
+        bs = []
+        for col in cols:
+            r = col[line]
+            for half in (r[:4], r[4:]):
+                v = 0
+                for ch in half:
+                    v = v * 4 + ".abc".index(ch)
+                bs.append(v)
+        bs += [0] * (256 - len(bs))
+        for k in range(0, 256, 32):
+            out.append("    .byte " + ",".join(str(v) for v in bs[k:k + 32]))
+    (ROOT / "src" / "gen" / "mirrorgfx.asm").write_text("\n".join(out) + "\n")
+
+
+# The mirror's people, 8 x 16 (a skin, b clothes, c hair / trousers), drawn
+# front (down), back (up), left and right, two steps each.
+def person(hair, face_down, body, legs2=None):
+    """hair/face 5 lines, body 6, legs 4 (+1 blank): a front view"""
+    return hair + face_down + body
+
+
+def walkers(top_d, top_u, top_s, body_d, body_s, legs):
+    """frames: down 0 1, up 0 1, left 0 1, right 0 1"""
+    out = []
+    flip = lambda rows: [r[::-1] for r in rows]
+    for top, body in ((top_d, body_d), (top_u, body_d)):
+        for lg in legs:
+            out.append(top + body + lg + ["........"])
+    for lg in legs:
+        out.append(top_s + body_s + lg + ["........"])
+    for f in out[4:6]:
+        out.append(flip(f))
+    return out
+
+
+LEGS = [["..c..c..", "..c..c..", "..c..c..", ".cc..cc."], ["..c..c..", "..c..c..", ".cc...c.", "......cc"]]
+LEGS_S = [["...cc...", "...cc...", "..c..c..", ".cc..cc."], ["...cc...", "...cc...", "...cc...", "..ccc..."]]
+
+ARTHUR_M = walkers(
+    ["..cccc..", ".cccccc.", ".caaaac.", ".aacaaa.", "..aaaa.."],
+    ["..cccc..", ".cccccc.", ".cccccc.", ".cccccc.", "..aaaa.."],
+    ["..cccc..", ".cccccc.", "..caaaa.", "..caaca.", "..aaaa.."],
+    [".bbbbbb.", "bbbbbbbb", "abbbbbba", "abbbbbba", ".bbbbbb.", "..cccc.."],
+    ["..bbbb..", ".bbbbbb.", ".bbbbbb.", ".bbabbb.", "..bbbb..", "..cccc.."],
+    LEGS)
+ARTHUR_M[4:8] = ARTHUR_M[4:8]
+PIXELKID_M = walkers(
+    [".bbbbbb.", "bbbbbbbb", ".caaaac.", ".aacaca.", "..aaaa.."],
+    [".bbbbbb.", ".bbbbbb.", ".cccccc.", ".cccccc.", "..aaaa.."],
+    ["..bbbb..", ".bbbbbbb", "..caaaa.", "..caaca.", "..aaaa.."],
+    [".bbbbbb.", "bbbbbbbb", "abbbbbba", "abbbbbba", ".bbbbbb.", "..cccc.."],
+    ["..bbbb..", ".bbbbbb.", ".bbbbbb.", ".bbabbb.", "..bbbb..", "..cccc.."],
+    LEGS)
+# the regulars stand facing you: Sue (goggles), Hal (headphones), Maria
+# (glasses, a long coat)
+SUE_M = ["..cccc..", ".cccccc.", ".bbabba.", ".aaaaaa.", "..aaaa..", ".bbbbbb.", "bbbbbbbb", "abbbbbba",
+         "abbbbbba", ".bbbbbb.", "..cccc..", "..c..c..", "..c..c..", "..c..c..", ".cc..cc.", "........"]
+HAL_M = ["..cccc..", "bcccccb.", "baaaaab.", "bacaca.b"[:8], "..aaaa..", ".bbbbbb.", "bbbbbbbb", "abbbbbba",
+         "abbbbbba", ".bbbbbb.", "..cccc..", "..c..c..", "..c..c..", "..c..c..", ".cc..cc.", "........"]
+MARIA_M = [".cccccc.", "cccccccc", "cbabbabc", "caaaaaac", "c.aaaa.c", ".bbbbbb.", "bbbbbbbb", "abbbbbba",
+           "abbbbbba", "bbbbbbbb", "bbbbbbbb", "bbbbbbbb", "..a..a..", "..a..a..", ".cc..cc.", "........"]
+
+
 def main():
     GFX.mkdir(parents=True, exist_ok=True)
     font()
@@ -447,6 +609,9 @@ def main():
     sprite("shell", SHELL)
     sprite("rock0", ROCK)
     sprite("rock1", ROCK2)
+    mirror_gfx([(f"marthur{i}", f) for i, f in enumerate(ARTHUR_M)]
+               + [(f"mkid{i}", f) for i, f in enumerate(PIXELKID_M)]
+               + [("msue", SUE_M), ("mhal", HAL_M), ("mmaria", MARIA_M)])
 
     print(f"wrote {GFX.relative_to(ROOT)}/: font, padp, padc, ball, ballcut0-4, garb0-1, spark0-2, porch")
 

@@ -1,0 +1,267 @@
+# 0x7800_MIRROR.BIN: the rooms and what people say in them.
+# tools/mirror.py turns it into src/gen/mirrordat.asm (bank 6).
+#
+# @room key | NAME             a room: then @pal, its 11 map rows, doors, NPC
+#   @pal  c1 c2 c3 (x4)        palettes 4-7 (floor, walls, furniture, tech)
+#   @bg   colour               the background (under the grid), default $00
+#   map rows: 20 characters, screen rows 1-11 (the legend below)
+#   @door col row room col row a TV (its left half) to another room: where
+#                              you step out (the tile you stand on)
+#   @npc key col row           who stands here (sue, hal, maria, pixelkid)
+#
+# Map legend: walkable  . floor  ~ rug  , grid  p plate  d door (open)
+#             solid     # wall top  = wall  w window  P poster  T t TV
+#                       [ - ] couch  h armchair  o table  B shelf
+#                       W workbench  A a arcade cabinet  S rack  D door
+#                       R r Q q card reader  L lever  * plant  l lamp
+#
+# @talk N key                   dialogue N (mirror.bas uses the numbers)
+#   = SPEAKER                   who's talking (up to 20 characters)
+#   then pages of 1-2 lines (20 characters), a blank line between pages
+# Text is ASCII 32-95: upper case, digits and punctuation.
+
+@room living | ARTHUR'S LIVING ROOM
+@pal $F2 $F4 $F6  $82 $86 $8A  $32 $36 $3A  $04 $08 $9C
+####################
+#===w=====l====w===#
+#*......Tt.......h.#
+#.......~~.........#
+#......~~~~........#
+#......~~~~........#
+#.......[-]........#
+#..................#
+#.o..............*.#
+#..................#
+####################
+@door 8 3 hub 9 9
+
+@room hub | THE FORUM
+@bg $90
+@pal $00 $02 $94  $92 $96 $9A  $04 $06 $0A  $04 $08 $CC
+####################
+#=P=Tt==Tt==Tt=#===#
+#,,,,,,,,,,,,,,#,,,#
+#,,,,,,,,,,,,p,#,Rr#
+#SS,,,,,,,,,,,,#,Qq#
+#,,,,,,,,,,,,,,D,,L#
+#,,,,,,,,,,,,,,#,,,#
+#SS,,,,,,,,,,,,#,,,#
+#,,p,,,,,,,,,,,#,,,#
+#,,,,,,,,Tt,,,,#,,,#
+####################
+@door 4 2 sue 9 9
+@door 8 2 hal 9 9
+@door 12 2 maria 9 9
+@door 9 10 living 8 4
+@npc pixelkid 1 6
+
+@room sue | SUE'S WORKSHOP
+@pal $12 $14 $16  $C2 $C4 $C8  $06 $0A $1C  $04 $08 $4C
+####################
+#===w======w=======#
+#WWW......WWW....*.#
+#..................#
+#.....~~~~~~.......#
+#.....~~~~~~.......#
+#..................#
+#W.................#
+#W..............o..#
+#........Tt........#
+####################
+@door 9 10 hub 4 3
+@npc sue 9 5
+
+@room hal | HAL'S ARCADE
+@pal $04 $02 $04  $62 $64 $68  $52 $56 $3C  $04 $08 $CC
+####################
+#==P====P====P====P#
+#A.A.A.A....A.A.A.A#
+#a.a.a.a....a.a.a.a#
+#,,,,,,,,,,,,,,,,,,#
+#,,,,,,,,,,,,,,,,,,#
+#,,,,,,,,,,,,,,,,,,#
+#,,,,,,,,,,,,,,,,,,#
+#,,,,,,,,,,,,,,,,,,#
+#,,,,,,,,Tt,,,,,,,,#
+####################
+@door 9 10 hub 8 3
+@npc hal 9 5
+
+@room maria | MARIA'S LIBRARY
+@pal $22 $24 $26  $72 $74 $78  $34 $38 $2C  $04 $08 $7C
+####################
+#=BBBB==w==w==BBBB=#
+#..................#
+#.BBB..........BBB.#
+#..................#
+#.BBB....oo....BBB.#
+#..................#
+#.BBB..........BBB.#
+#..................#
+#........Tt........#
+####################
+@door 9 10 hub 12 3
+@npc maria 9 5
+
+# ---------------------------------------------------------------------------
+# The talk
+
+@talk 0 intro
+= ARTHUR
+...THAT'S MY COUCH.
+THAT'S MY TV.
+
+IT'S MY LIVING ROOM.
+IN 160A.
+
+THE TV'S ON. IT'S
+SHOWING THE FORUM?
+
+@talk 1 hub
+= ARTHUR
+THE NEW RELEASES
+BOARD. AS A ROOM.
+
+THREE MORE TVS. AND
+SOMEONE'S HIDING.
+
+# pixelkid, by how kind Arthur's reviews were (rev_kind, all 3 days)
+@talk 2 kid0
+= PIXELKID_07
+...OH. IT'S YOU.
+ARTHUR_6502.
+
+I READ THEM. ALL OF
+YOUR REVIEWS.
+
+"NO SOUL." "1 STAR."
+YOU WERE RIGHT.
+
+I DIDN'T KNOW HOW TO
+START. I WAS AFRAID
+
+TO ASK. SO I LET A
+GENERATOR DO IT.
+
+@talk 3 kid1
+= PIXELKID_07
+...OH. IT'S YOU.
+ARTHUR_6502.
+
+I READ ALL OF YOUR
+REVIEWS. EVEN THE
+
+NICE ONE. I READ
+THAT ONE TEN TIMES.
+
+I DIDN'T KNOW HOW TO
+START. I WAS AFRAID
+
+TO ASK. SO I LET A
+GENERATOR DO IT.
+
+@talk 4 kid2
+= PIXELKID_07
+YOU'RE ARTHUR_6502.
+YOU SAID WELCOME.
+
+DID YOU MEAN IT?
+NOBODY SAYS THAT.
+
+I DIDN'T KNOW HOW TO
+START. I WAS AFRAID
+
+TO ASK. SO I LET A
+GENERATOR DO IT.
+
+@talk 5 kidjoin
+= ARTHUR
+...MY FIRST PROGRAM
+DIDN'T WORK EITHER.
+
+NOBODY'S DOES. THE
+TRICK IS STAYING.
+
+STICK AROUND, KID.
+COME ON.
+
+@talk 6 kidhelp
+= PIXELKID_07
+BUTTON 2: I WAIT, OR
+I FOLLOW YOU.
+
+A FRIEND CAN BE ME:
+JOYSTICK 2, FIRE.
+
+@talk 7 p2join
+= PIXELKID_07
+PLAYER 2'S GOT ME.
+HI, PLAYER 2!
+
+@talk 8 sue
+= SOLDERSUE
+ARTHUR? IN HERE?
+...HUH. NICE ROOM.
+
+THE CLOUD LEFT ME A
+CARD. HALF PUNCHED.
+
+TAKE IT TO THE BIG
+READER. I'LL BE BY.
+
+@talk 9 hal
+= HI_SCORE_HAL
+A RALLY. A REAL ONE.
+NO CRASHES.
+
+20 HITS IN A ROW,
+TOGETHER. READY?
+
+@talk 10 halwin
+= HI_SCORE_HAL
+20! GOOD GAME,
+ARTHUR. HONESTLY.
+
+HERE: MY CARD. THE
+CLOUD LEFT IT ON MY
+
+HIGH SCORE TABLE.
+
+@talk 11 maria
+= DOCMARIA
+ARTHUR. DID YOU KNOW
+THIS ROOM IS 160A?
+
+OF COURSE YOU DID.
+HERE, A CARD. IT'S
+
+FULL OF LOOPS AND
+ADD 127S. ENJOY.
+
+@talk 12 done
+= ARTHUR
+GOT IT. NOW THE BIG
+CARD READER.
+
+@talk 13 door
+= ARTHUR
+TWO PLATES, ONE DOOR
+IT TAKES TWO.
+
+@talk 14 opened
+= PIXELKID_07
+IT'S OPEN!
+WE DID THAT.
+
+@talk 15 reader
+= ARTHUR
+THE CARD READER.
+(COMING SOON.)
+
+@talk 16 halagain
+= HI_SCORE_HAL
+AGAIN? ANY TIME.
+
+@talk 17 halmiss
+= HI_SCORE_HAL
+OOF. AGAIN!
