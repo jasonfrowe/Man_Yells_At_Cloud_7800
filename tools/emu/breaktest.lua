@@ -74,6 +74,10 @@ emu.register_frame_done(function()
   if (hit4 and f == hit4 + 4) or (gl and (f == gl + 40 or f == gl + 260 or f == gl + 330)) then
     manager:machine().screens[":screen"]:snapshot()
   end
+  -- (SNAPS, day 2: the tunnelling ball as it wraps)
+  if os.getenv("SNAPS") and day == 2 and not gl and m():read_u8(0x2207) ~= 0 and f % 12 == 0 then
+    manager:machine().screens[":screen"]:snapshot()
+  end
   if gl and f == gl + 340 then
     print(string.format("result %d %d", gl - start, mm:read_u8(0x0172)))
     manager:machine():exit()

@@ -22,6 +22,7 @@
   dim padg = $2209
   dim padlen = $220A
   dim swlast = $220B
+  dim wraps = $220C
 
   rem ======================================================================
   rem  The slop title screen
@@ -96,7 +97,7 @@ startgame
   score = 0 : combo = 1 : glitch = 0 : combot = 0 : cpuscore = 0
   ghostt = 0 : seenbugs = 0
   exp = 0 : shx = 0 : astx = 0
-  spd = 0 : tunnel = 0 : lostt = 0 : padg = 0 : padlen = 28
+  spd = 0 : tunnel = 0 : lostt = 0 : wraps = 0 : padg = 0 : padlen = 28
   gosub readsw : swlast = t
   pady = 90 : cpuy = 90
   gosub showscore
@@ -121,6 +122,8 @@ startgame
   next
   if night = 2 then P6C1 = $46 : P6C3 = $CC : nhue = $50
   if night = 3 then gosub arena
+  rem (day 3's crash is the switch: the game says so, in the bottom wall)
+  if night = 3 then plotchars 'FLIP LEFT DIFFICULTY' 0 0 11
   savescreen
 playloop
   restorescreen
@@ -167,9 +170,16 @@ moveball
   if lostt then return
   ballx = ballx + balldx
   bally = bally + balldy
-  rem day 2, at top speed: the wall check misses it, and it's gone
+  rem day 2, at top speed: the wall checks miss it. It flies through the
+  rem walls and wraps round the screen, top to bottom and side to side,
+  rem a few times; then it's gone
   if tunnel = 0 then goto walls
-  if bally > 200 then lostt = 1
+  if ballx > 200 then ballx = 152
+  if ballx > 156 then ballx = 4
+  if bally > 4 then return
+  wraps = wraps + 1
+  if wraps >= 4 then lostt = 1 : return
+  bally = 186
   return
 walls
   if bally < 20 then bally = 20 : balldy = 0 - balldy : gosub sndwall
