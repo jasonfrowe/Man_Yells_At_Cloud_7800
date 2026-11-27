@@ -1,0 +1,103 @@
+# The story's cutscenes: tools/script.py turns them into src/gen/cuttxt.asm
+# (bank 7). Teletype text, 40 columns, in the 320A text engine.
+#
+# @cut N key           a cutscene (src/myac.bas's story steps use the numbers)
+# @at TEXT             the header (top row), up to 40: kept until the next @at
+# = SPEAKER            who talks (arthur, cloud, pixelkid, sue, hal, maria);
+#                      "= none" for narration. A speaker starts a new page.
+# then the page's lines (up to 6 of 40); a blank line also starts a new page
+# Text is ASCII 32-95: upper case, digits and punctuation.
+
+@cut 0 intro
+@at MONDAY, 6:45 AM.
+= none
+ARTHUR. SEVENTY-ONE. WROTE COBOL FOR
+THIRTY YEARS. KNOWS 6502 COLD.
+
+THESE DAYS HE PUNCHES CARDS, PART TIME,
+FOR A COMPANY CALLED NIMBUSWORKS.
+
+NOBODY THERE WILL SAY WHAT THE CARDS
+ARE FOR.
+= arthur
+A JOB'S A JOB.
+
+@cut 1 evening1
+@at MONDAY, 7:30 PM.
+= none
+HOME. TEA. THE 7800 HOMEBREW FORUM,
+NEW RELEASES.
+= arthur
+LET'S SEE WHAT THE KIDS ARE MAKING.
+
+@cut 2 night1
+@at MONDAY, 10:15 PM. THE PORCH.
+= none
+ONE STAR. ANOTHER PONG CLONE. HE NEEDS
+SOME AIR.
+
+THE SKY IS ONE BIG CLOUD. IT HANGS OVER
+HIS PORCH AS IF IT LIVES THERE.
+= arthur
+AND WHAT ARE YOU LOOKING AT?
+
+@cut 3 day2
+@at WEDNESDAY, 8:50 AM.
+= none
+THE CLOUD RAINED ON HIM UNTIL HE WENT
+INSIDE. HIS CARDIGAN IS STILL DAMP.
+= arthur
+IT SAID SOMETHING. IN THE RAIN.
+
+...NO. CLOUDS DON'T TALK.
+
+@cut 4 evening2
+@at WEDNESDAY, 7:30 PM.
+= arthur
+ANOTHER ONE. FROM THE SAME KID.
+
+@cut 5 night2
+@at WEDNESDAY, 10:40 PM. THE PORCH.
+= none
+THE CLOUD IS BACK. IT WAITED FOR HIM.
+= arthur
+OF COURSE YOU DID.
+
+@cut 6 day3
+@at FRIDAY, 8:55 AM.
+= none
+THE LAST JOB OF THE WEEK. THE WHOLE
+CARD.
+= arthur
+PONG. THEY WANT PONG. FOUR TIMES.
+
+@cut 7 evening3
+@at FRIDAY, 7:30 PM.
+= arthur
+LET'S GET THIS OVER WITH.
+
+@cut 8 night3
+@at FRIDAY, 11:00 PM. THE PORCH.
+= none
+HE ISN'T SURE WHY HE COMES OUT ANY MORE.
+HE ISN'T EVEN ANGRY.
+= arthur
+...HELLO AGAIN.
+
+@cut 9 saturday
+@at SATURDAY, 9:30 AM.
+= none
+ONE NEW THREAD ON THE FORUM. NO BOX
+ART. NO HYPE. ZERO REPLIES.
+
+0X7800_MIRROR.BIN
+POSTED BY: (NOBODY)
+= arthur
+...FOR ME?
+= none
+HE DOWNLOADS IT.
+
+@cut 10 tbc
+@at SATURDAY, 6:00 PM.
+= none
+TO BE CONTINUED: THE POTLUCK.

@@ -95,6 +95,13 @@
   dim rev_ph = $2700
   dim rev_done = $2709
   dim rev_kind = $270C
+  rem the story: on (1), its step; the cutscene to show; the title's pick
+  dim story = $2714
+  dim chap = $2715
+  dim cutid = $2716
+  dim titlesel = $2717
+  dim mcards = $2710
+  dim mdoor = $2711
 
   rem Buttons: either fire button starts and continues (joy0fire1 is
   rem button 1 and a one-button stick's, joy0fire0 button 2).
@@ -107,8 +114,87 @@
   asm
   jsr snd_init
 end
-  menusel = 0 : night = 1
+  menusel = 0 : night = 1 : story = 0 : titlesel = 0
   for x = 0 to 14 : rev_ph[x] = 0 : next
+
+  rem ======================================================================
+  rem  The title: STORY (the whole thing, a scene after another) or
+  rem  PROTOTYPES (the menu, a scene at a time)
+  rem ======================================================================
+gametitle
+  story = 0
+  asm
+  lda #MUS_TITLE
+  jsr mus_play
+end
+  musmask = $3F
+  sfxon = 1 : AUDV0 = 0 : AUDV1 = 0
+  BACKGRND = $80
+  P0C1 = $0F : P2C1 = $1C : P3C1 = $96
+  P5C1 = $08 : P5C2 = $0C : P5C3 = $0F
+  clearscreen
+  plotchars 'man yells' 1 44 5
+  plotchars 'at cloud' 1 48 6
+  plotchars 'STORY' 0 60 8
+  plotchars 'PROTOTYPES' 0 60 9
+  plotchars 'FREE. NEVER SOLD.' 3 12 11
+  savescreen
+  fireheld = 1 : stickheld = 1
+titleloop0
+  restorescreen
+  frm = frm + 1
+  t = frm + frm : t = t + t : t = t & $F0
+  P1C1 = t + $04 : P1C2 = t + $08 : P1C3 = t + $0E
+  rem the Cloud, breathing
+  t = frm / 32 : t = t & 1
+  plotsprite cloud0 5 40 4 t 4
+  t = titlesel + 8
+  plotchars '>' 2 48 t
+  drawscreen
+  if switchreset then reboot
+  t = 0
+  if joy0up then t = 1
+  if joy0down then t = 2
+  if t = 0 then stickheld = 0
+  if stickheld = 0 && t = 1 then titlesel = 0 : stickheld = 1
+  if stickheld = 0 && t = 2 then titlesel = 1 : stickheld = 1
+  gosub newfire
+  if u = 0 then goto titleloop0
+  if titlesel = 1 then goto menu
+  rem a new story: everything from the start
+  story = 1 : chap = 0 : night = 1
+  for x = 0 to 14 : rev_ph[x] = 0 : next
+  mcards = 0 : mdoor = 0
+
+  rem ======================================================================
+  rem  The story: its steps in order (storystep: kind, then its day or
+  rem  cutscene). Each scene, when it's done, comes to scenedone: the next
+  rem  step, or (prototypes) the menu.
+  rem    1 a cutscene (bank 7)   2 the day job   3 the evening (forum)
+  rem    4 the porch   5 the storm (bank 8)   6 the mirror   7 the end
+  rem ======================================================================
+storyrun
+  t = chap + chap
+  u = storystep[t] : t = t + 1 : v = storystep[t]
+  if u = 1 then cutid = v : goto cutscene bank7
+  if u = 2 then night = v : goto cards bank4
+  if u = 3 then night = v : goto forum bank5
+  if u = 4 then night = v : goto porch bank3
+  if u = 5 then goto storm bank8
+  if u = 6 then goto mirror bank6
+  goto gametitle
+scenedone
+  characterset font
+  if story = 0 then goto menu
+  chap = chap + 1
+  goto storyrun
+
+  data storystep
+  1, 0, 2, 1, 1, 1, 3, 1, 1, 2, 4, 1
+  1, 3, 2, 2, 1, 4, 3, 2, 1, 5, 4, 2
+  1, 6, 2, 3, 1, 7, 3, 3, 1, 8, 4, 3
+  5, 0, 1, 9, 6, 0, 1, 10, 7, 0
+end
 
   rem ======================================================================
   rem  The prototype menu
@@ -234,7 +320,10 @@ end
   incbasic mirror.bas
 
   bank 7
+  incbasic cut.bas
+
   bank 8
+  incbasic storm.bas
 
   bank 9
   rem the fixed bank at $C000: the graphics

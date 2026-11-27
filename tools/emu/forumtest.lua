@@ -26,6 +26,9 @@ emu.register_frame_done(function()
   f = f + 1
   local mm = m()
   local held = {}
+  -- the title: PROTOTYPES (down, fire), for the menu
+  if f >= 135 and f < 139 then held["P1 Down"] = true end
+  if f >= 145 and f < 149 then held["P1 Button 1"] = true end
   local ctrl = mm:read_u8(0x2107)
   local idle = #queue == 0 and cur == nil
   if phase == "boot" and f == 200 then push(MENU); phase = "forum"

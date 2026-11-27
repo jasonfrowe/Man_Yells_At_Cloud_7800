@@ -135,7 +135,7 @@ fleave
   asm
   jsr c_leave
 end
-  goto menu
+  goto scenedone
 
   rem ---- helpers ----
   rem the 40-column screen, the forum's palettes and its music

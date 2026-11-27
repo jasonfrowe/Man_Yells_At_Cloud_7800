@@ -22,6 +22,9 @@ emu.register_frame_done(function()
   f = f + 1
   local mm = m()
   local held = {}
+  -- the title: PROTOTYPES (down, fire), for the menu
+  if f >= 135 and f < 139 then held["P1 Down"] = true end
+  if f >= 145 and f < 149 then held["P1 Button 1"] = true end
   local bp, calm, dizzy = mm:read_u8(0xE9), mm:read_u8(0xEA), mm:read_u8(0xEB)
   local beat = mm:read_u8(0x2581) & 31
   if phase == "menu" then

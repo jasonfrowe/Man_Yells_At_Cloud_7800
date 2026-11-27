@@ -423,8 +423,7 @@ mprintnext
   for x = 0 to 60 : gosub mframe : next
   talkid = 23 : gosub talk
   rem (the potluck is next: prototype 6)
-  characterset font
-  goto menu
+  goto scenedone
   rem a frame with nothing but the screen
 mframe
   restorescreen

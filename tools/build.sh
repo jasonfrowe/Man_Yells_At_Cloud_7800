@@ -16,6 +16,7 @@ PATH="$HOME/.wasmtime/bin:$PATH"
 python3 "$ROOT/tools/music.py"
 python3 "$ROOT/tools/forum.py"
 python3 "$ROOT/tools/mirror.py"
+python3 "$ROOT/tools/script.py"
 
 rm -rf "$WORK"
 mkdir -p "$WORK"
@@ -26,6 +27,7 @@ cp "$ROOT"/src/asm/*.asm "$ROOT"/src/gen/*.asm "$WORK/"
 # (and a file can be inlined once: the forum's bank gets its own copy of
 # the 40-column font)
 cp "$WORK/font320.asm" "$WORK/font320b.asm"
+cp "$WORK/font320.asm" "$WORK/font320c.asm"
 cd "$WORK"
 bas7800dir="$BASDIR" PATH="$BASDIR:$PATH" sh "$BASDIR/7800basic.sh" myac.bas > build.log 2>&1 || true
 if [ ! -f myac.bas.a78 ] || grep -q -i -E "error|unresolved|Compilation failed" build.log; then

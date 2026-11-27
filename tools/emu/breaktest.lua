@@ -22,6 +22,9 @@ emu.register_frame_done(function()
   f = f + 1
   local mm = m()
   local held = {}
+  -- the title: PROTOTYPES (down, fire), for the menu
+  if f >= 135 and f < 139 then held["P1 Down"] = true end
+  if f >= 145 and f < 149 then held["P1 Button 1"] = true end
   -- the menu's first item (SUPER PADDLE BALL), then the slop title
   -- (right picks the day: night, 1-3)
   for k = 1, day - 1 do

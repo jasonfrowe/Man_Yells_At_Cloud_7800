@@ -452,7 +452,7 @@ raindone
   if pagedone < 90 then goto rainloop
   gosub newfire
   if u = 0 then goto rainloop
-  goto menu
+  goto scenedone
 
   rem one page of the Cloud's words; when it's typed, hold it, then turn
 raintext

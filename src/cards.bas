@@ -145,7 +145,7 @@ cdone
   asm
   jsr c_leave
 end
-  goto menu
+  goto scenedone
 
   rem ---- editing ----
   rem the stick: a press moves the cursor at once, then repeats
