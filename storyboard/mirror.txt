@@ -104,6 +104,13 @@
 @npc maria 9 5
 
 # ---------------------------------------------------------------------------
+# The top row: the room's name, or what button 1 would do (in this order:
+# 1 the regular, 2 a TV, 3 the door or the reader)
+@prompt | 1: TALK
+@prompt | 1: GO THROUGH THE TV
+@prompt | 1: LOOK
+
+# ---------------------------------------------------------------------------
 # The talk
 
 @talk 0 intro
@@ -116,6 +123,9 @@ IN 160A.
 
 THE TV'S ON. IT'S
 SHOWING THE FORUM?
+
+...IS IT CALLING ME?
+WALK UP TO IT.
 
 @talk 1 hub
 = ARTHUR

@@ -29,6 +29,7 @@
   dim mdsy = $2211
   dim mwho = $2213
   dim mmap = $2300
+  dim mstage = $2600
   rem this file's
   dim adir = $2216
   dim astep = $2217
@@ -60,6 +61,10 @@
   dim dhits = $22A0
   dim halagain = $22A2
   dim intalk = $22A3
+  dim facing = $22A4
+  dim hudnow = $22A5
+  rem the new display lists are done: m_stage to the screen after drawscreen
+  dim mcommit = $22A6
   rem kept for the finale: the cards (1 Sue, 2 Hal, 4 Maria), the door
   dim mcards = $2710
   dim mdoor = $2711
@@ -71,7 +76,7 @@ end
   characterset mfont
   sfxon = 1 : AUDV0 = 0 : AUDV1 = 0
   room = 0 : kmode = 0 : kroom = 1 : mcards = 0 : mdoor = 0
-  p2want = 0 : hubseen = 0 : lat1 = 0 : lat2 = 0 : intalk = 0
+  p2want = 0 : hubseen = 0 : lat1 = 0 : lat2 = 0 : intalk = 0 : mcommit = 0
   kx = 8 : ky = 92 : kdir = 0 : kstep = 0
   ax = 72 : ay = 140 : adir = 1 : astep = 0
   mfire1 = 1 : mfire2 = 1
@@ -84,8 +89,10 @@ mloop
   gosub mplayer
   gosub mkid
   if room = 1 then gosub mplates
+  gosub mhud
   gosub mdraw
   drawscreen
+  if mcommit then gosub mdocommit
   if switchreset then reboot
   if switchselect then characterset font : goto menu
   gosub mp2
@@ -96,8 +103,13 @@ mloop
 
   rem ---- the room ----
   rem load it (map, colours, who's there) and draw it once
+  rem (the map changes only after the frame's been drawn, and the display
+  rem lists are rebuilt from the top at once, ahead of MARIA: no frame of
+  rem the new map in the old palettes)
 mroom
+  drawwait
   asm
+  jsr m_blankall
   jsr m_load
 end
   P0C1 = $0F : P0C2 = $80 : P0C3 = $0F
@@ -105,17 +117,13 @@ end
   P2C1 = $3A : P2C2 = $56 : P2C3 = $84
   rem the hub: the door (row 6, column 15) once it's open; pixelkid once
   rem they've joined isn't the hub's regular any more
-  if room = 1 && mdoor then mmap[135] = 138
+  if room = 1 && mdoor then mstage[135] = 138
   if room = 1 && kmode then mnpc = 0
   if mnpc = 1 then P3C1 = $3A : P3C2 = $14 : P3C3 = $26
   if mnpc = 2 then P3C1 = $3A : P3C2 = $46 : P3C3 = $02
   if mnpc = 3 then P3C1 = $3A : P3C2 = $74 : P3C3 = $0C
-  drawwait
-  clearscreen
-  asm
-  jsr m_draw
-end
-  savescreen
+  hudnow = 0
+  gosub mredraw
   for x = 0 to 31 : trx[x] = ax : trxy[x] = ay : next
   return
 
@@ -191,6 +199,7 @@ mtoggle
   rem a plate stays down a second after you step off (plates: row 4
   rem column 13, map index 93; row 9 column 3, 183; the door 135)
 mplates
+  if mcommit then return
   u = 0 : v = 0
   mpx = ax + 4 : mpy = ay + 12
   asm
@@ -210,12 +219,13 @@ end
 mplates2
   if u then lat1 = 60
   if v then lat2 = 60
-  mmap[93] = 134 : mmap[183] = 134
-  if lat1 then lat1 = lat1 - 1 : mmap[93] = 136
-  if lat2 then lat2 = lat2 - 1 : mmap[183] = 136
+  t = 134 : u = 134
+  if lat1 then lat1 = lat1 - 1 : t = 136
+  if lat2 then lat2 = lat2 - 1 : u = 136
+  mmap[93] = t : mstage[93] = t : mmap[183] = u : mstage[183] = u
   if mdoor then return
   if lat1 = 0 || lat2 = 0 then return
-  mdoor = 1 : mmap[135] = 138
+  mdoor = 1 : mmap[135] = 138 : mstage[135] = 138
   sfxid = 4 : gosub playsfx
   talkid = 14 : goto talk
 
@@ -253,28 +263,52 @@ mdrawta
 
   rem ---- button 1: talk to whoever's there, or use what's in front ----
 mact
-  rem the point in front of Arthur's feet
+  gosub mfacing
+  if facing = 1 then goto mtalknpc
+  if facing = 2 then goto mgo
+  if facing = 3 then talkid = 13 : goto talk
+  if facing = 4 then talkid = 15 : goto talk
+  return
+
+  rem what's in front of Arthur: facing = 0 nothing, 1 the room's regular,
+  rem 2 a TV (mdroom: where it goes), 3 the closed door, 4 the card reader
+mfacing
+  facing = 0
   mpx = ax + 4 : mpy = ay + 12
   if adir = 0 then mpy = mpy + 12
   if adir = 1 then mpy = mpy - 14
   if adir = 2 then mpx = mpx - 8
   if adir = 3 then mpx = mpx + 8
-  if mnpc = 0 then goto mactdoor
+  if mnpc = 0 then goto mfacingt
   t = mnpcx + 4 : u = mnpcy + 12
   if mpx < t then t = t - mpx else t = mpx - t
   if mpy < u then u = u - mpy else u = mpy - u
-  if t < 10 && u < 16 then goto mtalknpc
-mactdoor
+  if t < 10 && u < 16 then facing = 1 : return
+mfacingt
   asm
   jsr m_door
 end
-  if mdroom <> 255 then goto mgo
+  if mdroom <> 255 then facing = 2 : return
   asm
   jsr m_at
   sta mtv
 end
-  if mtv = 172 then talkid = 13 : goto talk
-  if mtv >= 174 && mtv <= 180 then talkid = 15 : goto talk
+  if mtv = 172 then facing = 3
+  if mtv >= 174 && mtv <= 180 then facing = 4
+  return
+
+  rem the top row: the room's name, or what button 1 would do (it's the
+  rem map's row 0: writing it changes the screen)
+mhud
+  gosub mfacing
+  t = facing
+  if facing = 3 || facing = 4 then t = 3
+  if t = hudnow then return
+  hudnow = t
+  asm
+  lda hudnow
+  jsr m_hud
+end
   return
 
   rem through a TV: pixelkid comes along unless they're waiting
@@ -325,8 +359,10 @@ mtalkkid
   rem (the box is the room's bottom three rows, written over: m_boxsave
   rem keeps them, m_boxback puts them back, and the room's redrawn)
 talk
+  drawwait
   asm
   jsr m_boxsave
+  jsr m_blankbox
   lda talkid
   jsr m_talk
 end
@@ -336,26 +372,37 @@ talkloop
   restorescreen
   gosub mdraw
   drawscreen
+  if mcommit then gosub mdocommit
   if switchreset then reboot
   gosub mbuttons
   if w = 0 then goto talkloop
   asm
   jsr m_next
   sta mtv
+  jsr m_commitbox
 end
   if mtv then goto talkloop
   intalk = 0
+  drawwait
   asm
+  jsr m_blankbox
   jsr m_boxback
 end
-  if room = 1 && mdoor then mmap[135] = 138
+  if room = 1 && mdoor then mstage[135] = 138
+  rem (the display lists from m_stage; it goes on screen after drawscreen)
 mredraw
-  drawwait
   clearscreen
   asm
   jsr m_draw
 end
   savescreen
+  mcommit = 1
+  return
+mdocommit
+  mcommit = 0
+  asm
+  jsr m_commit
+end
   return
 
   rem w = 1 on a new press of button 1, 2 of button 2

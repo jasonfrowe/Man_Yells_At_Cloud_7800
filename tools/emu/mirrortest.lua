@@ -41,6 +41,7 @@ local plan = {
   {"done"},
 }
 local step, f, t0, hold, quiet = 1, 0, 0, 0, 0
+local lastit, lastrm, burst = 0, 0, 0
 local AX = {[0] = 0x2200, [1] = 0x2201}
 local AY = {[0] = 0x2202, [1] = 0x2203}
 emu.register_frame_done(function()
@@ -48,6 +49,13 @@ emu.register_frame_done(function()
   local mm = m()
   local held = {}
   local s = plan[step]
+  -- (TRANSITIONS: every frame around a talk's start and end, and a room change)
+  if os.getenv("TRANSITIONS") then
+    local it, rm = mm:read_u8(0x22A3), mm:read_u8(0x2209)
+    if it ~= lastit or rm ~= lastrm then burst = 4 end
+    lastit, lastrm = it, rm
+    if burst > 0 and f > 300 and f < 1300 then snap(); burst = burst - 1 end
+  end
   local nextstep = false
   if s[1] == "wait" then
     if f - t0 >= s[2] then nextstep = true end

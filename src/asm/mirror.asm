@@ -6,10 +6,16 @@
 ; gen/mirrordat.asm (tools/mirror.py, storyboard/mirror.txt).
 ; ===========================================================================
 
-m_map     = $2300   ; [240] 12 rows of 20 tile codes
-m_tn      = m_map+180 ; the talk box: rows 9-11 of the room, who and two
-m_t1      = m_map+200 ; lines (what was there kept in m_save)
-m_t2      = m_map+220
+m_map     = $2300   ; [240] 12 rows of 20 tile codes: on screen
+m_stage   = $2600   ; [240] the same, as it's meant to be: what the walls,
+                    ; the palettes and the display lists go by. A change
+                    ; that needs new display lists blanks those rows of
+                    ; m_map, rebuilds from m_stage, and copies m_stage to
+                    ; m_map (m_commit) after the drawscreen that finishes
+                    ; them: no frame of new tiles in old palettes
+m_tn      = m_stage+180 ; the talk box: rows 9-11 of the room, who and two
+m_t1      = m_stage+200 ; lines (what was there kept in m_save)
+m_t2      = m_stage+220
 m_save    = $2400   ; [60]
 m_x       = $2200   ; [2] Arthur, pixelkid: x (0-152)
 m_y       = $2202   ; [2] and y (the sprite's top; feet at +10 to +15)
@@ -51,7 +57,7 @@ m_load
     ldy #219
 m_load_m
     lda (m_ptr),y
-    sta m_map+20,y
+    sta m_stage+20,y
     dey
     cpy #255
     bne m_load_m
@@ -63,6 +69,7 @@ m_load_m
 m_load_n
     lda (m_ptr),y
     sta m_map,y
+    sta m_stage,y
     dey
     bpl m_load_n
     lda m_rnpc,x
@@ -97,6 +104,30 @@ m_load_p2
     iny                     ; (skip the gap between palettes)
     cpy #16
     bcc m_load_p2
+    rts
+
+; m_hud: row 0 (the top line): A = 0 the room's name, else prompt A
+m_hud
+    tax
+    beq m_hud_n
+    lda m_prlo-1,x
+    sta m_ptr
+    lda m_prhi-1,x
+    sta m_ptr+1
+    jmp m_hud_c
+m_hud_n
+    ldx m_room
+    lda m_rnamelo,x
+    sta m_ptr
+    lda m_rnamehi,x
+    sta m_ptr+1
+m_hud_c
+    ldy #19
+m_hud_l
+    lda (m_ptr),y
+    sta m_map,y
+    dey
+    bpl m_hud_l
     rts
 
 ; m_draw: the room's display objects (after clearscreen): the name, then
@@ -178,7 +209,7 @@ m_draw_plot
 ; A = the palette of the tile at m_map,x (keeps X and Y): text, 0
 m_tilepal
     sty m_dy2
-    lda m_map,x
+    lda m_stage,x
     bpl m_tilepal_t
     lsr
     sec
@@ -213,7 +244,7 @@ m_at
     clc
     adc m_rowoff,x
     tax
-    lda m_map,x
+    lda m_stage,x
     rts
 m_at_off
     ldx #0
@@ -393,7 +424,7 @@ m_door_r
 m_boxsave
     ldx #59
 m_bs_l
-    lda m_map+180,x
+    lda m_stage+180,x
     sta m_save,x
     dex
     bpl m_bs_l
@@ -402,9 +433,47 @@ m_boxback
     ldx #59
 m_bb_l
     lda m_save,x
-    sta m_map+180,x
+    sta m_stage+180,x
     dex
     bpl m_bb_l
+    rts
+
+; m_blankbox, m_blankall: rows 9-11, 1-11 of the screen's map to spaces
+; (blank in any palette, while the display lists are rebuilt)
+m_blankbox
+    ldx #59
+    lda #0
+m_bk_b
+    sta m_map+180,x
+    dex
+    bpl m_bk_b
+    rts
+m_blankall
+    ldx #219
+    lda #0
+m_bk_a
+    sta m_map+20,x
+    dex
+    cpx #255
+    bne m_bk_a
+    rts
+; m_commit: m_stage's rows 1-11 to the screen; m_commitbox rows 9-11
+m_commit
+    ldx #219
+m_cm_l
+    lda m_stage+20,x
+    sta m_map+20,x
+    dex
+    cpx #255
+    bne m_cm_l
+    rts
+m_commitbox
+    ldx #59
+m_cb_l
+    lda m_stage+180,x
+    sta m_map+180,x
+    dex
+    bpl m_cb_l
     rts
 
 ; m_talk: start talk A (m_page, m_pages), its first page into the box

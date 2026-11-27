@@ -44,7 +44,7 @@ def codes(text, n, width=20):
 
 
 def main():
-    rooms, talks, speakers = [], {}, []
+    rooms, talks, speakers, prompts = [], {}, [], []
     cur, mode, page, speaker = None, None, [], None
     lines = SRC.read_text().splitlines()
 
@@ -111,6 +111,9 @@ def main():
             cur["doors"].append((int(w[1]), int(w[2]), w[3], int(w[4]), int(w[5]), n))
         elif cmd == "@npc":
             cur["npc"] = (NPCS.index(w[1]), int(w[2]), int(w[3]))
+        elif cmd == "@prompt":
+            prompts.append(text.strip())
+            codes(prompts[-1], n)
         elif cmd == "@talk":
             cur_talk = int(w[1])
             if cur_talk != len(talks):
@@ -164,6 +167,11 @@ def main():
         for (c, row, to, sc, sr, _) in r["doors"]:
             d += [c, row, keys.index(to), sc * 8, sr * 16 - 4]
         table(f"m_doors{i}", d + [255])
+    # the top row's prompts (what button 1 would do), 1 up
+    table("m_prlo", [f"<m_pr{k}" for k in range(len(prompts))])
+    table("m_prhi", [f">m_pr{k}" for k in range(len(prompts))])
+    for k, t in enumerate(prompts):
+        table(f"m_pr{k}", codes(t, 0))
     # each tile's palette (by glyph, 64-95): m_draw groups a row's tiles
     # into runs of one palette
     tp = [0] * 32
