@@ -15,7 +15,8 @@
 #   and only that day). kind: a
 #   constructive one (counted for the finale). bug N: only if Arthur saw
 #   that bug (seenbugs bit N: 1 zone ghosts, 2 zone clipping, 4 no holey
-#   DMA, 8 DMA overrun, 16 not BCD, 32 the overflow).
+#   DMA, 8 DMA overrun, 16 not BCD, 32 the overflow crash (day 1), 64 the
+#   tunnelling ball (day 2), 128 the difficulty switch hang (day 3)).
 # @after day [kind] key                  (a reply to Arthur's review)
 
 @user arthur   ARTHUR_6502   3 arthur   | 6502 OR DIE
@@ -158,27 +159,31 @@ A PONG CLONE. A BAD ONE. :)
 @phrase bugs 1 bug 8 | PADDLE FLICKERS.
 @phrase bugs 1 bug 16 | SCORE ISN'T BCD.
 @phrase bugs 1 bug 32 | SCORE OVERFLOWS. THEN IT CRASHES.
-@phrase bugs 3 kind bug 1 | CLEAR EVERY ZONE'S LIST EACH FRAME.
-@phrase bugs 3 kind bug 2 | PLOT IT IN BOTH ZONES IT CROSSES.
-@phrase bugs 3 kind bug 4 | HOLEY DMA FIXES THE GARBAGE.
-@phrase bugs 3 kind bug 8 | FEWER OBJECTS IN ONE ZONE.
-@phrase bugs 3 kind bug 16 | SED, THEN ADC: A BCD SCORE.
-@phrase bugs 3 kind bug 32 | CAP THE COMBO. A BYTE STOPS AT 255.
+@phrase bugs 2 bug 64 | THE BALL TUNNELS OUT THE TOP.
+@phrase bugs 3 bug 128 | FLIP A SWITCH AND IT HANGS.
+# day 3's kind ones: not fixes (that's the kid's job, and the fun), just
+# "me too": everyone's first game did this
+@phrase bugs 3 kind bug 1 | GHOST BALLS! WE'VE ALL BEEN THERE.
+@phrase bugs 3 kind bug 2 | ZONES GOT ME TOO, MY FIRST TIME.
+@phrase bugs 3 kind bug 4 | HOLEY DMA TOOK ME A YEAR TOO.
+@phrase bugs 3 kind bug 8 | MY FIRST PADDLE FLICKERED TOO.
+@phrase bugs 3 kind bug 16 | MY SCORES WENT : ; < TOO. HA.
+@phrase bugs 3 kind bug 128 | THE SWITCH TRICK MADE ME LAUGH.
 
 @phrase verdict 1 | 1 STAR.
 @phrase verdict 1 | ZERO STARS, IF I COULD.
 @phrase verdict 2 | -- ARTHUR. 6502 OR DIE.
 @phrase verdict 3 | STAY OFF MY LAWN.
-@phrase verdict 3 kind | DM ME IF YOU WANT HELP.
+@phrase verdict 3 kind | POST YOUR NEXT ONE. STICK AROUND.
+@phrase verdict 3 kind | COME SAY HI IN THE OTHER THREADS.
 
+# (pixelkid_07 never replies to anyone, until the community reaches them)
 @after 1 hal
 OOF. TOUGH CROWD, ARTHUR.
 @after 2 sue
-YOU COULD JUST TELL THE KID HOW TO
-FIX IT, YOU KNOW.
-@after 3 pixelkid
-...YOU'RE RIGHT. IT'S PONG AGAIN.
-I DON'T KNOW HOW TO MAKE ANYTHING
-ELSE. SORRY.
+WE WERE ALL NEW ONCE, ARTHUR.
+THE KID NEEDS A HELLO, NOT A GRADE.
+@after 3 hal
+SAME OLD ARTHUR.
 @after 3 kind maria
 ...ARTHUR? ARE YOU FEELING OK?

@@ -12,6 +12,16 @@
   dim astx = $2203
   dim asty = $2204
   dim nhue = $2205
+  rem day 2's crash: the ball speeds up (spd 0-6), then tunnels (tunnel),
+  rem then it's gone (lostt counts the empty court)
+  dim spd = $2206
+  dim tunnel = $2207
+  dim lostt = $2208
+  rem day 3's: each flip of the left difficulty switch grows the paddle
+  rem (padg flips, padlen lines; swlast the switch)
+  dim padg = $2209
+  dim padlen = $220A
+  dim swlast = $220B
 
   rem ======================================================================
   rem  The slop title screen
@@ -86,6 +96,8 @@ startgame
   score = 0 : combo = 1 : glitch = 0 : combot = 0 : cpuscore = 0
   ghostt = 0 : seenbugs = 0
   exp = 0 : shx = 0 : astx = 0
+  spd = 0 : tunnel = 0 : lostt = 0 : padg = 0 : padlen = 28
+  gosub readsw : swlast = t
   pady = 90 : cpuy = 90
   gosub showscore
   gosub showcombo
@@ -116,12 +128,14 @@ playloop
   if joy0up then pady = pady - 3
   if joy0down then pady = pady + 3
   if pady < 20 then pady = 20
-  if pady > 160 then pady = 160
+  t = 188 - padlen : if pady > t then pady = t
+  if night = 3 then gosub swcheck
+  if padg >= 6 then goto hang
   gosub cpumove
   if servet then servet = servet - 1 : goto playdraw
   gosub moveball
 playdraw
-  plotsprite padp 1 8 pady 0 2
+  gosub drawpad
   rem BUG 8, DMA overrun: with the ball in the zone of the CPU paddle's
   rem top, MARIA "runs out of time" every other frame and drops the paddle
   t = bally / 16 : u = cpuy / 16 : w = frm & 1
@@ -142,6 +156,7 @@ skipcpu
   gosub sndtick
   drawscreen
   if switchreset then reboot
+  if lostt then lostt = lostt + 1 : if lostt > 90 then goto crash
   if glitch = 0 then goto playloop
   gosub doglitch
   if gtime then goto playloop
@@ -149,8 +164,14 @@ skipcpu
 
   rem the ball: walls, then the paddle it's heading for
 moveball
+  if lostt then return
   ballx = ballx + balldx
   bally = bally + balldy
+  rem day 2, at top speed: the wall check misses it, and it's gone
+  if tunnel = 0 then goto walls
+  if bally > 200 then lostt = 1
+  return
+walls
   if bally < 20 then bally = 20 : balldy = 0 - balldy : gosub sndwall
   if bally > 182 then bally = 182 : balldy = 0 - balldy : gosub sndwall
   if balldx >= 128 then goto ballleft
@@ -163,7 +184,7 @@ moveball
   if t <= cpuy then return
   t = cpuy + 10
   if bally >= t then return
-  ballx = 144 : balldx = 254
+  ballx = 144 : t = spd / 2 : balldx = 254 - t
   t = rand & 3 : balldy = cpudy[t]
   gosub sndhit
   return
@@ -174,14 +195,21 @@ ballleft
   if ballx < 6 then return
   t = bally + 6
   if t <= pady then return
-  u = pady + 28
+  u = pady + padlen
   if bally >= u then return
   rem where on the paddle (1-33): the top and bottom 7 lines are edges
   t = t - pady
   ballx = 12 : balldx = 2
   rem the edges smash it back (faster, steeper)
   if t < 8 then balldy = 253 : balldx = 3 : goto playerhit
-  if t > 27 then balldy = 3 : balldx = 3 : goto playerhit
+  u = padlen - 1
+  if t > u then balldy = 3 : balldx = 3 : goto playerhit
+  if padg = 0 then goto padmid
+  rem (a grown paddle: just its halves)
+  u = padlen / 2
+  if t < u then balldy = 255 : goto playerhit
+  balldy = 1 : goto playerhit
+padmid
   if t < 14 then balldy = 254 : goto playerhit
   if t < 18 then balldy = 255 : goto playerhit
   if t < 22 then balldy = 1 : goto playerhit
@@ -189,8 +217,11 @@ ballleft
   rem THE BUG: every hit scores the combo, then doubles it, in one byte:
   rem 1 + 2 + ... + 128 = 255, and the 8th hit's doubling wraps to 0
 playerhit
+  if night = 2 then gosub speedup
   t = combo : gosub addpoints
   combo = combo + combo
+  rem (days 2 and 3 crash their own way: the combo just sticks)
+  if combo = 0 && night > 1 then combo = 128
   if combo = 0 then gosub startglitch
   combot = 40
   ghostt = 24
@@ -202,7 +233,9 @@ cpumiss
   goto serveball
   rem a miss halves the combo (it used to start again at 1x: a long game)
 playermiss
+  if tunnel then return
   combo = combo / 2 : if combo = 0 then combo = 1
+  spd = spd / 2
   gosub showcombo
   if cpuscore < 99 then cpuscore = cpuscore + 1
   gosub showcpu
@@ -211,13 +244,69 @@ playermiss
   rem so it's always in reach
 serveball
   ballx = 78 : balldx = 254
-  t = rand & 7 : bally = pady + 8 : bally = bally + t
+  u = padlen / 2 : bally = pady + u : bally = bally - 6
+  t = rand & 7 : bally = bally + t
+  if bally > 182 then bally = 182
   balldy = 0
   servet = 60
   return
 
+  rem day 2: every hit's faster; the 6th (top speed) sends it up so fast
+  rem the top wall's check never sees it
+speedup
+  if spd < 6 then spd = spd + 1
+  t = spd / 2 : balldx = balldx + t
+  if spd < 6 then return
+  tunnel = 1 : balldy = 251
+  return
+
+  rem day 3: the left difficulty switch (t = 1 on B)
+readsw
+  t = 0 : if switchleftb then t = 1
+  return
+swcheck
+  gosub readsw
+  if t = swlast then return
+  swlast = t
+  padg = padg + 1 : padlen = padlen + 24
+  gosub sndedge
+  return
+
+  rem the player's paddle: a grown one is more paddles, end to end
+drawpad
+  plotsprite padp 1 8 pady 0 2
+  if padg = 0 then return
+  u = pady
+  for x = 1 to padg
+  u = u + 24 : plotsprite padp 1 8 u 0 2
+  next
+  return
+
+  rem day 3: the paddle fills the court, the ball's stuck inside it, and
+  rem the game hangs
+hang
+  rem (drawn as 6 paddles from line 30: the 7th would run off the screen)
+  ballx = 9 : bally = 100 : pady = 30 : padg = 5 : gtime = 0
+  AUDV0 = 0
+hangloop
+  restorescreen
+  frm = frm + 1
+  gosub drawpad
+  t = frm & 2 : t = t / 2 : ballx = 9 + t
+  plotsprite ball 3 ballx bally
+  plotchars dscore 0 24 0 2
+  plotchars dcombo 0 64 0 3
+  plotchars dcpu 0 136 0 2
+  AUDC1 = 7 : AUDF1 = 28 : AUDV1 = 6
+  drawscreen
+  if switchreset then reboot
+  gtime = gtime + 1
+  if gtime < 150 then goto hangloop
+  goto crash
+
   rem the ball, with its zone bugs
 drawball
+  if lostt then return
   u = bally : gosub plotball
   if ghostt = 0 then return
   rem BUG 1, zone ghosts: the ball's still in other zones' display lists
@@ -317,6 +406,7 @@ addpoints
   rem once only: a hit during the glitch mustn't put off the crash
 startglitch
   if glitch then return
+  if night > 1 then return
   glitch = 1 : gtime = 150
   return
 
@@ -335,19 +425,40 @@ doglitch
   rem ======================================================================
   rem  The crash
   rem ======================================================================
+  rem (each ROM its own: 1 the overflow, 2 the lost ball, 3 the hang)
 crash
-  seenbugs = seenbugs | 32
   AUDV0 = 0 : sndt = 0
   BACKGRND = $82
   P0C1 = $0F
   P1C1 = $0A : P1C2 = $0C : P1C3 = $0F
   P3C1 = $1E
   clearscreen
+  if night = 2 then goto crash2
+  if night = 3 then goto crash3
+  seenbugs = seenbugs | 32
   plotchars 'brk' 1 68 1
   plotchars 'SCORE OVERFLOW' 0 24 3
   plotchars 'PC=$F00D A=$FF X=00' 0 4 5
   plotchars 'SP=$FD  NV-BDIZC' 0 16 6
   plotchars 'YOU BROKE IT.' 3 28 8
+  goto crash9
+crash2
+  seenbugs = seenbugs | 64
+  plotchars 'err' 1 68 1
+  plotchars 'BALL NOT FOUND' 0 24 3
+  plotchars 'PC=$BA11 Y=$FF' 0 24 5
+  plotchars 'BALLY=255?' 0 40 6
+  plotchars 'WHERE DID IT GO?' 3 16 8
+  goto crash9
+crash3
+  seenbugs = seenbugs | 128
+  BACKGRND = $02
+  plotchars 'hang' 1 64 1
+  plotchars 'PADDLE OVERFLOW' 0 20 3
+  plotchars 'PC=$CAFE A=$FF' 0 24 5
+  plotchars 'THE BALL IS INSIDE.' 0 4 6
+  plotchars 'YOU BROKE IT.' 3 28 8
+crash9
   savescreen
   gtime = 0 : fireheld = 1
 crashloop

@@ -22,6 +22,10 @@ The message goes both ways:
 - **To the purists:** gatekeeping drives away the people who might become the next generation of homebrewers. Arthur's 1-star reviews aren't protecting the hobby. They're emptying it.
 - **To the newcomers:** dumping a generated ROM and vanishing isn't joining the community. Stay, ask, learn, and make something with people.
 
+**Add more than you take away.** The game never asks the player to fix the kid's code. That would just hand the slop's laziness to the player. It's about being present: a bad game and a chat about it beats a good game and an empty chair. Arthur's kind options are welcomes and "me too"s, not patches.
+
+**pixelkid_07 never replies, until the community reaches them.** Through the three evenings pixelkid only posts releases ("PIXELKID_07 IS VIEWING THIS THREAD." is all we see of them). After the mirror chapter, in the wrap-up, pixelkid is in the threads: taking feedback, posting better games (with source), and joining the other discussions.
+
 The game ends at a potluck on Arthur's porch. "Stay for the meal" is literal.
 
 There is no game over. It's a story game, and the ending is always happy.
@@ -176,19 +180,19 @@ The other two slop ROMs get their own mix, for example palette writes landing at
 
 > **[ NO SOUL. ]** **[ HITBOXES OF A POTATO. ]** **[ ★☆☆☆☆ ]**
 
-The phrase lists grow each day. On **Day 3** a new kind of option appears in every slot ("HERE'S HOW TO FIX THE BALL SPEED.", "DM ME IF YOU WANT HELP."). Arthur can still pick the grumpy ones, but the constructive ones are what pixelkid_07 remembers in the finale.
+The phrase lists grow each day. On **Day 3** a new kind of option appears in every slot ("WELCOME TO THE 7800, KID.", "POST YOUR NEXT ONE. STICK AROUND."). They're welcomes, not fixes. Arthur can still pick the grumpy ones, but the kind ones are what pixelkid_07 remembers in the finale.
 
 **As built (prototype 4):**
 - **The script** is one text file, `storyboard/forum.txt`: the regulars (handle, tag, colour, avatar), each evening's threads and posts, the review phrases and the replies. `tools/forum.py` checks it (line lengths, the font's characters) and builds the tables. Swapping in an AtariAge member's name is one line.
 - **The thread list:** up to four threads an evening, with who started each and how many replies. The first is always pixelkid_07's release.
 - **A thread:** posts with a 4 × 2 character avatar (16 × 16 art, doubled), the name in the poster's colour, a tag ("NEW MEMBER - 3 POSTS", "6502 OR DIE"), and up to four lines. Up and down scroll a post at a time; MORE... says there's more. The release thread says "PIXELKID_07 IS VIEWING THIS THREAD." pixelkid reads every review.
 - **Clues and the rumor:** Hal asks about weird symbols when the score gets high (day 1), the ball going through the wall (day 2), and says to try the left difficulty switch (day 3). On day 1, in "NIMBUSWORKS HIRING CARD PUNCHERS??", Hal's uncle knows the card readers have a secret ("UP, UP, DOWN, DOWN... HE NEVER TOLD ME THE REST") and DocMaria says that's a Contra thing.
-- **Story beats in the threads:** Sue's "@PIXELKID_07 - YOU THERE?" and DocMaria pointing at the pinned 7800basic thread (day 2), pixelkid's "...IT'S PONG AGAIN. SORRY. I DON'T KNOW HOW TO MAKE ANYTHING ELSE." and Sue tracing the slop to a generator at NimbusWorks, where Arthur works (day 3), and "HOW DID YOU ALL START?".
+- **Story beats in the threads:** Sue's "@PIXELKID_07 - YOU THERE?" and DocMaria pointing at the pinned 7800basic thread (day 2), Sue tracing the slop to a generator at NimbusWorks, where Arthur works (day 3), and "HOW DID YOU ALL START?". pixelkid never replies to anyone.
 - **Download:** button 1 in the release thread runs the slop ROM. Its crash goes to the review builder.
-- **The review builder:** three lines (the opener, the bugs, the verdict). Up and down pick the line, left and right the words. Each slot offers its day's phrases and earlier ones. The bugs slot offers a complaint only for a bug Arthur actually saw. On day 3 every slot gets a constructive option, and for the bugs it's the *fix* for a bug he saw ("SED, THEN ADC: A BCD SCORE.", "CAP THE COMBO. A BYTE STOPS AT 255."). Button 1 posts it.
-- **After posting:** the thread shows Arthur's review and a regular's reply (Hal's "OOF. TOUGH CROWD, ARTHUR.", Sue's "YOU COULD JUST TELL THE KID HOW TO FIX IT, YOU KNOW."). On day 3 a kind review gets DocMaria's "...ARTHUR? ARE YOU FEELING OK?". The game keeps each day's phrases and how many were kind (`rev_ph`, `rev_kind`) for pixelkid's dialogue in the finale.
+- **The review builder:** three lines (the opener, the bugs, the verdict). Up and down pick the line, left and right the words. Each slot offers its day's phrases and earlier ones. The bugs slot offers a complaint only for a bug Arthur actually saw. On day 3 every slot gets a kind option, and for the bugs it's a "me too" for a bug he saw ("GHOST BALLS! WE'VE ALL BEEN THERE.", "THE SWITCH TRICK MADE ME LAUGH."), never a fix. The screen's help line: "LEFT-RIGHT: SELECT RESPONSE   1: POST". Button 1 posts it.
+- **After posting:** the thread shows Arthur's review and a regular's reply (Hal's "OOF. TOUGH CROWD, ARTHUR.", Sue's "WE WERE ALL NEW ONCE, ARTHUR. THE KID NEEDS A HELLO, NOT A GRADE.", Hal's "SAME OLD ARTHUR."). On day 3 a kind review gets DocMaria's "...ARTHUR? ARE YOU FEELING OK?". The game keeps each day's phrases and how many were kind (`rev_ph`, `rev_kind`) for pixelkid's dialogue in the finale.
 - The forum plays its own POKEY loop (`MUS_FORUM`: C major, Am F C G, a modem-handshake chirp at the top).
-- Days 2 and 3's slop ROMs have their own titles and look (see the slop ROM table), but they still crash the day 1 way (the score overflow). Their signature crashes (the tunnelling ball, the difficulty switch) are still to build.
+- Each slop ROM crashes its own way (see the slop ROM table): day 1 the overflow, day 2 the ball speeds up with every hit and on the 6th tunnels out through the top ("ERR / BALL NOT FOUND"), day 3 each flip of the left difficulty switch adds a paddle until six fill the court with the ball stuck inside ("HANG / PADDLE OVERFLOW"). On days 2 and 3 the score and combo overflow only look broken (the combo sticks at 128).
 
 ### 4.3 The Night: Yelling at the Cloud (160A)
 
@@ -289,7 +293,7 @@ The Cloud drifts overhead. For the first time Arthur doesn't yell. He waves. The
 
 > *"Stay for the meal."*
 
-**Epilogue screen:** a new forum thread, *"Our first game. Made by five of us (and a cloud?)"*, posted by pixelkid_07, with replies from everyone. Arthur's review: ★★★★★. Then the credits.
+**Epilogue screen:** the new-releases board again, and pixelkid_07 is everywhere on it: replying in Hal's high-score thread, answering DocMaria's "how did you all start?", thanking people for feedback, and posting a better game with its source. The top thread: *"Our first game. Made by five of us (and a cloud?)"*, posted by pixelkid_07, with replies from everyone. Arthur's review: ★★★★★. Then the credits.
 
 ### 4.6 The Soul Meter
 

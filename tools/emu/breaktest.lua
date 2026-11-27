@@ -16,6 +16,7 @@ local f, start, gl, lastscore, hits, hit4 = 0, 300, nil, -1, 0, nil
 local edge = os.getenv("EDGE") or "middle"
 local day = tonumber(os.getenv("DAY") or "1")
 local aim
+local sw = 0
 math.randomseed(tonumber(os.getenv("SEED") or "7800"))
 emu.register_frame_done(function()
   f = f + 1
@@ -52,15 +53,24 @@ emu.register_frame_done(function()
       if hits == 4 then hit4 = f end
       lastscore = score
     end
+    -- day 3: after 4 hits, flip the left difficulty switch every 20 frames
+    if day == 3 and hits >= 4 and f % 20 == 0 then sw = 1 - sw end
     if mm:read_u8(0xF8) ~= 0 then
       gl = f
       print(string.format("frame %d: glitch (score wrapped to %d)", f, score))
+    elseif day == 2 and mm:read_u8(0x2208) ~= 0 then
+      gl = f
+      print(string.format("frame %d: the ball tunnelled out", f))
+    elseif day == 3 and mm:read_u8(0x2209) >= 5 and mm:read_u8(0x220A) > 160 then
+      gl = f
+      print(string.format("frame %d: the paddle fills the court", f))
     end
   end
   if gl and f >= gl + 300 and f < gl + 304 then held["P1 Button 1"] = true end
   for name, field in pairs(fields) do
     if name:match("^P1 ") then field:set_value(held[name] and 1 or 0) end
   end
+  if day == 3 then fields["Left Difficulty Switch"]:set_value(sw) end
   if (hit4 and f == hit4 + 4) or (gl and (f == gl + 40 or f == gl + 260 or f == gl + 330)) then
     manager:machine().screens[":screen"]:snapshot()
   end

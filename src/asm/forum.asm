@@ -770,7 +770,7 @@ f_hrel     .byte "UP/DOWN, 1: DOWNLOAD, 2: BACK",0
 f_moretxt  .byte "MORE...",0
 f_viewing  .byte "PIXELKID_07 IS VIEWING THIS THREAD.",0
 f_revhdr   .byte "REVIEW:",0
-f_hrev     .byte "STICK: PICK THE WORDS   1: POST",0
+f_hrev     .byte "LEFT-RIGHT: SELECT RESPONSE   1: POST",0
 f_slot0    .byte "THE OPENER",0
 f_slot1    .byte "THE BUGS",0
 f_slot2    .byte "THE VERDICT",0

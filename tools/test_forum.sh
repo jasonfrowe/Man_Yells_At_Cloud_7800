@@ -1,13 +1,13 @@
 #!/bin/sh
 # The evening works: a bot reads the forum, downloads and breaks the slop
-# ROM, writes and posts the review, and logs off; day 1 with the grumpy
-# phrases, day 3 with the constructive ones (all 3 must count). Screenshots
+# ROM (each day its own crash), writes and posts the review, and logs off;
+# days 1-2 with the grumpy phrases, day 3 the kind ones (all 3 must count). Screenshots
 # in build/forum/dayN/.
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 A7800=${A7800:-$HOME/Software/a7800/mame64}
 cd "$(dirname "$A7800")"
 FAIL=0
-for d in 1 3; do
+for d in 1 2 3; do
   OUT="$ROOT/build/forum/day$d"
   rm -rf "$OUT"; mkdir -p "$OUT"
   LOG=$(DAY=$d "$A7800" a7800 -cart "$ROOT/build/myac.a78" -video none -sound none -nothrottle \

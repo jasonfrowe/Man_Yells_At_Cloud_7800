@@ -120,7 +120,9 @@ porchloop
   next
   gosub drawarthur
   if dizzyt = 0 then gosub drawaim
-  if phraset then phraset = phraset - 1 : gosub drawphrase
+  rem what he yelled stays up until he yells the next (phraset: its age,
+  rem 1-255; 0 none yet)
+  if phraset then gosub drawphrase : if phraset < 255 then phraset = phraset + 1
   if fbt then fbt = fbt - 1 : gosub drawfeedback
   t = bp / 5 : gosub buildbar
   for x = 0 to 5 : bpbar[x] = rainrow[x] : next
@@ -193,8 +195,8 @@ yell
   t = aimoff + 8
   if t < 17 then pperf[x] = 1
   pose = w : poset = 12
-  gosub pickphrase
-  phraset = 45
+  rem a new phrase once the last has been up 1.5 s (time to read it)
+  if phraset = 0 || phraset > 90 then gosub pickphrase : phraset = 1
   rem TOO FAST: within half a beat of the last one
   if sinceyell < 16 then gosub toofast
   sinceyell = 0
