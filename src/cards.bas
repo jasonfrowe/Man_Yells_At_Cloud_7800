@@ -35,6 +35,10 @@
   dim cq6 = $2413
   dim cq8 = $2463
   dim cmsgrow = $24B8
+  rem the mirror's cards (src/mirror.bas): cmirror = 0 the day job, else
+  rem the mirror's card (1 Sue, 2 Maria, 3 pixelkid); cresult = 1 solved
+  dim cmirror = $2712
+  dim cresult = $2713
   rem the day job's
   dim coutn = $2268
   dim cpc = $226B
@@ -55,6 +59,9 @@
   dim chome = $24A0
 
 cards
+  cmirror = 0
+  rem (the mirror's cards come in here, cmirror set)
+cardsm
   asm
   lda #MUS_OFFICE
   jsr mus_play
@@ -68,6 +75,7 @@ end
   P2C1 = $CA : P2C2 = $CA : P2C3 = $CA
   P3C1 = $1C : P3C2 = $1C : P3C3 = $1C
   cjob = night - 1
+  if cmirror then cjob = cmirror + 2
 
   rem ---- a job: the card, the target, the screen ----
 cjobstart
@@ -83,14 +91,23 @@ cjobstart
   next
 cjobpre0
   ccol = 0 : crow = 0 : coutn = 0 : cstate = 0 : ckon = 0 : cassist = 0
+  cacc = 0 : ccnt = 0 : csteps = 0
   cdir = 0 : crep = 0 : fireheld = 1 : cfire2 = 1
+  rem Sue's card comes with three bad columns
+  if cjob <> 3 then goto cjobbad0
+  for x = 0 to 2
+  t = cbadcol[x] : cop[t] = cbadop[x] : cval[t] = cbadval[x]
+  next
+cjobbad0
   asm
   jsr c_cls
   jsr c_frame
 end
-  cprow = 0 : cpcol = 0 : cstr = 0 : gosub say
+  cprow = 0 : cpcol = 0 : cstr = cjobtitle[cjob] : gosub say
+  if cmirror then goto cjobtop
   cprow = 0 : cpcol = 32 : cstr = 1 : gosub say
   t = cjob + 17 : cpanel[36] = t + t
+cjobtop
   cprow = 1 : cpcol = 0 : cstr = 2 : gosub say
   cprow = 1 : cpcol = 8 : cstr = cjobtarget[cjob] : gosub say
   cprow = 2 : cpcol = 0 : cstr = 3 : gosub say
@@ -144,7 +161,9 @@ cdone
   asm
   jsr c_leave
 end
-  goto menu
+  if cmirror = 0 then goto menu
+  cresult = 0 : if ctimer = 1 then cresult = 1
+  goto mirrorback bank6
 
   rem ---- editing ----
   rem the stick: a press moves the cursor at once, then repeats
@@ -175,12 +194,13 @@ cmove
   gosub homeupd
   gosub clearmsg
   cprow = 11 : cpcol = 0
-  cstr = cjobhint[cjob] : if crow = 12 then cstr = 34
+  cstr = cjobhint[cjob] : if crow = 12 then cstr = 34 : if cmirror then cstr = 37
   goto say
-  rem GO HOME, marked while the cursor's on it (row 12)
+  rem GO HOME (GO BACK in the mirror), marked while the cursor's on it (row 12)
 homeupd
   cprow = 10 : cpcol = 32 : cstr = 32
   if crow = 12 then cstr = 31
+  if cmirror then cstr = cstr + 4
   goto say
 
   rem button 1 punches, button 2 runs the card; both feed the Konami code
@@ -280,7 +300,8 @@ chalt
   next
   ctimer = 1
   gosub clearmsg
-  cprow = 11 : cpcol = 0 : cstr = 18 : gosub say
+  cprow = 11 : cpcol = 0 : cstr = 18 : if cmirror then cstr = 38
+  gosub say
   sfxid = 11 : goto playsfx
 cnomatch
   gosub clearmsg
@@ -364,32 +385,56 @@ end
   rem    LOOP 13
   rem  day 3 PONG PONG PONG PONG 54321!: CNT 4, PONG and a space, LOOP 2;
   rem    LOAD '5', CNT 5, OUT, ADD 127 (-1), LOOP 15; LOAD '!', OUT
+  rem  the mirror's cards (jobs 3-5), the Cloud's invitation in pieces:
+  rem   Sue's SAT 6PM: all punched, three columns bad (cbad, below)
+  rem   Maria's BRING FOOD: BRING punched; the O's are one LOAD, OUT twice
+  rem   pixelkid's EVERYONE!: the kid punched EVERY and got stuck
   data csolop
   1, 16, 1, 16, 1, 16, 16, 1, 16
   1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 4, 16, 2, 8
   4, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 8, 1, 4, 16, 2, 8, 1, 16
+  1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16
+  1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 16, 1, 16
+  1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16
 end
   data csolval
   72, 0, 69, 0, 76, 0, 0, 79, 0
   67, 0, 65, 0, 82, 0, 84, 0, 32, 0, 49, 9, 0, 1, 13
   4, 80, 0, 79, 0, 78, 0, 71, 0, 32, 0, 2, 53, 5, 0, 127, 15, 33, 0
+  83, 0, 65, 0, 84, 0, 32, 0, 54, 0, 80, 0, 77, 0
+  66, 0, 82, 0, 73, 0, 78, 0, 71, 0, 32, 0, 70, 0, 79, 0, 0, 68, 0
+  69, 0, 86, 0, 69, 0, 82, 0, 89, 0, 79, 0, 78, 0, 69, 0, 33, 0
 end
   rem each job's first solution column, its length, how much comes punched,
-  rem its target (c_strs), its hint
+  rem its target (c_strs), its hint, its title
   data cjobfirst
-  0, 9, 24
+  0, 9, 24, 43, 57, 76
 end
   data cjobn
-  9, 15, 19
+  9, 15, 19, 14, 19, 18
 end
   data cjobpre
-  4, 0, 0
+  4, 0, 0, 14, 10, 10
 end
   data cjobtarget
-  25, 26, 27
+  25, 26, 27, 39, 40, 41
 end
   data cjobhint
-  28, 29, 30
+  28, 29, 30, 42, 43, 44
+end
+  data cjobtitle
+  0, 0, 0, 45, 46, 47
+end
+  rem Sue's bad columns: column 3 (LOAD 'C', not 'A': one hole too many),
+  rem 8 (OUT and ADD punched: it jams), 13 (LOAD 'L', not 'M': one short)
+  data cbadcol
+  2, 7, 12
+end
+  data cbadop
+  1, 18, 1
+end
+  data cbadval
+  67, 0, 76
 end
   rem the card rows' masks
   data cmop

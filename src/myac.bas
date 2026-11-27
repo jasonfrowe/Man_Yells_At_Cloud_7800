@@ -211,6 +211,8 @@ end
   inline music.asm
   inline sfx.asm
   inline text40.asm
+  rem (the mirror's words: bank 6's code copies them, from here)
+  inline mirrortalk.asm
 
   rem ======================================================================
   rem  The scenes, a bank each (MARIA reads a scene's text from its bank,

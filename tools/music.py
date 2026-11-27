@@ -21,7 +21,14 @@ frames, beat = mus_frame & 31 (the porch's on-beat window).
   MUS_FORUM  C major, late evening, "dial-up nostalgia": the forum's loop
              (a modem's handshake chirp on the harmony at the top)
 
-The generated songs (Cosmic Arc II's tools/musicgen) can come in later.
+  MUS_MIRROR generated (GENERATED, tools/musicgen from Cosmic Arc II): the
+             mirror ROM
+
+Generated songs: tools/musicgen (vendored from Cosmic Arc II, from
+RPMegaChopperII's OPL2 composer) composes; song_generated turns its rows
+into these voices' streams (each 64-row chunk a subroutine). A seed and a
+style each (musicgen/compose.py STYLE_NAMES): change one and rebuild to
+hear another.
 """
 
 from __future__ import annotations
@@ -328,6 +335,147 @@ ROOT_OF.update({"F": "F", "G": "G", "E": "E", "Em": "E", "B": "B", "D": "D"})
 MINOR.update({"Em"})
 
 # ---------------------------------------------------------------------------
+# Generated songs (tools/musicgen). Each: its label prefix, the seed, the
+# style (musicgen/compose.py STYLE_NAMES: 1 kraftwerk, 7 synthwave, 11
+# eurobeat, 12 chiparcade, ...), its mood.
+# skip_intro: start at the first section with all its parts but one, and
+# loop back there (no build-up, no fade-out): for a song that has to come
+# in strong (the composer's intro brings one part in at a time).
+GENERATED = {
+    # the mirror: Japanese fusion (T-Square era), F major, easy and warm:
+    # walking through your friends' rooms
+    "mirror": dict(pre="mm", seed=7800, style=13,
+                   mood=dict(key_root=5, scale="major", bpm=100, intensity=0.3, target_seconds=75)),
+}
+
+
+def _composer():
+    sys.path.insert(0, str(ROOT / "tools"))
+    from musicgen import compose
+    from musicgen.tracks import MoodPreset
+    from musicgen.furwriter import FurInstrument, FurOp, NOTE_OFF
+    # the composer picks OPL2 patches from a bank; the POKEY has none, so a
+    # stand-in (only the picks' random draws matter, to keep a seed's song)
+    bank = [FurInstrument(name=str(i), alg=0, fb=0, op0=FurOp(mult=1), op1=FurOp(mult=1)) for i in range(256)]
+    return compose, MoodPreset, NOTE_OFF, bank
+
+
+def _fold(n, lo, hi):
+    """our note (0 = C1) into lo..hi by octaves"""
+    while n > hi:
+        n -= 12
+    while n < lo:
+        n += 12
+    return n
+
+
+def song_generated(name):
+    g = GENERATED[name]
+    compose, MoodPreset, NOTE_OFF, bank = _composer()
+    song, _ = compose.generate_track(name, MoodPreset(**g["mood"]), g["seed"], bank, style=g["style"])
+    pre, plen = g["pre"], song.pattern_len
+    SPEED[0] = song.speed
+    if g.get("skip_intro"):
+        # the sections with all their parts, or all but one
+        empty = max(p for (_, p) in song.patterns)
+        roles = compose.ROLE_TO_CHANNEL.values()
+        active = [sum(1 for c in roles if song.orders[c][k] != empty and song.patterns[(c, song.orders[c][k])])
+                  for k in range(len(song.orders[0]))]
+        full = [k for k, a in enumerate(active) if a >= max(active) - 1]
+        a, b = full[0], full[-1] + 1
+        song.orders = [o[a:b] for o in song.orders]
+    maxd = max(1, 255 // song.speed)          # the player's wait: sixteenths * speed < 256
+    ch = compose.ROLE_TO_CHANNEL
+    # Furnace note values: C-4 (MIDI 60) is 108; ours: C1 (MIDI 24) is 0
+    conv = lambda v: v - 72
+    ranges = {"lead": (0, 95), "bass": (0, 95), "arp": (24, 57), "pad": (24, 57)}   # 8-bit: C3-A5
+    subs = []
+
+    def events(cells):
+        """a pattern's cells -> [(note or None, sixteenths)]"""
+        out, cur, start = [], None, 0
+        for row in sorted(cells):
+            c = cells[row]
+            if c.note is None:
+                continue
+            if row > start:
+                out.append((cur, row - start))
+            cur = None if c.note >= NOTE_OFF else c.note
+            start = row
+        out.append((cur, plen - start))
+        merged = []
+        for n, d in out:
+            if merged and n is None and merged[-1][0] is None:
+                merged[-1] = (None, merged[-1][1] + d)
+            elif d > 0:
+                merged.append((n, d))
+        return merged
+
+    def sub_label(voice, key):
+        return f"{pre}_s{voice}_{key}"
+
+    made = set()
+
+    def melodic(voice, role, ins):
+        st = Stream(f"{pre}_v{voice}")
+        st.ins(ins)
+        st.mark("loop")
+        c = ch[role]
+        lo, hi = ranges[role]
+        for pidx in song.orders[c]:
+            lab = sub_label(voice, pidx)
+            if lab not in made:
+                made.add(lab)
+                sub = Stream(lab)
+                sub.lines.append(lab)
+                seq = [(None if n is None else _fold(conv(n), lo, hi), d) for n, d in events(song.patterns[(c, pidx)])]
+                sub.notes(seq, maxd)
+                sub.ret()
+                subs.append(sub)
+            st.call(lab)
+        st.jump("loop")
+        return st
+
+    def drums(voice, roles):
+        st = Stream(f"{pre}_v{voice}")
+        st.mark("loop")
+        for k in range(len(song.orders[ch[roles[0]]])):
+            pids = tuple(song.orders[ch[r]][k] for r in roles)
+            lab = sub_label(voice, "_".join(str(p) for p in pids))
+            if lab not in made:
+                made.add(lab)
+                hits = {}
+                for r, p in zip(roles, pids):
+                    for row, cell in song.patterns[(ch[r], p)].items():
+                        if cell.note is not None and cell.note < NOTE_OFF:
+                            if r == "snare" or row not in hits:
+                                hits[row] = r
+                rows = sorted(hits)
+                seq = []
+                if not rows or rows[0] > 0:
+                    seq.append((None, rows[0] if rows else plen))
+                for i, row in enumerate(rows):
+                    gap = (rows[i + 1] if i + 1 < len(rows) else plen) - row
+                    r = hits[row]
+                    if r == "hat":
+                        r = "ohat" if gap >= 4 else "hat"       # a long gap: let it ring
+                    seq.append((DR[r], gap))
+                sub = Stream(lab)
+                sub.lines.append(lab)
+                sub.notes(seq, maxd)
+                sub.ret()
+                subs.append(sub)
+            st.call(lab)
+        st.jump("loop")
+        return st
+
+    voices = [melodic(0, "lead", "glead"), melodic(1, "bass", "gbass"),
+              melodic(2, "arp", "garp"), melodic(3, "pad", "gpad"),
+              drums(4, ("kick", "snare")), drums(5, ("hat",))]
+    return voices, subs, song.speed
+
+
+# ---------------------------------------------------------------------------
 # TIA effects: (AUDC, AUDF, AUDV) a frame; channel; priority
 def notes_fx(c, fs, each, v):
     out = []
@@ -375,7 +523,9 @@ def main():
     sfx = ["; Generated by tools/music.py. Do not edit. The effects (the fixed bank).", ""]
     hand = [("porch", 8, "mp", song_porch), ("rain", 9, "mr", song_rain),
             ("office", 9, "mo", song_office), ("forum", 10, "mf", song_forum)]
-    names = [h[0] for h in hand]
+    gen = ["mirror"]
+    # the songs' numbers (MUS_*) stay put, however each is made
+    names = [h[0] for h in hand] + gen
     for i, nm in enumerate(names):
         sfx.append(f"MUS_{nm.upper()} = {i}")
     out.append("song_lo .byte " + ",".join(f"<song_{i}" for i in range(len(names))))
@@ -386,6 +536,11 @@ def main():
         out.append("    .word " + ",".join(f"{p}_v{k}" for k in range(6)))
         SPEED[0] = speed
         streams += fn()
+    for nm in gen:
+        voices, subs, speed = song_generated(nm)
+        out.append(f"song_{names.index(nm)} .byte {speed},$3F")
+        out.append("    .word " + ",".join(f"{GENERATED[nm]['pre']}_v{k}" for k in range(6)))
+        streams += voices + subs
     for st in streams:
         if not (st.lines and st.lines[0] == st.label):
             out.append(st.label)

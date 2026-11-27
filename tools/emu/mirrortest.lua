@@ -35,9 +35,22 @@ local plan = {
   {"y", 0, 140}, {"press", "P1 Down"}, {"press", "P1 Button 1"}, {"wait", 20}, {"room", 1},
   {"x", 0, 32}, {"press", "P1 Up"}, {"press", "P1 Button 1"}, {"wait", 20}, {"room", 2},
   {"y", 0, 92}, {"press", "P1 Up"}, {"press", "P1 Button 1"}, {"wait", 10}, {"snap"}, {"talk"},
+  -- Sue's card: the card engine, Cloud Assist (the Konami code) punches it
+  {"ctrl", 0x43}, {"wait", 30}, {"snap"}, {"konami"}, {"wait", 420}, {"snap"}, {"press", "P1 Button 1"}, {"ctrl", 0x50}, {"wait", 20}, {"talk"},
   {"y", 0, 140}, {"press", "P1 Down"}, {"press", "P1 Button 1"}, {"wait", 20}, {"room", 1},
   {"x", 0, 96}, {"press", "P1 Up"}, {"press", "P1 Button 1"}, {"wait", 20}, {"room", 4},
-  {"y", 0, 102}, {"press", "P1 Up"}, {"press", "P1 Button 1"}, {"wait", 10}, {"snap"}, {"talk"}, {"snap"},
+  {"y", 0, 102}, {"press", "P1 Up"}, {"press", "P1 Button 1"}, {"wait", 10}, {"snap"}, {"talk"},
+  {"ctrl", 0x43}, {"wait", 30}, {"snap"}, {"konami"}, {"wait", 420}, {"snap"}, {"press", "P1 Button 1"}, {"ctrl", 0x50}, {"wait", 20}, {"talk"}, {"snap"},
+  -- back to the hub; pixelkid's card (player 2 steps pixelkid below Arthur)
+  {"y", 0, 140}, {"press", "P1 Down"}, {"press", "P1 Button 1"}, {"wait", 20}, {"room", 1},
+  {"y", 1, 62}, {"press", "P1 Down"}, {"press", "P1 Button 1"}, {"wait", 10}, {"talk"},
+  {"ctrl", 0x43}, {"wait", 30}, {"snap"}, {"konami"}, {"wait", 420}, {"snap"}, {"press", "P1 Button 1"}, {"ctrl", 0x50}, {"wait", 20}, {"talk"},
+  -- the reader: pixelkid on the lever (column 17, row 6), Arthur at the
+  -- reader's side (column 16, row 5), facing it
+  {"x", 1, 112}, {"y", 1, 92}, {"x", 1, 136},
+  {"y", 0, 92}, {"x", 0, 128}, {"y", 0, 76}, {"wait", 10}, {"snap"},
+  {"press", "P1 Right"}, {"press", "P1 Button 1"}, {"wait", 10}, {"talk"},
+  {"wait", 900}, {"snap"}, {"talk"}, {"wait", 30},
   {"done"},
 }
 local step, f, t0, hold, quiet = 1, 0, 0, 0, 0
@@ -76,6 +89,14 @@ emu.register_frame_done(function()
     elseif s[1] == "x" then held[p .. (v < want and "Right" or "Left")] = true
     else held[p .. (v < want and "Down" or "Up")] = true end
     if f - t0 > 600 then print(string.format("stuck: step %d at %d (want %d)", step, v, want)); s = {"done"} ; step = #plan end
+  elseif s[1] == "ctrl" then
+    if mm:read_u8(0x2107) == s[2] then nextstep = true end
+  elseif s[1] == "konami" then
+    -- up up down down left right left right, button 2, button 1
+    local seq = {"P1 Up", "P1 Up", "P1 Down", "P1 Down", "P1 Left", "P1 Right", "P1 Left", "P1 Right",
+                 "P1 Button 2", "P1 Button 1"}
+    local k = (f - t0) // 12 + 1
+    if k > #seq then nextstep = true elseif (f - t0) % 12 < 4 then held[seq[k]] = true end
   elseif s[1] == "room" then
     if mm:read_u8(0x2209) == s[2] then nextstep = true end
   elseif s[1] == "kmode" then

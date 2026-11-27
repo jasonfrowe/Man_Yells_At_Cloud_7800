@@ -214,10 +214,10 @@ ARTHUR? IN HERE?
 ...HUH. NICE ROOM.
 
 THE CLOUD LEFT ME A
-CARD. HALF PUNCHED.
+CARD. THREE COLUMNS
 
-TAKE IT TO THE BIG
-READER. I'LL BE BY.
+ARE BAD, AND I CAN'T
+FIND THEM. YOU?
 
 @talk 9 hal
 = HI_SCORE_HAL
@@ -243,15 +243,15 @@ ARTHUR. DID YOU KNOW
 THIS ROOM IS 160A?
 
 OF COURSE YOU DID.
-HERE, A CARD. IT'S
+HERE, THE CLOUD'S
 
-FULL OF LOOPS AND
-ADD 127S. ENJOY.
+CARD. IT SAYS BRING
+...AND THEN NOTHING.
 
-@talk 12 done
-= ARTHUR
-GOT IT. NOW THE BIG
-CARD READER.
+@talk 12 suedone
+= SOLDERSUE
+THAT'S IT! TAKE IT
+TO THE BIG READER.
 
 @talk 13 door
 = ARTHUR
@@ -263,10 +263,15 @@ IT TAKES TWO.
 IT'S OPEN!
 WE DID THAT.
 
-@talk 15 reader
+@talk 15 readerneed
 = ARTHUR
-THE CARD READER.
-(COMING SOON.)
+THE BIG CARD READER.
+IT TAKES FOUR CARDS.
+
+SUE'S, HAL'S,
+MARIA'S... AND ONE
+
+MORE. WHOSE?
 
 @talk 16 halagain
 = HI_SCORE_HAL
@@ -275,3 +280,74 @@ AGAIN? ANY TIME.
 @talk 17 halmiss
 = HI_SCORE_HAL
 OOF. AGAIN!
+
+@talk 18 mariadone
+= DOCMARIA
+BRING FOOD. A CLOUD
+THAT CARES ABOUT
+
+SNACKS. LOVELY.
+
+@talk 19 kidcard
+= PIXELKID_07
+I HAVE A CARD TOO.
+I TRIED. REALLY.
+
+I GOT AS FAR AS
+EVERY. THEN I GOT
+
+STUCK. WILL YOU
+SHOW ME?
+
+@talk 20 kiddone
+= PIXELKID_07
+EVERYONE! THAT'S MY
+FIRST REAL PROGRAM.
+
+...IT WORKS.
+
+@talk 21 kidagain
+= PIXELKID_07
+THE BIG READER'S
+BEHIND THE DOOR.
+
+@talk 22 readerlever
+= ARTHUR
+THE FEED LEVER HAS
+TO BE HELD DOWN.
+
+I CAN'T HOLD IT AND
+FEED IT. KID?
+
+@talk 23 readergo
+= ARTHUR
+HOLD IT THERE, KID.
+HERE GOES.
+
+@talk 24 ending
+= PIXELKID_07
+IT'S... AN
+INVITATION?
+
+= ARTHUR
+TO MY PORCH.
+...HUH.
+
+= PIXELKID_07
+CAN I COME?
+
+= ARTHUR
+EVERYONE CAN.
+IT SAYS SO.
+
+@talk 25 later
+= ARTHUR
+I'LL COME BACK TO
+IT.
+
+# ---------------------------------------------------------------------------
+# The card reader's printout: each card's line (Sue, Hal, Maria, pixelkid)
+@print | SAT 6PM
+@print | ARTHUR'S PORCH
+@print | BRING FOOD
+@print | EVERYONE!

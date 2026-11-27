@@ -34,7 +34,11 @@ and enjoy the meal.
    in the hub; what they say depends on Arthur's reviews, then they follow
    (button 2: wait / follow). Joystick 2's fire, any time: a second player
    takes pixelkid. Two plates open the hub's door; Hal's rally is 20 hits
-   together (player 2 takes Hal's paddle). Select goes back to the menu.
+   together (player 2 takes Hal's paddle). Sue's, Maria's and pixelkid's
+   cards are punched in the day job's card engine; with all four, and
+   pixelkid on the feed lever, the big reader prints the Cloud's
+   invitation. Music by the composer from Cosmic Arc II (`tools/musicgen`).
+   Select goes back to the menu.
 
 The menu shows how many POKEYs it found: the music plays on two, or falls
 back to lead, bass and drums on one. See [Concept.md](Concept.md)
@@ -81,7 +85,8 @@ then `.venv/bin/python tools/gfx.py`.
 | `tools/gfx.py` | The art, drawn as text, and the fonts (the forum's avatars too) |
 | `tools/test_break.sh`, `tools/emu/breaktest.lua` | Headless test: break the slop ROM |
 | `src/asm/sound.asm` | The POKEY music player and TIA effects (from Cosmic Arc II), with the one-POKEY fallback |
-| `tools/music.py` | The songs and effects, to `src/gen/` |
+| `tools/music.py` | The songs and effects, to `src/gen/` (hand-written, and generated: `GENERATED`) |
+| `tools/musicgen/` | The composer (from Cosmic Arc II): seeded songs in many styles |
 | `tools/test_porch.sh`, `tools/emu/porchtest.lua` | Headless test: the porch |
 | `tools/test_cards.sh`, `tools/emu/cardtest.lua` | Headless test: the day job |
 | `tools/test_forum.sh`, `tools/emu/forumtest.lua` | Headless test: the evening |

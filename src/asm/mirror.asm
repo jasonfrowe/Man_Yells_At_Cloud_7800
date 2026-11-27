@@ -457,6 +457,28 @@ m_bk_a
     cpx #255
     bne m_bk_a
     rts
+; m_paper: the card reader's paper: rows 1-11 blank (m_stage, and the
+; screen's map at once: the old display lists show nothing either)
+m_paper
+    ldx #219
+    lda #0
+m_pp_l
+    sta m_stage+20,x
+    sta m_map+20,x
+    dex
+    cpx #255
+    bne m_pp_l
+    ldy #19
+m_pp_n
+    lda m_papername,y
+    sta m_map,y
+    sta m_stage,y
+    dey
+    bpl m_pp_n
+    rts
+m_papername                 ; "THE CARD READER"
+    .byte 104,80,74,0,70,66,100,72,0,100,74,66,72,74,100,0,0,0,0,0
+
 ; m_commit: m_stage's rows 1-11 to the screen; m_commitbox rows 9-11
 m_commit
     ldx #219
