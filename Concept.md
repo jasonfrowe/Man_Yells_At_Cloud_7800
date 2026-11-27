@@ -247,13 +247,11 @@ It's the one time the player sees the Cloud *do* something rather than rain. It 
 
 **Look:** top-down 8-bit rooms. Arthur's living room is first. Each TV is a doorway into another regular's room, so the TVs form a little world map of connected rooms.
 
-**Goal:** the Cloud left behind a program split into four cards. **SolderSue, Hal and DocMaria each have one** (half-punched, and each stuck on it). **pixelkid_07 has the fourth** and is hiding in the hub room, a forum-themed room with the big card reader.
+**Goal:** the Cloud left behind a program split into four cards, already punched. **SolderSue, Hal and DocMaria each have one**, and **pixelkid_07 has the fourth**, hiding in the hub room, a forum-themed room with the big card reader. Nobody can read a card by eye: what the program says stays a mystery until the reader runs the deck. (The punch-card puzzles belong to the day job; here the cards are a reveal.)
 
-**Gathering the cards:** each regular's room is a short puzzle in their own style, using skills the player already has:
+**Gathering the cards:** Sue and Maria hand theirs over; pixelkid gives theirs on joining. Hal's is the prize for his rally:
 
-- **SolderSue:** finish her card by fixing three bad columns, a short punch puzzle.
 - **Hi_Score_Hal:** a two-paddle Pong rally, played properly for once, cooperating to keep the ball alive for 20 hits. This is the one game in the story you play straight, and it's a good one. With one joystick, Hal plays the other paddle (a forgiving CPU partner). With two, **Player 2 takes Hal's paddle.**
-- **DocMaria:** a punch-card puzzle using loop and `ADD 127` tricks to produce her card's characters.
 
 **pixelkid_07:** Arthur finds them in the hub. The dialogue depends on which reviews Arthur wrote, but every branch ends with pixelkid admitting they didn't know how to start and were afraid to ask. Arthur realizes the target of his anger was a kid who wanted in. Then pixelkid joins and follows Arthur for the rest of the chapter.
 
