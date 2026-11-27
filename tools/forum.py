@@ -75,9 +75,10 @@ def main():
         elif cmd == "@phrase":
             slot, day = SLOTS.index(words[1]), int(words[2])
             kind = "kind" in words[3:]
+            last = day - 1 if "only" in words[3:] else 2
             bug = int(words[words.index("bug") + 1]) if "bug" in words else 0
             check(n, "phrase", text)
-            phrases.append(dict(slot=slot, day=day - 1, kind=kind, bug=bug, text=text))
+            phrases.append(dict(slot=slot, day=day - 1, last=last, kind=kind, bug=bug, text=text))
         elif cmd == "@after":
             day = int(words[1])
             kind = "kind" in words[2:]
@@ -142,6 +143,7 @@ def main():
     ptrs("f_ph", [s(p["text"]) for p in phrases])
     table("f_phslot", [p["slot"] for p in phrases])
     table("f_phday", [p["day"] for p in phrases])
+    table("f_phlast", [p["last"] for p in phrases])
     table("f_phbug", [p["bug"] for p in phrases])
     table("f_phkind", [1 if p["kind"] else 0 for p in phrases])
     table("f_after", [after[(d, k)] for d in range(3) for k in (False, True)])

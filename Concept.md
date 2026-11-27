@@ -30,7 +30,7 @@ There is no game over. It's a story game, and the ending is always happy.
 
 ## 2. Story
 
-**Arthur** is a retired mainframe programmer. He does part-time punch-card data entry for a company called **NimbusWorks** and spends his evenings on AtariAge. Lately the new-releases forum is full of hyped games with glossy box art (*SUPER PADDLE BALL DELUXE*, *CYBER NEON BLAST*, *QUANTUM PIXEL QUEST*). Every one turns out to be a broken Pong clone, posted by a user named **pixelkid_07** who never answers a single reply.
+**Arthur** is a retired mainframe programmer. He does part-time punch-card data entry for a company called **NimbusWorks** and spends his evenings on AtariAge. Lately the new-releases forum is full of hyped games with glossy box art (*SUPER PADDLE BALL DELUXE*, *CYBER NEON BLASTER*, *7800 SKYWOLFENDOOMRIM*). Every one turns out to be a broken Pong clone, posted by a user named **pixelkid_07** who never answers a single reply.
 
 Arthur tears into each game, writes a 1-star review, then walks onto his porch and yells at the sky.
 
@@ -75,8 +75,8 @@ The regulars are the same people Arthur argues with in the forum scenes, so the 
 | | Day job | Evening forum | Night porch |
 |---|---|---|---|
 | **Day 1 (Mon)** | 1 punch-card job | Break *SUPER PADDLE BALL DELUXE* | Yell. Cloud's first line. |
-| **Day 2 (Wed)** | 1 job | Break *CYBER NEON BLAST* | Yell. Arthur's lines get softer. |
-| **Day 3 (Fri)** | 1 job (the whole card) | Break *QUANTUM PIXEL QUEST*. | Yell. The Cloud's key line. Then **the storm** over the data centre. |
+| **Day 2 (Wed)** | 1 job | Break *CYBER NEON BLASTER* | Yell. Arthur's lines get softer. |
+| **Day 3 (Fri)** | 1 job (the whole card) | Break *7800 SKYWOLFENDOOMRIM*. | Yell. The Cloud's key line. Then **the storm** over the data centre. |
 | **Finale (Sat)** | The MIRROR thread, then **the mirror ROM:** gather the cards, solve the two-person puzzles, run the deck. | | **Potluck on the porch.** Ending. |
 
 Totals: 3 punch-card jobs, 3 slop ROMs, 3 porch nights, 1 mirror chapter, the ending. Short cutscenes (picture or portrait over 40-column teletype text, as in Gamma Force) link the scenes.
@@ -144,8 +144,18 @@ Running past column 20 halts. A step limit stops infinite loops, and the reader 
 | ROM | The exploit | Crash screen |
 |---|---|---|
 | *SUPER PADDLE BALL DELUXE* | Every hit scores the combo (1, 2, 4, 8…) and doubles it, while the CPU only ever scores 1. The score is a single byte, so about 8 hits in a row **overflow** it. The digits turn to garbage tiles, and the game crashes. | `SCORE: ▒▓░` → `BRK` |
-| *CYBER NEON BLAST* | The ball speeds up on every hit. At top speed it **tunnels through the top wall** and leaves the screen. | `ERR: BALL NOT FOUND` |
-| *QUANTUM PIXEL QUEST* | Flip the **left difficulty switch** mid-rally. The paddle grows each time until it fills the screen and the ball gets stuck inside it. | Paddle fills the screen, then hangs |
+| *CYBER NEON BLASTER* | The ball speeds up on every hit. At top speed it **tunnels through the top wall** and leaves the screen. | `ERR: BALL NOT FOUND` |
+| *7800 SKYWOLFENDOOMRIM* | Flip the **left difficulty switch** mid-rally. The paddle grows each time until it fills the screen and the ball gets stuck inside it. | Paddle fills the screen, then hangs |
+
+**Every ROM is the same Pong, dressed up.** The titles promise the moon (120 FPS, then 240, then "8K RTX AT 480 FPS"); the game behind each is the same broken Pong with something bolted on for no reason, a parody of the era it borrows from:
+
+- *SUPER PADDLE BALL DELUXE*: plain Pong.
+- *CYBER NEON BLASTER*: the court's colours slowly cycle through neon hues, and every few seconds a robot marches across the court with a bouncing smiley face chasing it.
+- *7800 SKYWOLFENDOOMRIM* (Skyrim, Wolfenstein and Doom in one title, "OPEN WORLD! 900 HRS!"): the court is a tank arena with blocks, two tanks trade shells across the net, and an asteroid drifts by. It's still Pong.
+
+The cameos are drawn fresh for this game, as nods to the arcade era, not copies of the originals' sprites.
+
+**The serve is always in reach.** Each serve comes straight at the player's paddle, and a miss halves the combo instead of resetting it to 1x, so even a sloppy player breaks a ROM in under half a minute. Nobody should have to play slop for ten minutes.
 
 The difficulty-switch trick is a nod to 2600 paddle games, where the A/B switches set paddle size, and it gets players flipping real console switches.
 
@@ -177,7 +187,8 @@ The phrase lists grow each day. On **Day 3** a new kind of option appears in eve
 - **Download:** button 1 in the release thread runs the slop ROM. Its crash goes to the review builder.
 - **The review builder:** three lines (the opener, the bugs, the verdict). Up and down pick the line, left and right the words. Each slot offers its day's phrases and earlier ones. The bugs slot offers a complaint only for a bug Arthur actually saw. On day 3 every slot gets a constructive option, and for the bugs it's the *fix* for a bug he saw ("SED, THEN ADC: A BCD SCORE.", "CAP THE COMBO. A BYTE STOPS AT 255."). Button 1 posts it.
 - **After posting:** the thread shows Arthur's review and a regular's reply (Hal's "OOF. TOUGH CROWD, ARTHUR.", Sue's "YOU COULD JUST TELL THE KID HOW TO FIX IT, YOU KNOW."). On day 3 a kind review gets DocMaria's "...ARTHUR? ARE YOU FEELING OK?". The game keeps each day's phrases and how many were kind (`rev_ph`, `rev_kind`) for pixelkid's dialogue in the finale.
-- Days 2 and 3's slop ROMs (*CYBER NEON BLAST*, *QUANTUM PIXEL QUEST*) aren't built yet: *SUPER PADDLE BALL DELUXE* stands in. There's no forum music yet (the concept's "dial-up nostalgia" loop).
+- The forum plays its own POKEY loop (`MUS_FORUM`: C major, Am F C G, a modem-handshake chirp at the top).
+- Days 2 and 3's slop ROMs have their own titles and look (see the slop ROM table), but they still crash the day 1 way (the score overflow). Their signature crashes (the tunnelling ball, the difficulty switch) are still to build.
 
 ### 4.3 The Night: Yelling at the Cloud (160A)
 

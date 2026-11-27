@@ -14,18 +14,36 @@ end
 local function m() return manager:machine().devices[":maincpu"].spaces["program"] end
 local f, start, gl, lastscore, hits, hit4 = 0, 300, nil, -1, 0, nil
 local edge = os.getenv("EDGE") or "middle"
+local day = tonumber(os.getenv("DAY") or "1")
+local aim
+math.randomseed(tonumber(os.getenv("SEED") or "7800"))
 emu.register_frame_done(function()
   f = f + 1
   local mm = m()
   local held = {}
   -- the menu's first item (SUPER PADDLE BALL), then the slop title
+  -- (right picks the day: night, 1-3)
+  for k = 1, day - 1 do
+    if f >= 150 + 20 * k and f < 154 + 20 * k then held["P1 Right"] = true end
+  end
   if f >= 230 and f < 234 then held["P1 Button 1"] = true end
+  if f == start - 10 or (os.getenv("SNAPS") and f > start and (f - start) % 97 == 0 and f < start + 900) then manager:machine().screens[":screen"]:snapshot() end
   if f >= start and f < start + 4 then held["P1 Button 1"] = true end
   if f > start + 10 and not gl then
     local pady, bally = mm:read_u8(0xE6), mm:read_u8(0xE9)
     -- the ball's line 6 meets the paddle's line 4 (top), 17 or 30 (bottom)
     local want = bally - 11
     if edge == "top" then want = bally + 2 elseif edge == "bottom" then want = bally - 24 end
+    -- SLOPPY: a person, roughly: wakes up late (the ball past the middle
+    -- and coming), aims a random spot, and sometimes just misses
+    if os.getenv("SLOPPY") then
+      local bx, dx = mm:read_u8(0xE8), mm:read_u8(0xEA)
+      if dx < 128 or bx > 70 then aim = nil; want = pady
+      else
+        aim = aim or (math.random(0, 9) < (tonumber(os.getenv("MISS") or "1")) and 40 or math.random(-16, 16))
+        want = bally - 11 + aim
+      end
+    end
     if pady < want - 1 then held["P1 Down"] = true elseif pady > want + 1 then held["P1 Up"] = true end
     local score = mm:read_u8(0xEC)
     if score ~= lastscore then

@@ -10,8 +10,9 @@
 # @day N  | the evening's name ; @game | the slop ROM's title
 # @thread key [release] | title          (release: the slop ROM's thread)
 # @post key                              (then its lines)
-# @phrase slot day [kind] [bug N] | text
-#   slot: opener, bugs, verdict. day: the first day it's offered. kind: a
+# @phrase slot day [only] [kind] [bug N] | text
+#   slot: opener, bugs, verdict. day: the first day it's offered (only:
+#   and only that day). kind: a
 #   constructive one (counted for the finale). bug N: only if Arthur saw
 #   that bug (seenbugs bit N: 1 zone ghosts, 2 zone clipping, 4 no holey
 #   DMA, 8 DMA overrun, 16 not BCD, 32 the overflow).
@@ -30,10 +31,10 @@
 @thread pixelkid release | *** SUPER PADDLE BALL DELUXE *** OUT!!
 @post pixelkid
 THE BEST PADDLE GAME EVER MADE FOR
-THE 7800!!! 60 FPS! 4K GRAPHICS!
+THE 7800!!! 120 FPS! 4K GRAPHICS!
 INFINITE REPLAY! DOWNLOAD NOW!!!
 @post hal
-60 FPS ON A 7800? I'LL BITE.
+120 FPS ON A 60 HZ TV? I'LL BITE.
 DOWNLOADING.
 @post maria
 "4K GRAPHICS." THE ROM IS 8K.
@@ -74,13 +75,13 @@ YOU'RE WELCOME.
 
 # ---------------------------------------------------------------------------
 @day 2 | WED EVE
-@game | CYBER NEON BLAST
+@game | CYBER NEON BLASTER
 
-@thread pixelkid release | !!! CYBER NEON BLAST !!! FASTEST PONG
+@thread pixelkid release | !!! CYBER NEON BLASTER !!! OUT NOW!!
 @post pixelkid
 FROM THE MAKER OF SUPER PADDLE BALL
-DELUXE!!! NOW WITH NEON! AND SPEED!
-10/10 - IGN (PROBABLY)
+DELUXE!!! NOW WITH NEON! ROBOTS!
+240 FPS! 10/10 - IGN (PROBABLY)
 @post sue
 SAME KID. STILL NO SOURCE.
 @post hal
@@ -105,19 +106,19 @@ IT DOES NOT.
 
 # ---------------------------------------------------------------------------
 @day 3 | FRI EVE
-@game | QUANTUM PIXEL QUEST
+@game | 7800 SKYWOLFENDOOMRIM
 
-@thread pixelkid release | QUANTUM PIXEL QUEST - AN EPIC (PONG)
+@thread pixelkid release | 7800 SKYWOLFENDOOMRIM - OPEN WORLD!!!
 @post pixelkid
-MY BIGGEST GAME YET!!!
-...IT'S PONG AGAIN. SORRY. I DON'T
-KNOW HOW TO MAKE ANYTHING ELSE.
+MY BIGGEST GAME YET!!! OPEN WORLD!
+DRAGONS! DEMONS! TANKS! SPACE!
+900 HOURS OF CONTENT!!!
+@post maria
+900 HOURS ON A 16K CART? THAT'S
+18 BYTES AN HOUR.
 @post hal
 TRY THE LEFT DIFFICULTY SWITCH.
 TRUST ME.
-@post maria
-AT LEAST THE TITLE SCREEN DOESN'T
-CRASH THIS TIME.
 
 @thread sue | NIMBUSWORKS = THE SLOP FACTORY?
 @post sue
@@ -142,7 +143,11 @@ A PONG CLONE. A BAD ONE. :)
 @phrase opener 1 | WHAT IS THIS?
 @phrase opener 1 | I WANT MY 5 MINUTES BACK.
 @phrase opener 2 | ANOTHER PONG. GREAT.
+@phrase opener 2 only | NEON PONG IS STILL PONG.
+@phrase opener 2 only | WHY ARE THERE ROBOTS?
 @phrase opener 2 | NOT A GAME. A CRY FOR HELP.
+@phrase opener 3 only | OPEN WORLD? IT'S PONG.
+@phrase opener 3 only | 900 HOURS OF PONG. NO.
 @phrase opener 3 | MY TOASTER CODES BETTER.
 @phrase opener 3 kind | WELCOME TO THE 7800, KID.
 
@@ -171,7 +176,9 @@ OOF. TOUGH CROWD, ARTHUR.
 @after 2 sue
 YOU COULD JUST TELL THE KID HOW TO
 FIX IT, YOU KNOW.
-@after 3 hal
-SAME OLD ARTHUR.
+@after 3 pixelkid
+...YOU'RE RIGHT. IT'S PONG AGAIN.
+I DON'T KNOW HOW TO MAKE ANYTHING
+ELSE. SORRY.
 @after 3 kind maria
 ...ARTHUR? ARE YOU FEELING OK?

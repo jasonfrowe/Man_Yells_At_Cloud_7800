@@ -3,14 +3,17 @@
   rem  A story game for the Atari 7800. See Concept.md.
   rem
   rem  For now a menu of prototypes:
-  rem    1  SUPER PADDLE BALL DELUXE, the first slop ROM (below)
+  rem    1  SLOP ROM FOR DAY n: pixelkid_07's Pong, a new title each day
+  rem       (slop.bas)
   rem    2  THE PORCH: yelling at the Cloud, then the rain (porch.bas)
   rem    3  THE DAY JOB: punch cards at NimbusWorks, a job a day (cards.bas)
   rem    4  THE EVENING: the forum, the day's slop ROM, the review (forum.bas)
   rem  Left and right pick the night / day (1-3) for both.
   rem
-  rem  Prototype 1: SUPER PADDLE BALL DELUXE, the first slop ROM.
-  rem  An overblown title, then a broken Pong. Every hit scores the COMBO
+  rem  Prototype 1: the slop ROMs. Day 1 SUPER PADDLE BALL DELUXE, day 2
+  rem  CYBER NEON BLASTER (neon, robots marching through), day 3 7800
+  rem  SKYWOLFENDOOMRIM (a tank arena, an asteroid): each an overblown
+  rem  title, then the same broken Pong. Every hit scores the COMBO
   rem  (1, 2, 4, 8...) and doubles it; the CPU only ever scores 1. Score
   rem  and combo are bytes, so on the 8th hit in a row they overflow, the
   rem  HUD turns to garbage, and the game crashes (BRK).
@@ -120,7 +123,7 @@ end
   plotchars 'man yells' 1 44 1
   plotchars 'at cloud' 1 48 2
   plotchars 'PROTOTYPES' 3 40 4
-  plotchars 'SUPER PADDLE BALL' 0 16 6
+  plotchars 'SLOP ROM FOR DAY' 0 16 6
   plotchars 'THE PORCH: NIGHT' 0 16 7
   plotchars 'THE DAY JOB: DAY' 0 16 8
   plotchars 'THE EVENING: DAY' 0 16 9
@@ -135,6 +138,7 @@ menuloop
   t = menusel + 6
   plotchars '>' 2 4 t
   dnum = night + night : dnum = dnum + 32
+  plotchars dnum 2 152 6 1
   plotchars dnum 2 152 7 1
   plotchars dnum 2 152 8 1
   plotchars dnum 2 152 9 1
@@ -254,3 +258,11 @@ end
   incgraphic gfx/aimdot.png 160A 0 1 2 3
   incgraphic gfx/reticle.png 160A 0 1 2 3
   incgraphic gfx/drop.png 160A 0 1 2 3
+  incgraphic gfx/robot0.png 160A 0 1 2 3
+  incgraphic gfx/robot1.png 160A 0 1 2 3
+  incgraphic gfx/smiley.png 160A 0 1 2 3
+  incgraphic gfx/tankr.png 160A 0 1 2 3
+  incgraphic gfx/tankl.png 160A 0 1 2 3
+  incgraphic gfx/shell.png 160A 0 1 2 3
+  incgraphic gfx/rock0.png 160A 0 1 2 3
+  incgraphic gfx/rock1.png 160A 0 1 2 3

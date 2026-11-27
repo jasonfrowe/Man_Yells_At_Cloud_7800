@@ -11,9 +11,11 @@ and enjoy the meal.
 
 **Status:** three prototypes, picked from a menu:
 
-1. *SUPER PADDLE BALL DELUXE*: the first slop ROM, from its overblown title
-   screen to its crash, showing off the MARIA mistakes a first 7800 program
-   makes.
+1. *The slop ROMs*: pixelkid_07's games, one a day (SUPER PADDLE BALL
+   DELUXE, CYBER NEON BLASTER, 7800 SKYWOLFENDOOMRIM), from the overblown
+   title screen to the crash. Each is the same broken Pong with something
+   bolted on (robots marching through, a tank arena and an asteroid),
+   showing off the MARIA mistakes a first 7800 program makes.
 2. *The porch*: Arthur yells at the Cloud on the beat of the POKEY music
    until it breaks into rain and says one thing to him (nights 1 to 3).
 3. *The day job*: punch cards at NimbusWorks, in 320A, 40 columns. Punch
@@ -25,8 +27,7 @@ and enjoy the meal.
    the regulars' threads (clues, and a rumor about card readers), download
    pixelkid_07's latest release, break it, and post a review built from
    canned phrases: a complaint for each bug Arthur saw, and on day 3 a kind
-   option in every slot. A regular answers him. (Days 2 and 3's slop ROMs
-   aren't built yet: SUPER PADDLE BALL DELUXE stands in.)
+   option in every slot. A regular answers him. With its own POKEY loop.
 
 The menu shows how many POKEYs it found: the music plays on two, or falls
 back to lead, bass and drums on one. See [Concept.md](Concept.md)
@@ -39,7 +40,8 @@ Needs [wasmtime](https://wasmtime.dev) (7800basic is vendored in
 
 ```sh
 tools/build.sh        # -> build/myac.a78
-tools/test_break.sh   # a bot breaks the slop ROM, headless (a7800 fork)
+tools/test_break.sh   # a bot breaks the slop ROM, headless (a7800 fork;
+                      # DAY=2/3 the other ROMs, SLOPPY=1 MISS=3 a clumsier bot)
 tools/test_porch.sh   # a bot plays the porch (ONEPOKEY=1: one POKEY)
 tools/test_cards.sh   # GO HOME, a card punched by hand, days 2-3 Cloud Assisted
 tools/test_forum.sh   # read, download, break, review and post (days 1 and 3)
@@ -58,7 +60,7 @@ then `.venv/bin/python tools/gfx.py`.
 | Path | |
 |---|---|
 | `src/myac.bas` | The game (7800basic): settings, the menu, shared helpers, the sound driver (bank 1) |
-| `src/slop.bas` | SUPER PADDLE BALL DELUXE (bank 2) |
+| `src/slop.bas` | the slop ROMs, a title a day (bank 2) |
 | `src/porch.bas` | The porch and the rain (bank 3) |
 | `src/cards.bas`, `src/asm/cards.asm` | The day job: 320A, 40 columns, the card and its reader (bank 4) |
 | `src/forum.bas`, `src/asm/forum.asm` | The evening: the forum and the review builder (bank 5) |

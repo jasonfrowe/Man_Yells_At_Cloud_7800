@@ -536,6 +536,9 @@ f_rb_p
     lda f_day
     cmp f_phday,y
     bcc f_rb_n              ; (not offered yet)
+    lda f_phlast,y
+    cmp f_day
+    bcc f_rb_n              ; (that day's only)
     lda f_phbug,y
     beq f_rb_ok
     and seenbugs

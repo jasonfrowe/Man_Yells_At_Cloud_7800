@@ -138,12 +138,14 @@ end
   goto menu
 
   rem ---- helpers ----
-  rem the 40-column screen, the forum's palettes
+  rem the 40-column screen, the forum's palettes and its music
 fenter
   asm
-  jsr mus_stop
+  lda #MUS_FORUM
+  jsr mus_play
   jsr c_enter
 end
+  musmask = $37
   sfxon = 1 : AUDV0 = 0 : AUDV1 = 0
   BACKGRND = $00
   P0C1 = $0F : P0C2 = $0F : P0C3 = $0F

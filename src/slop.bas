@@ -1,7 +1,17 @@
   rem ======================================================================
-  rem  SUPER PADDLE BALL DELUXE, the first slop ROM (bank 2). See the
-  rem  notes at the top of myac.bas.
+  rem  The slop ROMs (bank 2): the day's title (night: 1 SUPER PADDLE BALL
+  rem  DELUXE, 2 CYBER NEON BLASTER, 3 7800 SKYWOLFENDOOMRIM), then the
+  rem  same broken Pong, with the day's "content" crashing through it. See
+  rem  the notes at the top of myac.bas.
   rem ======================================================================
+
+  rem the day's extras (scene RAM)
+  dim exp = $2200
+  dim exy = $2201
+  dim shx = $2202
+  dim astx = $2203
+  dim asty = $2204
+  dim nhue = $2205
 
   rem ======================================================================
   rem  The slop title screen
@@ -19,12 +29,34 @@ end
   AUDV0 = 0 : AUDV1 = 0 : sndt = 0
   tunepos = 0 : tunet = 0
   clearscreen
+  if night = 2 then goto title2
+  if night = 3 then goto title3
   plotchars 'super' 1 60 1
   plotchars 'paddle ball' 1 36 2
   plotchars 'deluxe' 1 56 3
   plotchars 'AI POWERED! 4K HD!' 2 8 5
   plotchars 'ULTRA REAL PHYSICS!' 2 4 6
   plotchars '#1 GAME OF THE YEER' 0 4 7
+  plotchars '120 FPS!!!' 2 40 8
+  goto title9
+title2
+  plotchars 'cyber' 1 60 1
+  plotchars 'neon' 1 64 2
+  plotchars 'blaster' 1 52 3
+  plotchars 'NEON RAY TRACING!' 2 12 5
+  plotchars 'ROBOTS! LAZERS! WOW!' 2 0 6
+  plotchars '#1 GAME OF THE YEER' 0 4 7
+  plotchars 'NOW 240 FPS!!!' 2 24 8
+  goto title9
+title3
+  plotchars '7800' 3 64 1
+  plotchars 'skywolfendoomrim' 1 16 2
+  plotchars 'goty' 1 64 3
+  plotchars 'OPEN WORLD! 900 HRS!' 2 0 5
+  plotchars 'DRAGONS! DEMONS!' 2 16 6
+  plotchars 'TANKS! SPACE ROCKS!' 0 4 7
+  plotchars '8K RTX AT 480 FPS!' 2 8 8
+title9
   plotchars '(C)2026 PIXELKID_07' 0 4 11
   savescreen
   fireheld = 1
@@ -53,6 +85,7 @@ startgame
   AUDV0 = 0 : AUDV1 = 0
   score = 0 : combo = 1 : glitch = 0 : combot = 0 : cpuscore = 0
   ghostt = 0 : seenbugs = 0
+  exp = 0 : shx = 0 : astx = 0
   pady = 90 : cpuy = 90
   gosub showscore
   gosub showcombo
@@ -74,6 +107,8 @@ startgame
   for t = 2 to 10
   plotchars netc 6 76 t 1
   next
+  if night = 2 then P6C1 = $46 : P6C3 = $CC : nhue = $50
+  if night = 3 then gosub arena
   savescreen
 playloop
   restorescreen
@@ -98,6 +133,8 @@ drawcpu
   plotsprite padc 2 148 cpuy 0 2
 skipcpu
   gosub drawball
+  if night = 2 then gosub parade
+  if night = 3 then gosub flyby
   plotchars dscore 0 24 0 2
   plotchars dcombo 0 64 0 3
   plotchars dcpu 0 136 0 2
@@ -163,16 +200,19 @@ playerhit
 cpumiss
   gosub sndmiss
   goto serveball
+  rem a miss halves the combo (it used to start again at 1x: a long game)
 playermiss
-  combo = 1 : gosub showcombo
+  combo = combo / 2 : if combo = 0 then combo = 1
+  gosub showcombo
   if cpuscore < 99 then cpuscore = cpuscore + 1
   gosub showcpu
   gosub sndmiss
+  rem the serve comes straight at the player's paddle, wherever it is,
+  rem so it's always in reach
 serveball
   ballx = 78 : balldx = 254
-  t = rand & 63 : bally = t + 70
-  balldy = 1
-  t = rand & 1 : if t then balldy = 255
+  t = rand & 7 : bally = pady + 8 : bally = bally + t
+  balldy = 0
   servet = 60
   return
 
@@ -204,6 +244,56 @@ plotgarb
   seenbugs = seenbugs | 4
   w = frm & 1 : x = u + 6
   plotsprite garb0 3 ballx x w
+  return
+
+  rem ---- the day's extras ----
+  rem day 2: neon, and every 256 frames a robot marches through with a
+  rem smiley bouncing after it (exp: the march, 1-200; exy its line)
+parade
+  t = frm & 31
+  if t = 0 then nhue = nhue + $10 : BACKGRND = nhue + $02 : P5C1 = nhue + $0A : P6C2 = nhue + $0C
+  if exp = 0 && frm = 0 then exp = 1 : t = rand & 63 : exy = t + 60
+  if exp = 0 then return
+  t = frm & 1 : if t then exp = exp + 1
+  if exp > 200 then exp = 0 : return
+  t = frm / 8 : t = t & 1
+  u = exp - 8
+  if t then plotsprite robot1 6 u exy else plotsprite robot0 6 u exy
+  u = exp - 40
+  t = frm & 15 : w = bounce[t] : w = exy + w
+  plotsprite smiley 3 u w
+  return
+
+  rem day 3: a tank arena (plotted once, under savescreen)
+arena
+  BACKGRND = $C2
+  P7C1 = $28 : P6C2 = $26
+  P4C2 = $06 : P4C3 = $0A
+  plotchars blockh 7 32 3 3
+  plotchars blockh 7 104 3 3
+  plotchars blockh 7 32 9 3
+  plotchars blockh 7 104 9 3
+  for t = 4 to 8
+  plotchars blockh 7 48 t 1
+  plotchars blockh 7 104 t 1
+  next
+  plotsprite tankr 1 28 98
+  plotsprite tankl 2 124 98
+  return
+
+  rem the tanks trade a shell now and then, and an asteroid drifts by
+flyby
+  if shx = 0 && frm = 128 then shx = 36
+  if shx then shx = shx + 2 : plotsprite shell 0 shx 101
+  if shx > 118 then shx = 0
+  if astx = 0 && frm = 0 then astx = 1 : t = rand & 31 : asty = t + 24
+  if astx = 0 then return
+  astx = astx + 1
+  t = frm & 1 : if t then asty = asty + 1
+  if astx > 172 then astx = 0 : return
+  u = astx - 12
+  t = frm & 16
+  if t then plotsprite rock1 4 u asty else plotsprite rock0 4 u asty
   return
 
   rem the CPU follows the ball at 1 pixel a frame, or drifts home
@@ -352,5 +442,13 @@ end
 end
   data netc
   184
+end
+  rem the arena's blocks (glyph 113, solid colour 1)
+  data blockh
+  226, 226, 226
+end
+  rem the smiley's bounce
+  data bounce
+  0, 2, 6, 10, 14, 16, 18, 18, 18, 16, 14, 10, 6, 2, 0, 0
 end
 

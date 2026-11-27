@@ -390,6 +390,32 @@ SPARK = [
 ]
 
 
+# The day 2 and 3 slop ROMs' gatecrashers (pixelkid's "content"), drawn
+# fresh as nods to the arcade era, not copies of anyone's sprites.
+# A robot marching through (day 2), two walking frames: c body, a eyes.
+ROBOT = [
+    "..cccc..", ".cccccc.", ".caccac.", ".cccccc.", "..cccc..", "...cc...",
+    ".cccccc.", "cccccccc", "c.cccc.c", "c.cccc.c", "..cccc..", "..c..c..",
+]
+ROBOT_LEGS = [
+    ["..c..c..", "..c..c..", "..c..c..", ".cc..cc."],
+    ["..c..c..", ".c....c.", "c......c", "cc....cc"],
+]
+# a smiley bouncing after it: a face, b features
+# (each line doubled: 160A pixels are wide)
+SMILEY = [r for r in ["..aaaa..", ".aaaaaa.", "aabaabaa", "aaaaaaaa", "abaaaaba", "aabbbbaa", ".aaaaaa.", "..aaaa.."]
+          for _ in (0, 1)]
+# day 3's arena: two tanks facing off, a shell, and an asteroid going by
+TANK_R = ["aaaaaa..", "aaaaaa..", ".aaaa...", ".aaaaaaa", ".aaaa...", "aaaaaa..", "aaaaaa.."]
+TANK_L = [r[::-1] for r in TANK_R]
+SHELL = [".aa.", ".aa."]
+ROCK = [
+    "....bbbb....", "..bbbcbbbb..", ".bbcccbbbbb.", ".bbcbbbbbbb.", "bbbbbbbbcbbb", "bbbbbbbbbbbb",
+    "bbbcbbbbbbb.", ".bbbbbbbcbbb", ".bbbbbbbbbb.", "..bbbbcbbb..", "...bbbbbb...", "............",
+]
+ROCK2 = ["".join(ROCK[11 - x][y] for x in range(12)) for y in range(12)]
+
+
 def main():
     GFX.mkdir(parents=True, exist_ok=True)
     font()
@@ -413,6 +439,14 @@ def main():
     sprite("aimdot", AIMDOT)
     sprite("reticle", RETICLE)
     sprite("drop", DROP)
+    for i, legs in enumerate(ROBOT_LEGS):
+        sprite(f"robot{i}", ROBOT + legs)
+    sprite("smiley", SMILEY)
+    sprite("tankr", TANK_R)
+    sprite("tankl", TANK_L)
+    sprite("shell", SHELL)
+    sprite("rock0", ROCK)
+    sprite("rock1", ROCK2)
 
     print(f"wrote {GFX.relative_to(ROOT)}/: font, padp, padc, ball, ballcut0-4, garb0-1, spark0-2, porch")
 
