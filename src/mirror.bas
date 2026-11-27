@@ -70,14 +70,10 @@
   dim paper = $22A8
   dim psi = $22A9
   dim pdi = $22AA
-  rem kept for the finale: the cards (1 Sue, 2 Hal, 4 Maria, 8 pixelkid),
-  rem the door; the card engine's job and result (cards.bas)
+  rem kept for the finale: the cards, already punched (1 Sue, 2 Hal,
+  rem 4 Maria, 8 pixelkid), the door
   dim mcards = $2710
   dim mdoor = $2711
-  dim cmirror = $2712
-  dim cresult = $2713
-  rem where everyone was, while a card's punched (bank 4)
-  dim sv = $2720
 
 mirror
   gosub mmusic
@@ -357,23 +353,18 @@ mgo
 mtalknpc
   if mnpc = 4 then goto mtalkkid
   if mnpc = 2 then goto mtalkhal
-  rem Sue's card (job 1) and Maria's (job 2): punched in the card engine
-  if mnpc = 3 then goto mtalkmaria
-  t = mcards & 1
-  if t then talkid = 12 : goto talk
-  talkid = 8 : gosub talk
-  t = 1 : goto mcardgo
-mtalkmaria
-  t = mcards & 4
-  if t then talkid = 18 : goto talk
-  talkid = 11 : gosub talk
-  t = 2 : goto mcardgo
-  rem pixelkid's own card (job 3), once they're following
+  rem Sue's card and Maria's: punched already (what they say, only the
+  rem reader knows)
+  t = 1 : talkid = 8 : u = 12
+  if mnpc = 3 then t = 4 : talkid = 11 : u = 18
+  v = mcards & t
+  if v then talkid = u : goto talk
+  mcards = mcards | t
+  sfxid = 11 : gosub playsfx
+  goto talk
+  rem pixelkid, following: where to go
 mtalkkidcard
-  t = mcards & 8
-  if t then talkid = 21 : goto talk
-  talkid = 19 : gosub talk
-  t = 3 : goto mcardgo
+  talkid = 20 : goto talk
 mtalkhal
   halagain = mcards & 2
   talkid = 9
@@ -395,14 +386,17 @@ mtalkkid
   talkid = 5 : gosub talk
   kmode = 1 : kroom = 1 : kx = mnpcx : ky = mnpcy : mnpc = 0
   talkid = 6 : gosub talk
+  rem pixelkid's card, the fourth
+  talkid = 19 : gosub talk
+  mcards = mcards | 8
   if p2want then kmode = 3 : talkid = 7 : goto talk
   return
 
   rem ---- the big card reader: all four cards, and someone on the lever ----
 mreader
   if mcards <> 15 then talkid = 15 : goto talk
-  if lever = 0 then talkid = 22 : goto talk
-  talkid = 23 : gosub talk
+  if lever = 0 then talkid = 21 : goto talk
+  talkid = 22 : gosub talk
   rem the printout: the room goes, the paper comes, a line a card
   drawwait
   paper = 1
@@ -427,7 +421,7 @@ mprintnext
   for x = 0 to 30 : gosub mframe : next
   next
   for x = 0 to 60 : gosub mframe : next
-  talkid = 24 : gosub talk
+  talkid = 23 : gosub talk
   rem (the potluck is next: prototype 6)
   characterset font
   goto menu
@@ -437,34 +431,6 @@ mframe
   drawscreen
   if mcommit then gosub mdocommit
   return
-
-  rem ---- a card in the card engine (bank 4): t = 1 Sue's, 2 Maria's, 3
-  rem pixelkid's. Everyone's place is kept; mirrorback picks up ----
-mcardgo
-  cmirror = t
-  sv[0] = room : sv[1] = ax : sv[2] = ay : sv[3] = adir : sv[4] = kx
-  sv[5] = ky : sv[6] = kdir : sv[7] = kmode : sv[8] = kroom : sv[9] = p2want
-  sv[10] = hubseen
-  rem (from mact: its return's dropped)
-  pop
-  goto cardsm bank4
-mirrorback
-  room = sv[0] : ax = sv[1] : ay = sv[2] : adir = sv[3] : kx = sv[4]
-  ky = sv[5] : kdir = sv[6] : kmode = sv[7] : kroom = sv[8] : p2want = sv[9]
-  hubseen = sv[10]
-  gosub mmusic
-  characterset mfont
-  sfxon = 1 : AUDV0 = 0 : AUDV1 = 0
-  lat1 = 0 : lat2 = 0 : intalk = 0 : mcommit = 0 : lever = 0 : paper = 0
-  astep = 0 : kstep = 0 : mfire1 = 1 : mfire2 = 1
-  gosub mroom
-  if cresult = 0 then talkid = 25 : gosub talk : goto mloop
-  if cmirror = 1 then mcards = mcards | 1 : talkid = 12
-  if cmirror = 2 then mcards = mcards | 4 : talkid = 18
-  if cmirror = 3 then mcards = mcards | 8 : talkid = 20
-  sfxid = 11 : gosub playsfx
-  gosub talk
-  goto mloop
 
   rem the mirror's song (tools/music.py: generated)
 mmusic

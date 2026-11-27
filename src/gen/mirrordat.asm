@@ -26,12 +26,10 @@ T_HALAGAIN = 16
 T_HALMISS = 17
 T_MARIADONE = 18
 T_KIDCARD = 19
-T_KIDDONE = 20
-T_KIDAGAIN = 21
-T_READERLEVER = 22
-T_READERGO = 23
-T_ENDING = 24
-T_LATER = 25
+T_KIDAGAIN = 20
+T_READERLEVER = 21
+T_READERGO = 22
+T_ENDING = 23
 m_rmaplo .byte <m_map0,<m_map1,<m_map2,<m_map3,<m_map4
 m_rmaphi .byte >m_map0,>m_map1,>m_map2,>m_map3,>m_map4
 m_rnamelo .byte <m_name0,<m_name1,<m_name2,<m_name3,<m_name4

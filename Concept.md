@@ -296,12 +296,7 @@ That's the "real-world puzzle": the community's combined program turns out to be
 - **Player 2:** joystick 2's fire at any time. Before pixelkid joins it's remembered; after, player 2 walks pixelkid and plays Hal's paddle in the rally.
 - **The plate door:** both plates at once; a plate stays down a second after you step off (too short to run between them alone, long enough for one person with two sticks to switch hands). Once open it stays open.
 - **Hal's rally:** 20 hits in a row, together. Hal never misses; a miss resets the count. Button 2 gives up.
-- **The cards (5b):** each one is the day job's card engine (bank 4), on the regular's card:
-  - **SolderSue's** prints `SAT 6PM`, but three columns are bad: one has a hole too many (`C` for `A`), one has two opcodes punched (it jams), one is a hole short (`L` for `M`).
-  - **Hal's** prints `ARTHUR'S PORCH`: the rally's prize.
-  - **DocMaria's** prints `BRING FOOD`: `BRING` is punched, the rest is yours (the O's: one LOAD, two OUTs).
-  - **pixelkid's** prints `EVERYONE!`: the kid punched `EVERY` and got stuck. Arthur finishes it with them ("N IS O + 127"), and it's their first real program.
-  - GO BACK leaves a card for later; Cloud Assist works here too.
+- **The cards (5b)** come already punched: the puzzles are the day job's. Nobody can read a card by eye, so what the Cloud wrote stays a mystery until the reader runs them. Sue's ("NO IDEA WHAT IT SAYS"), Hal's (the rally's prize), Maria's ("I'VE COUNTED THE HOLES. I KNOW WHAT IT SAYS. I'M NOT TELLING."), and pixelkid's, which they hand over on joining ("IT'S ALL PUNCHED. I CAN'T READ IT.").
 - **The card reader** is in the alcove behind the plate door. It takes all four cards, and its feed lever has to be held down while Arthur feeds them: pixelkid (parked there, or player 2) stands at the lever. The room gives way to paper and the reader types the Cloud's invitation, a card a line:
 
   ```

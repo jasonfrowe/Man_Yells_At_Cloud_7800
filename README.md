@@ -34,10 +34,9 @@ and enjoy the meal.
    in the hub; what they say depends on Arthur's reviews, then they follow
    (button 2: wait / follow). Joystick 2's fire, any time: a second player
    takes pixelkid. Two plates open the hub's door; Hal's rally is 20 hits
-   together (player 2 takes Hal's paddle). Sue's, Maria's and pixelkid's
-   cards are punched in the day job's card engine; with all four, and
-   pixelkid on the feed lever, the big reader prints the Cloud's
-   invitation. Music by the composer from Cosmic Arc II (`tools/musicgen`).
+   together (player 2 takes Hal's paddle). Everyone hands over a card, already
+   punched; with all four, and pixelkid on the feed lever, the big reader
+   runs them and prints what the Cloud wrote: an invitation. Music by the composer from Cosmic Arc II (`tools/musicgen`).
    Select goes back to the menu.
 
 The menu shows how many POKEYs it found: the music plays on two, or falls

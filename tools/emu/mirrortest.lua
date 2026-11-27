@@ -35,16 +35,12 @@ local plan = {
   {"y", 0, 140}, {"press", "P1 Down"}, {"press", "P1 Button 1"}, {"wait", 20}, {"room", 1},
   {"x", 0, 32}, {"press", "P1 Up"}, {"press", "P1 Button 1"}, {"wait", 20}, {"room", 2},
   {"y", 0, 92}, {"press", "P1 Up"}, {"press", "P1 Button 1"}, {"wait", 10}, {"snap"}, {"talk"},
-  -- Sue's card: the card engine, Cloud Assist (the Konami code) punches it
-  {"ctrl", 0x43}, {"wait", 30}, {"snap"}, {"konami"}, {"wait", 420}, {"snap"}, {"press", "P1 Button 1"}, {"ctrl", 0x50}, {"wait", 20}, {"talk"},
   {"y", 0, 140}, {"press", "P1 Down"}, {"press", "P1 Button 1"}, {"wait", 20}, {"room", 1},
   {"x", 0, 96}, {"press", "P1 Up"}, {"press", "P1 Button 1"}, {"wait", 20}, {"room", 4},
   {"y", 0, 102}, {"press", "P1 Up"}, {"press", "P1 Button 1"}, {"wait", 10}, {"snap"}, {"talk"},
-  {"ctrl", 0x43}, {"wait", 30}, {"snap"}, {"konami"}, {"wait", 420}, {"snap"}, {"press", "P1 Button 1"}, {"ctrl", 0x50}, {"wait", 20}, {"talk"}, {"snap"},
-  -- back to the hub; pixelkid's card (player 2 steps pixelkid below Arthur)
+  {"snap"},
+  -- back to the hub
   {"y", 0, 140}, {"press", "P1 Down"}, {"press", "P1 Button 1"}, {"wait", 20}, {"room", 1},
-  {"y", 1, 62}, {"press", "P1 Down"}, {"press", "P1 Button 1"}, {"wait", 10}, {"talk"},
-  {"ctrl", 0x43}, {"wait", 30}, {"snap"}, {"konami"}, {"wait", 420}, {"snap"}, {"press", "P1 Button 1"}, {"ctrl", 0x50}, {"wait", 20}, {"talk"},
   -- the reader: pixelkid on the lever (column 17, row 6), Arthur at the
   -- reader's side (column 16, row 5), facing it
   {"x", 1, 112}, {"y", 1, 92}, {"x", 1, 136},

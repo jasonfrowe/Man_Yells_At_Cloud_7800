@@ -1,8 +1,7 @@
 #!/bin/sh
 # The mirror works: a bot walks Arthur through the TVs, talks pixelkid into
 # joining, joins as player 2, opens the hub's door (both plates) and wins
-# Hal's rally, punches Sue's, Maria's and pixelkid's cards (Cloud Assist),
-# and runs the deck through the reader (pixelkid on the lever). Screenshots in build/mirror/a7800/.
+# Hal's rally, collects the four cards (already punched), and runs the deck through the reader (pixelkid on the lever). Screenshots in build/mirror/a7800/.
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 A7800=${A7800:-$HOME/Software/a7800/mame64}
 OUT="$ROOT/build/mirror"
