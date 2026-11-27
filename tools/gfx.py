@@ -620,6 +620,45 @@ TABLE_P = (["................................"] * 6
 assert len(TABLE_P) == 32 and all(len(r) == 32 for r in TABLE_P)
 
 
+def kid_sun():
+    """The sun at the potluck, as a kid would draw it: a wobbly circle (b,
+    with an outline c), crooked rays of different lengths (c), dot eyes and
+    a big smile (a). 24 x 32 (160A pixels are wide: it's round on a TV)."""
+    import math
+    rnd = random.Random(7)
+    W, H = 24, 32
+    g = [["."] * W for _ in range(H)]
+    cx, cy = 11.5, 15.5
+    R = 10.0
+    for y in range(H):
+        for x in range(W):
+            dx, dy = (x - cx) * 2, y - cy        # (in square units)
+            a = math.atan2(dy, dx)
+            r = R + 0.8 * math.sin(3 * a + 1) + 0.5 * math.sin(7 * a)   # the wobble
+            d = math.hypot(dx, dy)
+            if d <= r - 1.8:
+                g[y][x] = "b"
+            elif d <= r:
+                g[y][x] = "c"
+    for k in range(9):                          # the rays
+        a = 2 * math.pi * k / 9 + rnd.uniform(-0.25, 0.25)
+        length = rnd.uniform(2.0, 4.5)
+        for t in [i * 0.5 for i in range(int(length * 2) + 1)]:
+            d = R + 1.5 + t
+            x = round(cx + math.cos(a) * d / 2)
+            y = round(cy + math.sin(a) * d)
+            if 0 <= x < W and 0 <= y < H:
+                g[y][x] = "c"
+    for (x, y) in ((9, 12), (9, 13), (14, 11), (14, 12)):    # the eyes (not quite level)
+        g[y][x] = "a"
+    for x, y in ((7, 17), (8, 18), (9, 19), (10, 19), (11, 19), (12, 19), (13, 19), (14, 18), (15, 17)):
+        g[y][x] = "a"                           # the smile
+    return ["".join(r) for r in g]
+
+
+SUN_P = kid_sun()
+
+
 # The mirror's people, 8 x 16 (a skin, b clothes, c hair / trousers), drawn
 # front (down), back (up), left and right, two steps each.
 def person(hair, face_down, body, legs2=None):
@@ -705,15 +744,25 @@ def main():
     wave[0:3] = ["....cccc...a.a..", "...cccccc..aaa..", "...caaaac...aa.."]
     halves = []
     for nm, sp in (("psue", SUE_P), ("phal", HAL_P), ("pmaria", MARIA_P), ("pkid", KID_P),
-                   ("ptable", TABLE_P), ("pwave", wave)):
+                   ("ptable", TABLE_P), ("pwave", wave), ("psun", SUN_P)):
         w = len(sp[0])
         sp = [r_ + "." * ((-w) % 8) for r_ in sp]
         halves += [(nm + "t", sp[:16]), (nm + "b", sp[16:32])]
     # the storm's block (bank 8) holds the potluck's people too
     block_gfx(S_TILES, [("bolt0", BOLT[0]), ("bolt1", BOLT[1])] + halves, "stormgfx", "sfont", 72)
+    # the TVs' glow on the floor (16 x 16, two flickers; down for a TV on
+    # a top wall, up for one on a bottom wall)
+    glow = [
+        ["b.b.b.b.b.b.b.b.", ".b.b.b.b.b.b.b.b", "b.b.b.b.b.b.b.b.", "..b.b.b.b.b.b...", ".b...b...b...b..",
+         "...b...b...b....", ".b.....b.....b..", "....b.....b.....", "..b.........b...", "......b.........",
+         "................", "........b.......", "................", "................", "................",
+         "................"],
+    ]
+    glow.append([r[1:] + r[:1] for r in glow[0][:3]] + [r[::-1] for r in glow[0][3:]])
+    glows = [("mglowd0", glow[0]), ("mglowd1", glow[1]), ("mglowu0", glow[0][::-1]), ("mglowu1", glow[1][::-1])]
     mirror_gfx([(f"marthur{i}", f) for i, f in enumerate(ARTHUR_M)]
                + [(f"mkid{i}", f) for i, f in enumerate(PIXELKID_M)]
-               + [("msue", SUE_M), ("mhal", HAL_M), ("mmaria", MARIA_M)])
+               + [("msue", SUE_M), ("mhal", HAL_M), ("mmaria", MARIA_M)] + glows)
 
     print(f"wrote {GFX.relative_to(ROOT)}/: font, padp, padc, ball, ballcut0-4, garb0-1, spark0-2, porch")
 

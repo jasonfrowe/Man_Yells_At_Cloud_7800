@@ -45,9 +45,9 @@ emu.register_frame_done(function()
       -- so the score's gone past 9 too)
       if day == 3 and mm:read_u8(0xED) >= 16 and f % 20 == 0 then sw = 1 - sw end
       local crashed = mm:read_u8(0xF8) ~= 0 or (day == 2 and mm:read_u8(0x2208) ~= 0)
-        or (day == 3 and mm:read_u8(0x220A) > 160)
+        or (day == 3 and mm:read_u8(0x220F) ~= 0)
       if crashed then gl = f; print(string.format("day %d: the slop ROM crashed", day)) end
-    elseif f == gl + 300 then push({A}); phase = "review"
+    elseif f == gl + 450 then push({A}); phase = "review"
     end
   elseif phase == "review" and idle and ctrl == 0x43 then
     push(REVIEW); phase = "posted"; t0 = f

@@ -65,17 +65,17 @@ emu.register_frame_done(function()
     elseif day == 2 and mm:read_u8(0x2208) ~= 0 then
       gl = f
       print(string.format("frame %d: the ball tunnelled out", f))
-    elseif day == 3 and mm:read_u8(0x2209) >= 5 and mm:read_u8(0x220A) > 160 then
+    elseif day == 3 and mm:read_u8(0x220F) ~= 0 then
       gl = f
-      print(string.format("frame %d: the paddle fills the court", f))
+      print(string.format("frame %d: the court's full of paddle; the ball sticks", f))
     end
   end
-  if gl and f >= gl + 300 and f < gl + 304 then held["P1 Button 1"] = true end
+  if gl and f >= gl + 450 and f < gl + 454 then held["P1 Button 1"] = true end
   for name, field in pairs(fields) do
     if name:match("^P1 ") then field:set_value(held[name] and 1 or 0) end
   end
   if day == 3 then fields["Left Difficulty Switch"]:set_value(sw) end
-  if (hit4 and f == hit4 + 4) or (gl and (f == gl + 40 or f == gl + 260 or f == gl + 330)) then
+  if (hit4 and f == hit4 + 4) or (gl and (f == gl + 40 or f == gl + 400 or f == gl + 480)) then
     manager:machine().screens[":screen"]:snapshot()
   end
   -- (SNAPS, day 2: the tunnelling ball as it wraps)
@@ -86,7 +86,7 @@ emu.register_frame_done(function()
   if os.getenv("KEEPSNAP") and not gl and m():read_u8(0x2209) == 2 and f % 8 == 0 and keepn < 4 then
     keepn = keepn + 1; manager:machine().screens[":screen"]:snapshot()
   end
-  if gl and f == gl + 340 then
+  if gl and f == gl + 490 then
     print(string.format("result %d %d", gl - start, mm:read_u8(0x0172)))
     manager:machine():exit()
   end

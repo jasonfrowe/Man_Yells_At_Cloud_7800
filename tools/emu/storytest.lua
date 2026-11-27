@@ -55,7 +55,8 @@ emu.register_frame_done(function()
     elseif k == 3 then
       if dt > 60 and dt % 30 < 3 then held["P1 Button 2"] = true end
     elseif k == 8 then
-      if dt == 200 or dt == 420 or dt == 620 or dt == 1000 then snap() end
+      if os.getenv("PEEK") and dt % 100 == 0 then print(string.format("peek dt %d: pkt %d pkn %d pkbg %02X", dt, mm:read_u8(0x2200), mm:read_u8(0x2202), mm:read_u8(0x2203))) end
+      if dt == 200 or dt == 560 or dt == 700 or dt == 760 or dt == 1000 or dt == 1120 then snap() end
       if dt > 1150 and dt % 30 < 3 then held["P1 Button 1"] = true end
     elseif k == 7 or (ending and c == 255) then
       if dt == 60 then

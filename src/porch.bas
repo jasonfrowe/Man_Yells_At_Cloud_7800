@@ -347,26 +347,26 @@ pickcheck
   if phrase = t then goto pickagain
   return
 drawphrase
-  if phrase = 0 then plotchars 'NO SOUL!' 0 0 5
-  if phrase = 1 then plotchars 'IT~S JUST PONG!' 0 0 5
-  if phrase = 2 then plotchars '6502 OR DIE!' 0 0 5
-  if phrase = 3 then plotchars 'GET OFF MY CART!' 0 0 5
-  if phrase = 4 then plotchars 'WHERE~S THE MANUAL?' 0 0 5
-  if phrase = 5 then plotchars 'WHO NEEDS 4K HD?' 0 0 5
-  if phrase = 6 then plotchars 'BLOW ON THE CART!' 0 0 5
-  if phrase = 7 then plotchars 'PROSYSTEM FOREVER!' 0 0 5
-  if phrase = 8 then plotchars 'TRAMIEL SHOULD HAVE' 0 0 5 : plotchars 'RELEASED THE 7800!' 0 0 6
-  if phrase = 9 then plotchars 'THE 7800 WOULD HAVE' 0 0 5 : plotchars 'BEAT THE NES!' 0 0 6
-  if phrase = 10 then plotchars 'MARIA DMA IS SPECIAL' 0 0 5
-  if phrase = 11 then plotchars 'POKEY HAD SOUL!' 0 0 5
-  if phrase = 12 then plotchars 'HOLEY DMA ISN~T A' 0 0 5 : plotchars 'BUG, IT~S A FEATURE!' 0 0 6
-  if phrase = 13 then plotchars 'IN MY DAY WE COUNTED' 0 0 5 : plotchars 'EVERY CYCLE!' 0 0 6
-  if phrase = 14 then plotchars 'YOUR ZONES ARE' 0 0 5 : plotchars 'A MESS!' 0 0 6
-  if phrase = 15 then plotchars '128 BYTES OF RAM' 0 0 5 : plotchars 'WAS ENOUGH FOR US!' 0 0 6
-  if phrase = 16 then plotchars 'WHY WON~T THEY REPLY' 0 0 5
-  if phrase = 17 then plotchars 'I MISS THE OLD DAYS' 0 0 5
-  if phrase = 18 then plotchars 'WE USED TO MAKE' 0 0 5 : plotchars 'THINGS TOGETHER...' 0 0 6
-  if phrase = 19 then plotchars 'IS ANYONE OUT THERE?' 0 0 5
+  if phrase = 0 then plotchars 'NO SOUL!' 0 8 5
+  if phrase = 1 then plotchars 'IT~S JUST PONG!' 0 8 5
+  if phrase = 2 then plotchars '6502 OR DIE!' 0 8 5
+  if phrase = 3 then plotchars 'GET OFF MY CART!' 0 8 5
+  if phrase = 4 then plotchars 'WHERE~S THE MANUAL?' 0 8 5
+  if phrase = 5 then plotchars 'WHO NEEDS 4K HD?' 0 8 5
+  if phrase = 6 then plotchars 'BLOW ON THE CART!' 0 8 5
+  if phrase = 7 then plotchars 'PROSYSTEM FOREVER!' 0 8 5
+  if phrase = 8 then plotchars 'TRAMIEL SHOULD HAVE' 0 8 5 : plotchars 'RELEASED THE 7800!' 0 8 6
+  if phrase = 9 then plotchars 'THE 7800 WOULD HAVE' 0 8 5 : plotchars 'BEAT THE NES!' 0 8 6
+  if phrase = 10 then plotchars 'MARIA IS SPECIAL!' 0 8 5
+  if phrase = 11 then plotchars 'POKEY HAD SOUL!' 0 8 5
+  if phrase = 12 then plotchars 'HOLEY DMA ISN~T A' 0 8 5 : plotchars 'BUG, IT~S A FEATURE' 0 8 6
+  if phrase = 13 then plotchars 'IN MY DAY, WE' 0 8 5 : plotchars 'COUNTED CYCLES!' 0 8 6
+  if phrase = 14 then plotchars 'YOUR ZONES ARE' 0 8 5 : plotchars 'A MESS!' 0 8 6
+  if phrase = 15 then plotchars '128 BYTES OF RAM' 0 8 5 : plotchars 'WAS ENOUGH FOR US!' 0 8 6
+  if phrase = 16 then plotchars 'WHY NO REPLIES?' 0 8 5
+  if phrase = 17 then plotchars 'I MISS THE OLD DAYS' 0 8 5
+  if phrase = 18 then plotchars 'WE USED TO MAKE' 0 8 5 : plotchars 'THINGS TOGETHER...' 0 8 6
+  if phrase = 19 then plotchars 'ANYONE OUT THERE?' 0 8 5
   return
 
   rem the scenery: stars, the house, the porch, the yard. (No stars in

@@ -418,6 +418,78 @@ m_door_n
 m_door_r
     rts
 
+; m_glow: each of the room's TVs lights the floor in front of it: a glow
+; sprite (palette 0's colour 2) below a TV on a top wall, above one on a
+; bottom wall; m_glowf (0, 1) its flicker
+m_glowf   = $22B6
+m_glowi   = $22B7
+m_glow
+    ldx m_room
+    lda m_rdoorslo,x
+    sta m_ptr
+    lda m_rdoorshi,x
+    sta m_ptr+1
+    ldy #0
+m_gl_l
+    sty m_glowi
+    lda (m_ptr),y
+    bmi m_gl_r
+    asl
+    asl
+    asl
+    sta temp4               ; x: the column's
+    iny
+    lda (m_ptr),y           ; the row
+    cmp #6
+    bcs m_gl_up
+    adc #1                  ; (below it)
+    asl
+    asl
+    asl
+    asl
+    sta temp5
+    lda #<mglowd0
+    ldx #>mglowd0
+    bne m_gl_p
+m_gl_up
+    sec
+    sbc #1                  ; (above it)
+    asl
+    asl
+    asl
+    asl
+    sta temp5
+    lda #<mglowu0
+    ldx #>mglowu0
+m_gl_p
+    ldy m_glowf
+    beq m_gl_f
+    clc
+    adc #mglowd0_width
+m_gl_f
+    sta temp1
+    stx temp2
+    lda #(0|mglowd0_width_twoscompliment)
+    sta temp3
+    lda #(mglowd0_mode|%01000000)
+    sta temp6
+    lda m_ptr
+    pha
+    lda m_ptr+1
+    pha
+    jsr plotsprite
+    pla
+    sta m_ptr+1
+    pla
+    sta m_ptr
+    lda m_glowi
+    clc
+    adc #5
+    tay
+    bne m_gl_l
+m_gl_r
+    rts
+
 ; ---- the talk ----------------------------------------------------------------
 ; The talk box is the room's rows 9-11, written over with the text (then
 ; redrawn: mirror.bas). m_boxsave keeps the rows, m_boxback puts them back.

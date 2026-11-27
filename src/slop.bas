@@ -23,6 +23,10 @@
   dim padlen = $220A
   dim swlast = $220B
   dim wraps = $220C
+  rem day 3, the court full of paddle: two volleys, then the ball sticks
+  dim padfull = $220D
+  dim fullhits = $220E
+  dim stuckf = $220F
 
   rem ======================================================================
   rem  The slop title screen
@@ -97,7 +101,8 @@ startgame
   score = 0 : combo = 1 : glitch = 0 : combot = 0 : cpuscore = 0
   ghostt = 0 : seenbugs = 0
   exp = 0 : shx = 0 : astx = 0
-  spd = 0 : tunnel = 0 : lostt = 0 : wraps = 0 : padg = 0 : padlen = 28
+  spd = 0 : tunnel = 0 : lostt = 0 : wraps = 0
+  padfull = 0 : fullhits = 0 : stuckf = 0 : padg = 0 : padlen = 28
   gosub readsw : swlast = t
   pady = 90 : cpuy = 90
   gosub showscore
@@ -132,7 +137,8 @@ playloop
   if pady < 20 then pady = 20
   t = 188 - padlen : if pady > t then pady = t
   if night = 3 then gosub swcheck
-  if padg >= 6 then goto hang
+  if padfull then pady = 30
+  if stuckf then goto hang
   gosub cpumove
   if servet then servet = servet - 1 : goto playdraw
   gosub moveball
@@ -159,6 +165,7 @@ skipcpu
   rem and once it's flipped, to keep going
   if night <> 3 then goto nohint
   if padg = 0 then plotchars 'FLIP LEFT DIFFICULTY' 0 0 11 : goto nohint
+  if padfull then goto nohint
   t = frm & 16
   if t then plotchars 'KEEP FLIPPING IT!' 0 12 11
 nohint
@@ -184,7 +191,7 @@ moveball
   if ballx > 156 then ballx = 4
   if bally > 4 then return
   wraps = wraps + 1
-  if wraps >= 4 then lostt = 1 : return
+  if wraps >= 8 then lostt = 1 : return
   bally = 186
   return
 walls
@@ -234,6 +241,8 @@ padmid
   rem 1 + 2 + ... + 128 = 255, and the 8th hit's doubling wraps to 0
 playerhit
   if night = 2 then gosub speedup
+  rem (the full court: the third hit's the one that sticks)
+  if padfull then fullhits = fullhits + 1 : if fullhits >= 3 then stuckf = 1
   t = combo : gosub addpoints
   combo = combo + combo
   rem (days 2 and 3 crash their own way: the combo just sticks)
@@ -284,6 +293,9 @@ swcheck
   gosub readsw
   if t = swlast then return
   swlast = t
+  if padfull then return
+  rem (the sixth flip: six paddles, the court full, top to bottom)
+  if padg = 5 then padfull = 1 : pady = 30 : gosub sndedge : return
   padg = padg + 1 : padlen = padlen + 24
   gosub sndedge
   return
@@ -302,7 +314,7 @@ drawpad
   rem the game hangs
 hang
   rem (drawn as 6 paddles from line 30: the 7th would run off the screen)
-  ballx = 9 : bally = 100 : pady = 30 : padg = 5 : gtime = 0
+  ballx = 9 : pady = 30 : padg = 5 : gtime = 0
   AUDV0 = 0
 hangloop
   restorescreen
@@ -316,7 +328,8 @@ hangloop
   AUDC1 = 7 : AUDF1 = 28 : AUDV1 = 6
   drawscreen
   if switchreset then reboot
-  gtime = gtime + 1
+  rem (300 frames: gtime counts every other one)
+  t = frm & 1 : if t then gtime = gtime + 1
   if gtime < 150 then goto hangloop
   goto crash
 
@@ -428,7 +441,8 @@ startglitch
 
   rem the glitch: the HUD fills with noise, colors and the TIA go wrong
 doglitch
-  gtime = gtime - 1
+  rem (300 frames: gtime counts every other one)
+  t = frm & 1 : if t then gtime = gtime - 1
   t = rand & 15 : t = t + t : dscore[0] = t + 186
   t = rand & 15 : t = t + t : dscore[1] = t + 186
   t = rand & 15 : t = t + t : dscore[2] = t + 186

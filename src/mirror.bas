@@ -68,6 +68,7 @@
   dim mcommit = $22A6
   dim lever = $22A7
   dim paper = $22A8
+  dim mglowf = $22B6
   dim psi = $22A9
   dim pdi = $22AA
   rem kept for the finale: the cards, already punched (1 Sue, 2 Hal,
@@ -117,7 +118,7 @@ mroom
   jsr m_blankall
   jsr m_load
 end
-  P0C1 = $0F : P0C2 = $80 : P0C3 = $0F
+  P0C1 = $0F : P0C2 = $88 : P0C3 = $0F
   P1C1 = $3A : P1C2 = $D4 : P1C3 = $08
   P2C1 = $3A : P2C2 = $56 : P2C3 = $84
   rem the hub: the door (row 6, column 15) once it's open; pixelkid once
@@ -250,6 +251,14 @@ mlever
   rem ---- drawing: the regular, pixelkid, Arthur ----
 mdraw
   if paper then return
+  rem the TVs' glow, flickering (not while the talk's up: rows 9-11)
+  if intalk then goto mdrawg
+  t = rand & 7
+  if t = 0 then mglowf = mglowf ^ 1 : t = rand & 3 : P0C2 = glowcol[t]
+  asm
+  jsr m_glow
+end
+mdrawg
   rem (while talking, no one's drawn over the box: rows 9-11, lines 144 up)
   if intalk then goto mdrawt
   if mnpc = 1 then plotsprite msue 3 mnpcx mnpcy
@@ -586,6 +595,10 @@ rhit
   hits = hits + 1
   sfxid = 3 : goto playsfx
 
+  rem the TVs' light: a CRT's blue, wavering
+  data glowcol
+  $86, $88, $8A, $88
+end
   data rdy
   255, 1, 254, 2
 end

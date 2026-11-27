@@ -225,8 +225,8 @@ end
   rem  THE POTLUCK (prototype 6, bank 8, with the storm): Saturday, 6 PM, the porch at dusk. The
   rem  regulars and pixelkid on the grass, a card table with a CRT, the
   rem  7800 and the dishes. The Cloud comes; Arthur waves instead of
-  rem  yelling; a last light shower; the Cloud parts for the stars and
-  rem  says its last line. (Its people share the storm's graphics block: gen/stormgfx.asm.)
+  rem  yelling; it says its last line, decides its job is done, and comes
+  rem  apart like a bad signal. The sun comes out: a kid drew it. (Its people share the storm's graphics block: gen/stormgfx.asm.)
   rem ======================================================================
 
   dim pkt = $2200
@@ -244,7 +244,7 @@ end
   sfxon = 1 : AUDV0 = 0 : AUDV1 = 0
   pkbg = $46 : BACKGRND = pkbg
   P0C1 = $0F
-  P1C1 = $06 : P1C2 = $0A : P1C3 = $0E
+  P1C1 = $0C : P1C2 = $0A : P1C3 = $0E
   P2C1 = $3A : P2C2 = $E4 : P2C3 = $08
   P3C1 = $3A : P3C2 = $26 : P3C3 = $F4
   P4C1 = $3A : P4C2 = $46 : P4C3 = $02
@@ -257,7 +257,7 @@ end
   plotsprite chair 7 30 112 0 2
   plotsprite ptablet 7 76 112
   plotsprite ptableb 7 76 128
-  plotchars pkline 1 8 2 20
+  plotchars pkline 1 8 5 20
   savescreen
   pkt = 0 : pkcx = 160 : pkn = 0 : fireheld = 1
 
@@ -289,9 +289,9 @@ potloop
 pkstage
   if pkn = 0 then goto pkcome
   if pkn = 1 then goto pkwave
-  if pkn = 2 then goto pkshower
-  if pkn = 3 then goto pkpart
-  goto pkstars
+  if pkn = 2 then goto pkspeak
+  if pkn = 3 then goto pkglitch
+  goto pksun
 pkcome
   gosub pkarthur
   t = frm & 1 : if t then pkcx = pkcx - 1
@@ -311,44 +311,47 @@ pkwave2
   if pkt < 150 then return
   pkn = 2 : pkt = 0
   return
-pkshower
+  rem its last line, typed under it, a letter every 6 frames
+pkspeak
   gosub pkarthur
   gosub pkcloud
-  rem a few drops, falling from under the Cloud
-  for x = 0 to 5
-  t = frm + dropoff[x] : t = t & 63 : t = t + t : t = t + 64
-  u = dropx[x]
-  if t < 176 then plotsprite drop 1 u t
-  next
-  if pkt < 200 then return
+  t = pkt / 6
+  if t < 20 then pkline[t] = stayline[t]
+  if pkt < 210 then return
   pkn = 3 : pkt = 0
   return
-pkpart
-  rem the Cloud thins, and goes up and away: dusk becomes night
+  rem its job's done: it comes apart like a bad signal (jumps, wrong
+  rem colours, gaps, static), and it's gone
+pkglitch
   gosub pkarthur
-  t = frm & 1 : if t then pkcx = pkcx + 1
-  if pkt = 40 then P1C1 = $04 : P1C2 = $06 : P1C3 = $08 : pkbg = $54
-  if pkt = 80 then P1C1 = $02 : P1C2 = $04 : P1C3 = $06 : pkbg = $62
-  if pkt = 120 then pkbg = $80
-  t = frm / 32 : t = t & 1
-  if pkt < 140 then plotsprite cloud0 1 pkcx 8 t 4
+  t = rand & 7 : u = pkt / 32
+  if t < u then goto pkglitch2
+  t = rand & 7 : t = t + pkcx : t = t - 4
+  u = frm / 32 : u = u & 1
+  plotsprite cloud0 1 t 8 u 4
+pkglitch2
+  t = frm & 3
+  if t = 0 then t = rand : P1C2 = t | $08 : t = rand : P1C3 = t | $0C
+  t = rand & 15 : if t = 0 then u = rand & 15 : pkline[u] = rand & $7E
+  AUDC1 = 8 : AUDF1 = rand & 31 : AUDV1 = 5
   if pkt < 150 then return
-  rem (palette 1 is the sky's now: white text, white stars)
-  P1C1 = $0E : P1C2 = $0E : P1C3 = $0E
+  AUDV1 = 0
+  for x = 0 to 19 : pkline[x] = 0 : next
+  rem (palette 1 is the sun's now)
+  P1C1 = $F2 : P1C2 = $1E : P1C3 = $2A
   pkn = 4 : pkt = 0
   return
-pkstars
+  rem the sun comes out (a kid drew it), and it's day
+pksun
   gosub pkarthur
-  plotchars pkstar 1 120 0 1
-  plotchars pkstar 1 16 1 1
-  plotchars pkstar 1 144 3 1
-  plotchars pkstar 1 72 4 1
-  plotchars pkstar 1 40 5 1
-  rem the line, a letter every 6 frames
-  if pkt < 30 then return
-  t = pkt - 30 : t = t / 6
-  if t < 20 then pkline[t] = stayline[t]
-  if pkt > 230 then pkn = 99
+  if pkt = 20 then pkbg = $56
+  if pkt = 40 then pkbg = $86
+  if pkt = 60 then pkbg = $98
+  t = pkt / 2 : t = 64 - t
+  if pkt > 120 then t = 4
+  plotsprite psunt 1 112 t
+  t = t + 16 : plotsprite psunb 1 112 t
+  if pkt > 250 then pkn = 99
   return
 pkcloud
   t = frm / 32 : t = t & 1
@@ -358,13 +361,6 @@ pkarthur
   plotsprite arthur0 2 12 112 0 2
   return
 
-  rem the shower's drops: their places, and how far each is behind
-  data dropx
-  52, 64, 76, 88, 100, 112
-end
-  data dropoff
-  0, 11, 22, 33, 44, 55
-end
   rem "STAY FOR THE MEAL." (centred in 18 of the 20)
   data stayline
   0, 102, 104, 66, 114, 0, 76, 94, 100, 0, 104, 80, 74, 0, 90, 74, 66, 88, 28, 0
@@ -384,9 +380,6 @@ pkscene
   plotchars pksiding 7 0 11 6
   plotchars pkdirt 6 48 11 14
   return
-  data pkstar
-  250
-end
   data pksiding
   230, 230, 230, 230, 230, 230
 end
